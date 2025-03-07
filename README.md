@@ -20,7 +20,7 @@
 
 ### 프로젝트 구조
 - frontend: Vue.js
-- backend: Spring Boot
+- backend: Spring Boot (Java)
 - DB: PostgreSQL (AWS RDS)
 
 
