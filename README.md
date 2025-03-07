@@ -24,3 +24,11 @@
 - DB: PostgreSQL (AWS RDS)
 
 
+### git branch 전략
+- main: 배포용 브랜치
+- develop: 개발용 브랜치
+
+* 기능 별로 잘게 쪼개서 브런치를 만들고 작업하기
+* 브런치 이름은 이름_기능명 으로 작성하기 (ex. khkim_mainPage 개발)
+* 작업이 완료되면 develop 브런치로 PR 보내기 (assignee: khkim, reviewer: khkim)
+* 큰 기능이 개발될 때마다 develop -> main 브런치로 khkim 가 머지 진행.
