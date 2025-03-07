@@ -1,7 +1,7 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
   <Header></Header>
-  <router-view></router-view> <!-- 여기에 템플릿 삽입 ㄱㄱ-->
+  <router-view></router-view>
   <Footer></Footer>
 
 </template>
@@ -15,7 +15,6 @@ export default {
   components: {
     Header,
     Footer,
-
   }
 }
 </script>
