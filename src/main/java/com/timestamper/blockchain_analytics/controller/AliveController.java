@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequestMapping("/api")
 @RestController
-public class TestController {
+public class AliveController {
 
-    @GetMapping("test")
-    public void getTest() {
+    @GetMapping("alive")
+    public void getAliveStatus() {
         log.info("Execute Test Controller");
     }
 }
