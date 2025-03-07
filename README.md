@@ -11,8 +11,9 @@
 
 ### backend 실행 방법
 1. frontend 폴더에서 npm run build 실행
-2. backend 폴더에서 src > main > java > com > blockchain > blockchain > BlockchainApplication.java 실행
-3. http://localhost:8080/ 으로 접속
+2. frontend 폴더에서 npm run serve 실행
+3. backend 폴더에서 src > main > java > com > blockchain > blockchain > BlockchainApplication.java 실행
+4. http://localhost:8080/ 으로 접속
 
 ** backend 실행 시 frontend 서버도 같이 실행되어 있어야 함
 
