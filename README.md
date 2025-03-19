@@ -72,8 +72,8 @@ CREATE TABLE transaction (
      txhash VARCHAR(100) UNIQUE NOT NULL,
      timestamp BIGINT NOT NULL,
      amount NUMERIC(30,10) NOT NULL,
-     denom VARCHAR(20) NOT NULL,
-     dpDenom VARCHAR(20) NOT NULL,
+     denom VARCHAR(100) NOT NULL,
+     dpDenom VARCHAR(30) NOT NULL,
      fromAddress VARCHAR(100) NOT NULL,
      toAddress VARCHAR(100) NOT NULL,
      fromChain VARCHAR(50) NOT NULL,
@@ -83,9 +83,9 @@ CREATE TABLE transaction (
 );
 
 -- 인덱스 추가 (조회 성능 향상)
-CREATE INDEX idx_txhash ON blockchain_transactions(txhash);
-CREATE INDEX idx_from_address ON blockchain_transactions(fromAddress);
-CREATE INDEX idx_to_address ON blockchain_transactions(toAddress);
+CREATE INDEX idx_txhash ON transaction(txhash);
+CREATE INDEX idx_from_address ON transaction(fromAddress);
+CREATE INDEX idx_to_address ON transaction(toAddress);
 ```
 
 
