@@ -1,10 +1,11 @@
 package com.timestamper.blockchain_analytics.controller;
 
+import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountDTO;
+import com.timestamper.blockchain_analytics.dto.TransactionFilteredLatestDTO;
+import com.timestamper.blockchain_analytics.dto.TransactionFilteredVolumeDTO;
 import com.timestamper.blockchain_analytics.service.TransactionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,7 +21,22 @@ public class TransactionController {
         return transactionService.getTokens();
     }
 
+    @GetMapping("getNodeInfos/volume")
+    public List<TransactionFilteredVolumeDTO> getTransactionsFilteredByVolume(@RequestParam String token) {
+        return transactionService.getTransactionFilteredVolume(token);
+    }
 
+    @GetMapping("getNodeInfos/latest")
+    public List<TransactionFilteredLatestDTO> getTransactionsFilteredByLatest(@RequestParam String token) {
+        return transactionService.getTransactionFilteredLatest(token);
+    }
+
+    @GetMapping("getNodeInfos/amount")
+    public List<TransactionFilteredAmountDTO> getTransactionsFilteredByAmount(@RequestParam String token) {
+        return transactionService.getTransactionFilteredAmount(token);
+    }
+
+    // TODO 클릭노드의(수신자, 토큰 정보 이용) 최신 transaction 정보를 가져오는 API 추가
 
 
 }

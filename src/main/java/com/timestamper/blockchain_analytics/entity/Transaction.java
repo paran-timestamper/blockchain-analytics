@@ -32,16 +32,16 @@ public class Transaction {
     @Column(nullable = false)
     private String dpdenom;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "fromaddress")
     private String fromAddress;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "toaddress")
     private String toAddress;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "fromchain")
     private String fromChain;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "tochain")
     private String toChain;
 
     public void BlockchainTransaction(String txhash, String type, Long timestamp, Double amount, String denom, String dpdenom,
