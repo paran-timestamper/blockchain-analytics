@@ -66,7 +66,7 @@
 ## 4️⃣ DB 생성 쿼리
 
 ```sql
-CREATE TABLE blockchain_transactions (
+CREATE TABLE transaction (
      id SERIAL PRIMARY KEY,
      type VARCHAR(20) NOT NULL,
      txhash VARCHAR(100) UNIQUE NOT NULL,
@@ -87,4 +87,7 @@ CREATE INDEX idx_txhash ON blockchain_transactions(txhash);
 CREATE INDEX idx_from_address ON blockchain_transactions(fromAddress);
 CREATE INDEX idx_to_address ON blockchain_transactions(toAddress);
 ```
+
+ㅁㅁㅁㅁ
+dhkdkdkdkdkdk
 
