@@ -87,3 +87,5 @@ CREATE INDEX idx_txhash ON blockchain_transactions(txhash);
 CREATE INDEX idx_from_address ON blockchain_transactions(fromAddress);
 CREATE INDEX idx_to_address ON blockchain_transactions(toAddress);
 ```
+
+
