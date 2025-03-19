@@ -66,7 +66,7 @@
 ## 4️⃣ DB 생성 쿼리
 
 ```sql
-CREATE TABLE blockchain_transactions (
+CREATE TABLE transaction (
      id SERIAL PRIMARY KEY,
      type VARCHAR(20) NOT NULL,
      txhash VARCHAR(100) UNIQUE NOT NULL,
