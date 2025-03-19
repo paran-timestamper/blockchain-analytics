@@ -1,6 +1,6 @@
 <template>
   <div id="nav">
-    Main Headerrrrrrrrrrrrrrrrrrrrrrrrrrrr rtsgzgadsddsz
+    Main Headerrrrrrrrrrrrrrrrrrrrrrrrrrrr rtsgzgadsddssz
   </div>
   <hr/>
 </template>
