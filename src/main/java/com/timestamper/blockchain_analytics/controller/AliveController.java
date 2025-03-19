@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AliveController {
 
     @GetMapping("alive")
-    public void getAliveStatus() {
+    public String getAliveStatus() {
         log.info("Execute Test Controller");
+        return "Alive";
     }
 }
