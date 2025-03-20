@@ -1,6 +1,7 @@
 package com.timestamper.blockchain_analytics.controller;
 
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountDTO;
+import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountResponse;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredLatestDTO;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredVolumeDTO;
 import com.timestamper.blockchain_analytics.service.TransactionService;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/transaction")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -32,7 +33,7 @@ public class TransactionController {
     }
 
     @GetMapping("getNodeInfos/amount")
-    public List<TransactionFilteredAmountDTO> getTransactionsFilteredByAmount(@RequestParam String token) {
+    public TransactionFilteredAmountResponse getTransactionsFilteredByAmount(@RequestParam String token) {
         return transactionService.getTransactionFilteredAmount(token);
     }
 

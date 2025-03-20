@@ -17,7 +17,4 @@ public class TransactionFilteredAmountDTO {
     private String fromAddress; // 거래 주소
     private Double totalAmount; // 총 거래량
     private Double totalValue;  // 총 거래량 * 현재 토큰 가격
-
-
-
 }
