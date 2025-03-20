@@ -13,9 +13,9 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("User API")
-                        .description("사용자 관리 API")
+                        .title("Crypto Transaction API")
+                        .description("Crypto Transaction 관리 API")
                         .version("1.0"))
-                .addTagsItem(new Tag().name("User API").description("사용자 관리 API"));
+                .addTagsItem(new Tag().name("Crypto Transaction API").description("Crypto Transaction 관리 API"));
     }
 }
