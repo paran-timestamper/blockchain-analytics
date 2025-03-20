@@ -6,6 +6,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class CryptoPriceService {
@@ -34,7 +35,9 @@ public class CryptoPriceService {
                     Map<String, Object> cryptoData = (Map<String, Object>) data.get(symbol);
                     Map<String, Object> quote = (Map<String, Object>) cryptoData.get("quote");
                     Map<String, Object> currencyData = (Map<String, Object>) quote.get(currency);
-                    return (Double) currencyData.get("price");
+
+                    return Optional.ofNullable((Double) currencyData.get("price"))
+                            .orElseThrow(() -> new RuntimeException("CoinMarketCap API에 등록되지 않은 코인입니다."));
                 });
     }
 }
