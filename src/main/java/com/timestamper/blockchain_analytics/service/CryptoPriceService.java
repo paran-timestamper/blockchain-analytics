@@ -35,9 +35,7 @@ public class CryptoPriceService {
                     Map<String, Object> cryptoData = (Map<String, Object>) data.get(symbol);
                     Map<String, Object> quote = (Map<String, Object>) cryptoData.get("quote");
                     Map<String, Object> currencyData = (Map<String, Object>) quote.get(currency);
-
-                    return Optional.ofNullable((Double) currencyData.get("price"))
-                            .orElseThrow(() -> new RuntimeException("CoinMarketCap API에 등록되지 않은 코인입니다."));
+                    return (Double) currencyData.get("price");
                 });
     }
 }

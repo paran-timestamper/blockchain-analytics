@@ -18,10 +18,10 @@ public class TokenPriceAPIClient {
 
     public double updatePrice(String symbol, String currency) {
         String token = symbol.split("\\.")[0];
-        log.warn("token = {} ", token);
-
-        price = cryptoPriceService.getCryptoPrice(token, currency).block();
-        log.info("Price of {} in {} is {}, symbol is {}", token, currency, price, symbol);
+        price =  cryptoPriceService.getCryptoPrice(token, currency)
+                .onErrorReturn(0.0)
+                .blockOptional()
+                .orElse(0.0);
 
         return price;
     }
