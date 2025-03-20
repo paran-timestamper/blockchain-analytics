@@ -17,21 +17,40 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    /**
+     * Get all tokens
+     * @return
+     */
     @GetMapping("getTokens")
     public List<String> getTokens() {
         return transactionService.getTokens();
     }
 
+    /**
+     * Get transactions filtered by volume
+     * @param token
+     * @return
+     */
     @GetMapping("getNodeInfos/volume")
     public List<TransactionFilteredVolumeDTO> getTransactionsFilteredByVolume(@RequestParam String token) {
         return transactionService.getTransactionFilteredVolume(token);
     }
 
+    /**
+     * Get transactions filtered by latest
+     * @param token
+     * @return
+     */
     @GetMapping("getNodeInfos/latest")
     public List<TransactionFilteredLatestDTO> getTransactionsFilteredByLatest(@RequestParam String token) {
         return transactionService.getTransactionFilteredLatest(token);
     }
 
+    /**
+     * Get transactions filtered by amount
+     * @param token
+     * @return
+     */
     @GetMapping("getNodeInfos/amount")
     public TransactionFilteredAmountResponse getTransactionsFilteredByAmount(@RequestParam String token) {
         return transactionService.getTransactionFilteredAmount(token);
