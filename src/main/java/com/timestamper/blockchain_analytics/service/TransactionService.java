@@ -33,7 +33,7 @@ public class TransactionService {
                                                      transactionRepository.findByTransactionFilteredAmount(token));
     }
 
-    public List<Transaction> getTransactionFilteredByAddress(String token, String fromAddress) {
+    public List<Transaction> getTransactionByAddress(String token, String fromAddress) {
         return transactionRepository.findByDpdenomAndFromAddressOrderByTimestampDesc(token, fromAddress);
     }
 }
