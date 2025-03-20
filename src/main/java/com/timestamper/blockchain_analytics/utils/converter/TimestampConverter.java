@@ -1,4 +1,4 @@
-package com.timestamper.blockchain_analytics.utils;
+package com.timestamper.blockchain_analytics.utils.converter;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

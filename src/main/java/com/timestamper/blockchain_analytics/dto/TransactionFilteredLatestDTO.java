@@ -1,6 +1,6 @@
 package com.timestamper.blockchain_analytics.dto;
 
-import com.timestamper.blockchain_analytics.utils.TimestampConverter;
+import com.timestamper.blockchain_analytics.utils.converter.TimestampConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package com.timestamper.blockchain_analytics.dto;
 
-import com.timestamper.blockchain_analytics.utils.TokenPriceAPIClient;
+import com.timestamper.blockchain_analytics.utils.api.TokenPriceAPIClient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
