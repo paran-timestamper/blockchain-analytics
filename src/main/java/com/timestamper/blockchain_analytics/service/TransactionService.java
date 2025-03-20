@@ -1,9 +1,9 @@
 package com.timestamper.blockchain_analytics.service;
 
-import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountDTO;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountResponse;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredLatestDTO;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredVolumeDTO;
+import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.repository.TransactionRepository;
 import com.timestamper.blockchain_analytics.utils.api.TokenPriceAPIClient;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class TransactionService {
     private final TokenPriceAPIClient tokenPriceAPIClient;
     private final TransactionRepository transactionRepository;
 
-    public List<String> getTokens() { return transactionRepository.findDistinctDpdenom(); }
+    public List<String> getAllTokens() { return transactionRepository.findDistinctDpdenom(); }
 
     public List<TransactionFilteredVolumeDTO> getTransactionFilteredVolume(String token) {
         return transactionRepository.findByTransactionFilteredVolume(token);
@@ -31,5 +31,9 @@ public class TransactionService {
     public TransactionFilteredAmountResponse getTransactionFilteredAmount(String token) {
         return new TransactionFilteredAmountResponse(tokenPriceAPIClient.updatePrice(token, "USD"),
                                                      transactionRepository.findByTransactionFilteredAmount(token));
+    }
+
+    public List<Transaction> getTransactionFilteredByAddress(String token, String fromAddress) {
+        return transactionRepository.findByDpdenomAndFromAddressOrderByTimestampDesc(token, fromAddress);
     }
 }

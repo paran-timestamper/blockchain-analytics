@@ -1,9 +1,9 @@
 package com.timestamper.blockchain_analytics.controller;
 
-import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountDTO;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountResponse;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredLatestDTO;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredVolumeDTO;
+import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +21,9 @@ public class TransactionController {
      * Get all tokens
      * @return
      */
-    @GetMapping("getTokens")
+    @GetMapping("tokens")
     public List<String> getTokens() {
-        return transactionService.getTokens();
+        return transactionService.getAllTokens();
     }
 
     /**
@@ -31,7 +31,7 @@ public class TransactionController {
      * @param token
      * @return
      */
-    @GetMapping("getNodeInfos/volume")
+    @GetMapping("nodeInfos/volume")
     public List<TransactionFilteredVolumeDTO> getTransactionsFilteredByVolume(@RequestParam String token) {
         return transactionService.getTransactionFilteredVolume(token);
     }
@@ -41,7 +41,7 @@ public class TransactionController {
      * @param token
      * @return
      */
-    @GetMapping("getNodeInfos/latest")
+    @GetMapping("nodeInfos/latest")
     public List<TransactionFilteredLatestDTO> getTransactionsFilteredByLatest(@RequestParam String token) {
         return transactionService.getTransactionFilteredLatest(token);
     }
@@ -51,12 +51,20 @@ public class TransactionController {
      * @param token
      * @return
      */
-    @GetMapping("getNodeInfos/amount")
+    @GetMapping("nodeInfos/amount")
     public TransactionFilteredAmountResponse getTransactionsFilteredByAmount(@RequestParam String token) {
         return transactionService.getTransactionFilteredAmount(token);
     }
 
-    // TODO 클릭노드의(수신자, 토큰 정보 이용) 최신 transaction 정보를 가져오는 API 추가
-
+    /**
+     * Get transactions filtered by address
+     * @param token
+     * @param fromAddress
+     * @return
+     */
+    @GetMapping("infos/address")
+    public List<Transaction> getTransactionsFilteredByAddress(@RequestParam String token, @RequestParam String fromAddress) {
+        return transactionService.getTransactionFilteredByAddress(token, fromAddress);
+    }
 
 }
