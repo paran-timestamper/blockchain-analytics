@@ -88,4 +88,5 @@ CREATE INDEX idx_from_address ON transaction(fromAddress);
 CREATE INDEX idx_to_address ON transaction(toAddress);
 ```
 
-
+## API 명세 보는법
+- backend 서버 실행 후 다음 주소로 접근 (http://localhost:8080/swagger-ui.html)
