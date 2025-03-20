@@ -20,7 +20,3 @@ spring:
 coinmarketcap:
     api:
         key: 92f9eaef-5c0d-47f1-ab78-cce21448214e
-
-dune:
-    api:
-        key: TidUKUx6oUPMRHWIyfuzVNyjI8kzSNDi
