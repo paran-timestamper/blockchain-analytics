@@ -16,3 +16,7 @@ spring:
             hibernate:
                 format_sql: true
         open-in-view: false
+
+coinmarketcap:
+    api:
+        key: 92f9eaef-5c0d-47f1-ab78-cce21448214e

@@ -46,4 +46,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             LIMIT 100
         """)
     List<TransactionFilteredAmountDTO> findByTransactionFilteredAmount(@Param("token") String token);
+
+    List<Transaction> findByDpdenomAndFromAddressOrderByTimestampDesc(String dpdenom, String fromAddress);
+
 }
