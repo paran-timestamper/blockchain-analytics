@@ -28,6 +28,7 @@ public class TransactionController {
 
     /**
      * Get transactions filtered by volume
+     * 트랜잭션량
      * @param token
      * @return
      */
@@ -38,6 +39,7 @@ public class TransactionController {
 
     /**
      * Get transactions filtered by latest
+     * 최신순
      * @param token
      * @return
      */
@@ -48,6 +50,7 @@ public class TransactionController {
 
     /**
      * Get transactions filtered by amount
+     * 거래 대금
      * @param token
      * @return
      */
