@@ -3,20 +3,20 @@
     <!-- 상단 UI 버튼 -->
     <div class="controls">
       <div class="dropdown">
-        <button @click="toggleTokenCategory" :class="{ active: selectedToken !== '' }">TOKEN</button>
+        <button class="token-button" @click="toggleTokenCategory">{{ selectedToken || 'TOKEN' }}</button>
         <div v-if="showTokenCategory" class="dropdown-content vertical">
-          <button @click="selectToken('ETH')">ETH</button>
-          <button @click="selectToken('BTC')">BTC</button>
-          <button @click="selectToken('USDT')">USDT</button>
+          <button class="dropdown-option" @click="selectToken('ETH')">ETH</button>
+          <button class="dropdown-option" @click="selectToken('BTC')">BTC</button>
+          <button class="dropdown-option" @click="selectToken('USDT')">USDT</button>
         </div>
       </div>
 
       <div class="dropdown">
-        <button @click="toggleFilterCategory" :class="{ active: selectedFilter !== '' }" style="width:105px">FILTER</button>
+        <button class="token-button" @click="toggleFilterCategory">{{ selectedFilter || 'FILTER' }}</button>
         <div v-if="showFilterCategory" class="dropdown-content vertical">
-          <button @click="selectFilter('거래 대금')">거래 대금</button>
-          <button @click="selectFilter('트랜잭션량')">트랜잭션량</button>
-          <button @click="selectFilter('최신순')">최신순</button>
+          <button class="dropdown-option" @click="selectFilter('거래 대금')">거래 대금</button>
+          <button class="dropdown-option" @click="selectFilter('트랜잭션량')">트랜잭션량</button>
+          <button class="dropdown-option" @click="selectFilter('최신순')">최신순</button>
         </div>
       </div>
     </div>

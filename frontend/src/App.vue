@@ -7,9 +7,9 @@
           <span class="logo-text">TimeStamper</span>
         </div>
         <nav class="nav-links">
-          <span class="nav-button disabled">Charts</span>
+          <router-link to="/charts" class="nav-button">Charts</router-link>
           <router-link to="/visual" class="nav-button">Visual</router-link>
-          <span class="nav-button disabled">Heatmap</span>
+          <router-link to="/heatmap" class="nav-button">Heatmap</router-link>
 
           <div class="dropdown">
             <button class="nav-button" @click="toggleTop3">TOP 3 Address</button>
@@ -54,6 +54,24 @@ export default {
   font-family: 'Roboto Mono', monospace;
   display: flex;
   flex-direction: column;
+}
+
+.nav-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: #1f2630;
+  color: #c7d2fe;
+  text-decoration: none;
+  transition: 0.2s;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+
+.nav-button:hover {
+  background: #2196f3;
+  color: white;
 }
 
 .arkham-header {
