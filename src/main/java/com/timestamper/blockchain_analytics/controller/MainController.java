@@ -1,5 +1,6 @@
 package com.timestamper.blockchain_analytics.controller;
 
+import com.timestamper.blockchain_analytics.dto.news.NewsResponseDto;
 import com.timestamper.blockchain_analytics.service.crypto.CryptoNewsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,7 @@ public class MainController {
     private final CryptoNewsService cryptoNewsService;
 
     @GetMapping("/")
-    public String getMainInfo() {
+    public NewsResponseDto getMainInfo() {
         return cryptoNewsService.getNews();
     }
 }

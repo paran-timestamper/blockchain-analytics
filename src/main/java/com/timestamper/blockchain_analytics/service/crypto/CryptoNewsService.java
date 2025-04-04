@@ -1,5 +1,6 @@
 package com.timestamper.blockchain_analytics.service.crypto;
 
+import com.timestamper.blockchain_analytics.dto.news.NewsResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +19,7 @@ public class CryptoNewsService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public String getNews() {
+    public NewsResponseDto getNews() {
         String url = UriComponentsBuilder.fromUriString(baseUrl)
                 .queryParam("q", keyword)
                 .queryParam("lang", "en")
@@ -26,6 +27,6 @@ public class CryptoNewsService {
                 .queryParam("token", apiKey)
                 .toUriString();
 
-        return restTemplate.getForObject(url, String.class);
+        return restTemplate.getForObject(url, NewsResponseDto.class);
     }
 }
