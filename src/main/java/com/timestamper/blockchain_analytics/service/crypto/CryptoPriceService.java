@@ -1,4 +1,4 @@
-package com.timestamper.blockchain_analytics.service;
+package com.timestamper.blockchain_analytics.service.crypto;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

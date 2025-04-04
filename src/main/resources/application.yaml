@@ -17,6 +17,19 @@ spring:
                 format_sql: true
         open-in-view: false
 
+# 코인 실시간 가격 api
 coinmarketcap:
     api:
         key: 92f9eaef-5c0d-47f1-ab78-cce21448214e
+
+# 코인 뉴스 기사 api
+# https://gnews.io/dashboard
+# 하루에 100개까지의 기사를 가져올 수 있다. (free plan)
+gnews:
+    api:
+        key: fa046cc8df54645fc630e6661a27198e
+        base-url: https://gnews.io/api/v4/search
+
+
+
+
