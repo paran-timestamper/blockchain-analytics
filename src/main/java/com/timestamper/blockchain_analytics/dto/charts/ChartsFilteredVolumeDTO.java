@@ -1,11 +1,11 @@
-package com.timestamper.blockchain_analytics.dto;
+package com.timestamper.blockchain_analytics.dto.charts;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class TransactionFilteredVolumeDTO {
+public class ChartsFilteredVolumeDTO {
     private String fromAddress;
     private Long count;
 }
