@@ -1,4 +1,4 @@
-package com.timestamper.blockchain_analytics.dto;
+package com.timestamper.blockchain_analytics.dto.charts;
 
 import com.timestamper.blockchain_analytics.utils.converter.TimestampConverter;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class TransactionFilteredLatestDTO {
+public class ChartsFilteredLatestDTO {
 
-    public TransactionFilteredLatestDTO(String txhash, String fromAddress, String toAddress, Double amount, String dpdenom, Long timestamp) {
+    public ChartsFilteredLatestDTO(String txhash, String fromAddress, String toAddress, Double amount, String dpdenom, Long timestamp) {
         this.txhash = txhash;
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;

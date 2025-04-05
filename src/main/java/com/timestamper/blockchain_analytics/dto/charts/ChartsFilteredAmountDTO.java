@@ -1,4 +1,4 @@
-package com.timestamper.blockchain_analytics.dto;
+package com.timestamper.blockchain_analytics.dto.charts;
 
 import com.timestamper.blockchain_analytics.utils.api.TokenPriceAPIClient;
 import lombok.AllArgsConstructor;
@@ -6,9 +6,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class TransactionFilteredAmountDTO {
+public class ChartsFilteredAmountDTO {
 
-    public TransactionFilteredAmountDTO(String fromAddress, Double totalAmount) {
+    public ChartsFilteredAmountDTO(String fromAddress, Double totalAmount) {
         this.fromAddress = fromAddress;
         this.totalAmount = totalAmount;
         this.totalValue = totalAmount * TokenPriceAPIClient.getPrice();

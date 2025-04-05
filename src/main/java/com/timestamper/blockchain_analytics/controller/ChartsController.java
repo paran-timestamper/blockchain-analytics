@@ -1,10 +1,10 @@
 package com.timestamper.blockchain_analytics.controller;
 
-import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountResponse;
-import com.timestamper.blockchain_analytics.dto.TransactionFilteredLatestDTO;
-import com.timestamper.blockchain_analytics.dto.TransactionFilteredVolumeDTO;
+import com.timestamper.blockchain_analytics.dto.charts.ChartsFilteredAmountResponse;
+import com.timestamper.blockchain_analytics.dto.charts.ChartsFilteredLatestDTO;
+import com.timestamper.blockchain_analytics.dto.charts.ChartsFilteredVolumeDTO;
 import com.timestamper.blockchain_analytics.entity.Transaction;
-import com.timestamper.blockchain_analytics.service.TransactionService;
+import com.timestamper.blockchain_analytics.service.ChartsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +13,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/transaction")
-public class TransactionController {
+public class ChartsController {
 
-    private final TransactionService transactionService;
+    private final ChartsService chartsService;
 
     /**
      * Get transactions filtered by volume
@@ -24,8 +24,8 @@ public class TransactionController {
      * @return
      */
     @GetMapping("nodeInfos/volume")
-    public List<TransactionFilteredVolumeDTO> getTransactionsFilteredByVolume(@RequestParam String token) {
-        return transactionService.getTransactionFilteredVolume(token);
+    public List<ChartsFilteredVolumeDTO> getChartsFilteredByVolume(@RequestParam String token) {
+        return chartsService.getChartsFilteredVolume(token);
     }
 
     /**
@@ -35,8 +35,8 @@ public class TransactionController {
      * @return
      */
     @GetMapping("nodeInfos/latest")
-    public List<TransactionFilteredLatestDTO> getTransactionsFilteredByLatest(@RequestParam String token) {
-        return transactionService.getTransactionFilteredLatest(token);
+    public List<ChartsFilteredLatestDTO> getChartsFilteredByLatest(@RequestParam String token) {
+        return chartsService.getChartsFilteredLatest(token);
     }
 
     /**
@@ -46,8 +46,8 @@ public class TransactionController {
      * @return
      */
     @GetMapping("nodeInfos/amount")
-    public TransactionFilteredAmountResponse getTransactionsFilteredByAmount(@RequestParam String token) {
-        return transactionService.getTransactionFilteredAmount(token);
+    public ChartsFilteredAmountResponse getChartsFilteredByAmount(@RequestParam String token) {
+        return chartsService.getChartsFilteredAmount(token);
     }
 
     /**
@@ -57,8 +57,8 @@ public class TransactionController {
      * @return
      */
     @GetMapping("infos/address")
-    public List<Transaction> getTransactionsByAddress(@RequestParam String token, @RequestParam String fromAddress) {
-        return transactionService.getTransactionByAddress(token, fromAddress);
+    public List<Transaction> getChartsByAddress(@RequestParam String token, @RequestParam String fromAddress) {
+        return chartsService.getChartsByAddress(token, fromAddress);
     }
 
     // TODO infos/address 필터링 기능
