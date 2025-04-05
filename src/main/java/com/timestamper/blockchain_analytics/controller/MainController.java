@@ -14,6 +14,10 @@ public class MainController {
 
     private final CryptoNewsService cryptoNewsService;
 
+    /**
+     * @description Main > 뉴스 기사 검색
+     * @return NewsResponseDto
+     */
     @GetMapping("/")
     public NewsResponseDto getMainInfo() {
         return cryptoNewsService.getNews();

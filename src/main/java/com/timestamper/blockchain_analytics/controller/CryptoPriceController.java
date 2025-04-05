@@ -14,6 +14,12 @@ import reactor.core.publisher.Mono;
 public class CryptoPriceController {
     private final CryptoPriceService cryptoPriceService;
 
+    /**
+     * @param symbol
+     * @param currency
+     * @return Crypto price in the specified currency
+     * @description Get the current price of a cryptocurrency in a specified currency
+     */
     @GetMapping("/price")
     public Mono<Double> getCryptoPrice(
             @RequestParam String symbol,
