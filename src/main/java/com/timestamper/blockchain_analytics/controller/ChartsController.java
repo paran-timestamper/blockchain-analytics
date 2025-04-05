@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/transaction")
+@RequestMapping("/api/charts")
 public class ChartsController {
 
     private final ChartsService chartsService;
@@ -23,7 +23,7 @@ public class ChartsController {
      * @param token
      * @return
      */
-    @GetMapping("nodeInfos/volume")
+    @GetMapping("infos/volume")
     public List<ChartsFilteredVolumeDTO> getChartsFilteredByVolume(@RequestParam String token) {
         return chartsService.getChartsFilteredVolume(token);
     }
@@ -34,7 +34,7 @@ public class ChartsController {
      * @param token
      * @return
      */
-    @GetMapping("nodeInfos/latest")
+    @GetMapping("infos/latest")
     public List<ChartsFilteredLatestDTO> getChartsFilteredByLatest(@RequestParam String token) {
         return chartsService.getChartsFilteredLatest(token);
     }
@@ -45,7 +45,7 @@ public class ChartsController {
      * @param token
      * @return
      */
-    @GetMapping("nodeInfos/amount")
+    @GetMapping("infos/amount")
     public ChartsFilteredAmountResponse getChartsFilteredByAmount(@RequestParam String token) {
         return chartsService.getChartsFilteredAmount(token);
     }
