@@ -1,6 +1,6 @@
-package com.timestamper.blockchain_analytics.dto.news.response;
+package com.timestamper.blockchain_analytics.dto.main.news.response;
 
-import com.timestamper.blockchain_analytics.dto.news.NewsDto;
+import com.timestamper.blockchain_analytics.dto.main.news.NewsDto;
 import lombok.Data;
 
 import java.util.List;
