@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/main")
+@RequestMapping("/api/news")
 public class NewsController {
 
     private final CryptoNewsAPI cryptoNewsAPI;
@@ -18,7 +18,7 @@ public class NewsController {
      * @description Main > 뉴스 기사 검색
      * @return NewsResponseDto
      */
-    @GetMapping("/news")
+    @GetMapping("")
     public NewsResponseDto getNews() {
         return cryptoNewsAPI.getNews();
     }

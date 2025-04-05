@@ -20,7 +20,7 @@ public class CryptoPriceController {
      * @param request
      * @return
      */
-    @GetMapping("/cryptoPrice")
+    @GetMapping("/price")
     public Mono<Double> getCryptoPrice(@RequestBody CryptoPriceRequestDTO request) {
         String currency = request.getCurrency() != null ? request.getCurrency() : "USD";
         return cryptoPriceService.getCryptoPrice(request.getSymbols(), currency);
@@ -31,7 +31,7 @@ public class CryptoPriceController {
      * @param request
      * @return
      */
-    @GetMapping("/cryptoPrices")
+    @GetMapping("/prices")
     public Mono<Map<String, Double>> getCryptoPrices(@RequestBody CryptoPricesRequestDTO request) {
         String currency = request.getCurrency() != null ? request.getCurrency() : "USD";
         return cryptoPriceService.getMultipleCryptoPrices(request.getSymbols(), currency);
