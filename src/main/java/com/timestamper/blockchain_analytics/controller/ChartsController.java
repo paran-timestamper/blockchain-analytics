@@ -23,4 +23,25 @@ public class ChartsController {
         return chartsService.getChartsFilteredLatest(chartsTransactionRequest);
     }
 
+    /**
+     * @description Charts > 거래대금 데이터 (paging적용) - 연, 월, 일 필터링
+     * @param chartsTransactionRequest
+     * @return ChartsTransactionResponse
+     */
+    @PostMapping("infos/transactionPrice")
+    public ChartsTransactionResponse getChartsFilteredByPrice(@RequestBody ChartsTransactionRequest chartsTransactionRequest) {
+        return chartsService.getChartsFilteredByPrice(chartsTransactionRequest);
+    }
+
+//    TODO transaction 필터링은 출력이 다른방식으로 되어야할거 같다.
+//    /**
+//     * @description Charts > 트랜잭션량 데이터 (paging적용) - 연, 월, 일 필터링
+//     * @param chartsTransactionRequest
+//     * @return ChartsTransactionResponse
+//     */
+//    @PostMapping("infos/transactionAmount")
+//    public ChartsTransactionResponse getChartsFilteredByTransactionAmount(@RequestBody ChartsTransactionRequest chartsTransactionRequest) {
+//        return chartsService.getChartsFilteredByAmount(chartsTransactionRequest);
+//    }
+
 }

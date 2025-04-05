@@ -1,8 +1,6 @@
 package com.timestamper.blockchain_analytics.dto.charts;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +11,10 @@ public class TransactionInfoDTO {
     private String txHash;
     private String fromAddress;
     private String toAddress;
-    private Double value;
+    private double value;
+    private double totalPrice;
     private String dpDenom;
     private LocalDateTime convertedDate;
 }
+
+

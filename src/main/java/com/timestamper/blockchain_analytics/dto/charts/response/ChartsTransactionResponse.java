@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ChartsTransactionResponse {
     private List<TransactionInfoDTO> transactions;
+    private double currentTokenPrice;
     private int page;
     private int size;
     private long totalCount;
