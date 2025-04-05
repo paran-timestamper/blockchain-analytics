@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/main")
-public class MainController {
+public class NewsController {
 
     private final CryptoNewsAPI cryptoNewsAPI;
 
