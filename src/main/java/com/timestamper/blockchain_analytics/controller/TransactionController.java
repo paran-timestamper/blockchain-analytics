@@ -18,15 +18,6 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     /**
-     * Get all tokens
-     * @return
-     */
-    @GetMapping("tokens")
-    public List<String> getTokens() {
-        return transactionService.getAllTokens();
-    }
-
-    /**
      * Get transactions filtered by volume
      * 트랜잭션량
      * @param token
