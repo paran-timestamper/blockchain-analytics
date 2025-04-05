@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ChartsTransactionResponse {
+public class ChartsTransactionResponseDTO {
     private List<TransactionInfoDTO> transactions;
     private double currentTokenPrice;
     private int page;

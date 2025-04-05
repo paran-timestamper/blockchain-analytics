@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface ChartsRepository extends PagingAndSortingRepository<Transaction, Long> {
@@ -151,4 +152,7 @@ public interface ChartsRepository extends PagingAndSortingRepository<Transaction
             @Param("currentTokenPrice") double currentTokenPrice,
             Pageable pageable
     );
+
+
+    List<Transaction> findByFromAddressOrderByTimestampDesc(String fromAddress);
 }

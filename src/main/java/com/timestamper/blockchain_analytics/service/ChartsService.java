@@ -1,8 +1,10 @@
 package com.timestamper.blockchain_analytics.service;
 
 import com.timestamper.blockchain_analytics.dto.charts.TransactionInfoDTO;
-import com.timestamper.blockchain_analytics.dto.charts.request.ChartsTransactionRequest;
-import com.timestamper.blockchain_analytics.dto.charts.response.ChartsTransactionResponse;
+import com.timestamper.blockchain_analytics.dto.charts.request.AddressTransactionRequestDTO;
+import com.timestamper.blockchain_analytics.dto.charts.request.ChartsTransactionRequestDTO;
+import com.timestamper.blockchain_analytics.dto.charts.response.ChartsTransactionResponseDTO;
+import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.repository.ChartsRepository;
 import com.timestamper.blockchain_analytics.utils.api.TokenPriceAPIClient;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,30 +25,30 @@ public class ChartsService {
     private final ChartsRepository chartsRepository;
     private final TokenPriceAPIClient tokenPriceAPIClient;
 
-    public ChartsTransactionResponse getChartsFilteredLatest(ChartsTransactionRequest chartsTransactionRequest) {
-        Pageable pageable = getPageable(chartsTransactionRequest);
-        double currentTokenPrice = tokenPriceAPIClient.updatePrice(chartsTransactionRequest.getToken(), CURRENCY);
-        Page<TransactionInfoDTO> pageResult = getResultByLatest(chartsTransactionRequest, pageable, currentTokenPrice);
+    public ChartsTransactionResponseDTO getChartsFilteredLatest(ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
+        Pageable pageable = getPageable(chartsTransactionRequestDTO);
+        double currentTokenPrice = tokenPriceAPIClient.updatePrice(chartsTransactionRequestDTO.getToken(), CURRENCY);
+        Page<TransactionInfoDTO> pageResult = getResultByLatest(chartsTransactionRequestDTO, pageable, currentTokenPrice);
 
-        return new ChartsTransactionResponse(
+        return new ChartsTransactionResponseDTO(
                 pageResult.getContent(),
                 currentTokenPrice,
-                chartsTransactionRequest.getPage(),
-                chartsTransactionRequest.getSize(),
+                chartsTransactionRequestDTO.getPage(),
+                chartsTransactionRequestDTO.getSize(),
                 pageResult.getTotalElements()
         );
     }
 
-    private Page<TransactionInfoDTO> getResultByLatest(ChartsTransactionRequest chartsTransactionRequest, Pageable pageable, double currentTokenPrice) {
+    private Page<TransactionInfoDTO> getResultByLatest(ChartsTransactionRequestDTO chartsTransactionRequestDTO, Pageable pageable, double currentTokenPrice) {
         Page<TransactionInfoDTO> pageResult;
 
         // 날짜 필터링이 있는 경우
-        if (chartsTransactionRequest.getStartDate() != null && chartsTransactionRequest.getEndDate() != null) {
-            LocalDateTime startDate = chartsTransactionRequest.getStartDate().atStartOfDay();
-            LocalDateTime endDate = chartsTransactionRequest.getEndDate().plusDays(1).atStartOfDay();
+        if (chartsTransactionRequestDTO.getStartDate() != null && chartsTransactionRequestDTO.getEndDate() != null) {
+            LocalDateTime startDate = chartsTransactionRequestDTO.getStartDate().atStartOfDay();
+            LocalDateTime endDate = chartsTransactionRequestDTO.getEndDate().plusDays(1).atStartOfDay();
 
             pageResult = chartsRepository.findFilteredTransactionsByLatestAndDate(
-                    chartsTransactionRequest.getToken(),
+                    chartsTransactionRequestDTO.getToken(),
                     currentTokenPrice,
                     startDate,
                     endDate,
@@ -53,7 +56,7 @@ public class ChartsService {
             );
         } else {
             pageResult = chartsRepository.findFilteredTransactionsByLatest(
-                    chartsTransactionRequest.getToken(),
+                    chartsTransactionRequestDTO.getToken(),
                     currentTokenPrice,
                     pageable
             );
@@ -61,30 +64,30 @@ public class ChartsService {
         return pageResult;
     }
 
-    public ChartsTransactionResponse getChartsFilteredByPrice(ChartsTransactionRequest chartsTransactionRequest) {
-        Pageable pageable = getPageable(chartsTransactionRequest);
-        double currentTokenPrice = tokenPriceAPIClient.updatePrice(chartsTransactionRequest.getToken(), CURRENCY);
-        Page<TransactionInfoDTO> pageResult = getResultByPrice(chartsTransactionRequest, pageable, currentTokenPrice);
+    public ChartsTransactionResponseDTO getChartsFilteredByPrice(ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
+        Pageable pageable = getPageable(chartsTransactionRequestDTO);
+        double currentTokenPrice = tokenPriceAPIClient.updatePrice(chartsTransactionRequestDTO.getToken(), CURRENCY);
+        Page<TransactionInfoDTO> pageResult = getResultByPrice(chartsTransactionRequestDTO, pageable, currentTokenPrice);
 
-        return new ChartsTransactionResponse(
+        return new ChartsTransactionResponseDTO(
                 pageResult.getContent(),
                 currentTokenPrice,
-                chartsTransactionRequest.getPage(),
-                chartsTransactionRequest.getSize(),
+                chartsTransactionRequestDTO.getPage(),
+                chartsTransactionRequestDTO.getSize(),
                 pageResult.getTotalElements()
         );
     }
 
-    private Page<TransactionInfoDTO> getResultByPrice(ChartsTransactionRequest chartsTransactionRequest, Pageable pageable, double currentTokenPrice) {
+    private Page<TransactionInfoDTO> getResultByPrice(ChartsTransactionRequestDTO chartsTransactionRequestDTO, Pageable pageable, double currentTokenPrice) {
         Page<TransactionInfoDTO> pageResult;
 
         // 날짜 필터링이 있는 경우
-        if (chartsTransactionRequest.getStartDate() != null && chartsTransactionRequest.getEndDate() != null) {
-            LocalDateTime startDate = chartsTransactionRequest.getStartDate().atStartOfDay();
-            LocalDateTime endDate = chartsTransactionRequest.getEndDate().plusDays(1).atStartOfDay();
+        if (chartsTransactionRequestDTO.getStartDate() != null && chartsTransactionRequestDTO.getEndDate() != null) {
+            LocalDateTime startDate = chartsTransactionRequestDTO.getStartDate().atStartOfDay();
+            LocalDateTime endDate = chartsTransactionRequestDTO.getEndDate().plusDays(1).atStartOfDay();
 
             pageResult = chartsRepository.findFilteredTransactionsByPriceAndDate(
-                    chartsTransactionRequest.getToken(),
+                    chartsTransactionRequestDTO.getToken(),
                     currentTokenPrice,
                     startDate,
                     endDate,
@@ -92,7 +95,7 @@ public class ChartsService {
             );
         } else {
             pageResult = chartsRepository.findFilteredTransactionsByPrice(
-                    chartsTransactionRequest.getToken(),
+                    chartsTransactionRequestDTO.getToken(),
                     currentTokenPrice,
                     pageable
             );
@@ -100,30 +103,30 @@ public class ChartsService {
         return pageResult;
     }
 
-    public ChartsTransactionResponse getChartsFilteredByAmount(ChartsTransactionRequest chartsTransactionRequest) {
-        Pageable pageable = getPageable(chartsTransactionRequest);
-        double currentTokenPrice = tokenPriceAPIClient.updatePrice(chartsTransactionRequest.getToken(), CURRENCY);
-        Page<TransactionInfoDTO> pageResult = getResultByTransactionAmount(chartsTransactionRequest, pageable, currentTokenPrice);
+    public ChartsTransactionResponseDTO getChartsFilteredByAmount(ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
+        Pageable pageable = getPageable(chartsTransactionRequestDTO);
+        double currentTokenPrice = tokenPriceAPIClient.updatePrice(chartsTransactionRequestDTO.getToken(), CURRENCY);
+        Page<TransactionInfoDTO> pageResult = getResultByTransactionAmount(chartsTransactionRequestDTO, pageable, currentTokenPrice);
 
-        return new ChartsTransactionResponse(
+        return new ChartsTransactionResponseDTO(
                 pageResult.getContent(),
                 currentTokenPrice,
-                chartsTransactionRequest.getPage(),
-                chartsTransactionRequest.getSize(),
+                chartsTransactionRequestDTO.getPage(),
+                chartsTransactionRequestDTO.getSize(),
                 pageResult.getTotalElements()
         );
     }
 
-    private Page<TransactionInfoDTO> getResultByTransactionAmount(ChartsTransactionRequest chartsTransactionRequest, Pageable pageable, double currentTokenPrice) {
+    private Page<TransactionInfoDTO> getResultByTransactionAmount(ChartsTransactionRequestDTO chartsTransactionRequestDTO, Pageable pageable, double currentTokenPrice) {
         Page<TransactionInfoDTO> pageResult;
 
         // 날짜 필터링이 있는 경우
-        if (chartsTransactionRequest.getStartDate() != null && chartsTransactionRequest.getEndDate() != null) {
-            LocalDateTime startDate = chartsTransactionRequest.getStartDate().atStartOfDay();
-            LocalDateTime endDate = chartsTransactionRequest.getEndDate().plusDays(1).atStartOfDay();
+        if (chartsTransactionRequestDTO.getStartDate() != null && chartsTransactionRequestDTO.getEndDate() != null) {
+            LocalDateTime startDate = chartsTransactionRequestDTO.getStartDate().atStartOfDay();
+            LocalDateTime endDate = chartsTransactionRequestDTO.getEndDate().plusDays(1).atStartOfDay();
 
             pageResult = chartsRepository.findFilteredTransactionsByAmountAndDate(
-                    chartsTransactionRequest.getToken(),
+                    chartsTransactionRequestDTO.getToken(),
                     currentTokenPrice,
                     startDate,
                     endDate,
@@ -131,7 +134,7 @@ public class ChartsService {
             );
         } else {
             pageResult = chartsRepository.findFilteredTransactionsByAmount(
-                    chartsTransactionRequest.getToken(),
+                    chartsTransactionRequestDTO.getToken(),
                     currentTokenPrice,
                     pageable
             );
@@ -139,11 +142,15 @@ public class ChartsService {
         return pageResult;
     }
 
-    private Pageable getPageable(ChartsTransactionRequest chartsTransactionRequest) {
+    private Pageable getPageable(ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
         return PageRequest.of(
-                Math.max(0, chartsTransactionRequest.getPage() - 1),
-                chartsTransactionRequest.getSize()
+                Math.max(0, chartsTransactionRequestDTO.getPage() - 1),
+                chartsTransactionRequestDTO.getSize()
         );
+    }
+
+    public List<Transaction> getTransactionByAddress(AddressTransactionRequestDTO request) {
+        return chartsRepository.findByFromAddressOrderByTimestampDesc(request.getFromAddress());
     }
 }
 
