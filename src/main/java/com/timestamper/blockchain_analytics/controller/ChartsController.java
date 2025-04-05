@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/transaction")
+@RequestMapping("/api/charts")
 public class ChartsController {
 
     private final ChartsService chartsService;
