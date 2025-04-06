@@ -24,7 +24,7 @@ public interface HeatmapRepository extends JpaRepository<Transaction, Long> {
         ),
         tx_data AS (
             SELECT
-                TO_CHAR(t.converted_date, 'FMDay') AS day,
+                TO_CHAR(t.converted_date, 'Day') AS day,
                 EXTRACT(HOUR FROM t.converted_date) AS hour,
                 COUNT(*) AS txCount
             FROM transaction t
