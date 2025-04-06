@@ -1,12 +1,15 @@
 package com.timestamper.blockchain_analytics.repository;
 
+import com.timestamper.blockchain_analytics.dto.heatmap.DataTransactionDTO;
 import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.service.projection.HeatmapProjection;
+import com.timestamper.blockchain_analytics.service.projection.HeatmapTransactionProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -55,4 +58,20 @@ public interface HeatmapRepository extends JpaRepository<Transaction, Long> {
         ORDER BY day_order, hour
     """, nativeQuery = true)
     List<HeatmapProjection> getInfo(LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+    @Query(value = """
+        SELECT
+            RANK() OVER (ORDER BY COUNT(*) DESC) AS rank,
+            dpdenom AS token,
+            COUNT(*) AS transactionCount,
+            SUM(amount) AS totalAmount
+        FROM transaction
+        WHERE converted_date >= :startDateTime
+          AND converted_date < :endDateTime
+          AND dpdenom <> 'Unknown'
+        GROUP BY dpdenom
+        ORDER BY transactionCount DESC
+        LIMIT 3
+    """, nativeQuery = true)
+    List<HeatmapTransactionProjection> getTransactionInfo(LocalDateTime startDateTime, LocalDateTime endDateTime);
 }
