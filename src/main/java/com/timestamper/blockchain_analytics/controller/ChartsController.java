@@ -1,8 +1,8 @@
 package com.timestamper.blockchain_analytics.controller;
 
-import com.timestamper.blockchain_analytics.dto.charts.ChartsFilteredAmountResponse;
-import com.timestamper.blockchain_analytics.dto.charts.ChartsFilteredLatestDTO;
-import com.timestamper.blockchain_analytics.dto.charts.ChartsFilteredVolumeDTO;
+import com.timestamper.blockchain_analytics.dto.charts.request.AddressTransactionRequestDTO;
+import com.timestamper.blockchain_analytics.dto.charts.request.ChartsTransactionRequestDTO;
+import com.timestamper.blockchain_analytics.dto.charts.response.ChartsTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.service.ChartsService;
 import lombok.RequiredArgsConstructor;
@@ -18,57 +18,39 @@ public class ChartsController {
     private final ChartsService chartsService;
 
     /**
-     * Get transactions filtered by volume
-     * 트랜잭션량
-     * @param token
-     * @return
-     */
-    @GetMapping("infos/volume")
-    public List<ChartsFilteredVolumeDTO> getChartsFilteredByVolume(@RequestParam String token) {
-        return chartsService.getChartsFilteredVolume(token);
-    }
-
-    /**
-     * Get transactions filtered by latest
-     * 최신순
-     * @param token
-     * @return
+     * @description Charts > 최신순 데이터 (paging적용) - 연, 월, 일 필터링
+     * @param chartsTransactionRequestDTO
+     * @return ChartsTransactionResponse
      */
     @GetMapping("infos/latest")
-    public List<ChartsFilteredLatestDTO> getChartsFilteredByLatest(@RequestParam String token) {
-        return chartsService.getChartsFilteredLatest(token);
+    public ChartsTransactionResponseDTO getChartsFilteredByLatest(@RequestBody ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
+        return chartsService.getChartsFilteredLatest(chartsTransactionRequestDTO);
     }
 
     /**
-     * Get transactions filtered by amount
-     * 거래 대금
-     * @param token
-     * @return
+     * @description Charts > 거래대금 데이터 (paging적용) - 연, 월, 일 필터링
+     * @param chartsTransactionRequestDTO
+     * @return ChartsTransactionResponse
      */
-    @GetMapping("infos/amount")
-    public ChartsFilteredAmountResponse getChartsFilteredByAmount(@RequestParam String token) {
-        return chartsService.getChartsFilteredAmount(token);
+    @GetMapping("infos/transactionPrice")
+    public ChartsTransactionResponseDTO getChartsFilteredByPrice(@RequestBody ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
+        return chartsService.getChartsFilteredByPrice(chartsTransactionRequestDTO);
     }
 
-    /**
-     * Get transactions by address
-     * @param token
-     * @param fromAddress
-     * @return
-     */
-    @GetMapping("infos/address")
-    public List<Transaction> getChartsByAddress(@RequestParam String token, @RequestParam String fromAddress) {
-        return chartsService.getChartsByAddress(token, fromAddress);
+//    TODO transaction 필터링은 출력이 다른방식으로 되어야할거 같다.
+//    /**
+//     * @description Charts > 트랜잭션량 데이터 (paging적용) - 연, 월, 일 필터링
+//     * @param chartsTransactionRequest
+//     * @return ChartsTransactionResponse
+//     */
+//    @PostMapping("infos/transactionAmount")
+//    public ChartsTransactionResponse getChartsFilteredByTransactionAmount(@RequestBody ChartsTransactionRequest chartsTransactionRequest) {
+//        return chartsService.getChartsFilteredByAmount(chartsTransactionRequest);
+//    }
+
+    @GetMapping("infos/transaction")
+    public List<Transaction> getTransactionByAddress(@RequestBody AddressTransactionRequestDTO request) {
+        return chartsService.getTransactionByAddress(request);
     }
 
-    // TODO infos/address 필터링 기능
-
-
-    // TODO infos/address 일, 월 그래프 데이터 필터링 기능
-
-
-    // TODO 고래 데이터 필터링 기능
-
-
-    // TODO 히트맵 데이터 필터링 기능
 }

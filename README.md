@@ -86,6 +86,14 @@ CREATE TABLE transaction (
 CREATE INDEX idx_txhash ON transaction(txhash);
 CREATE INDEX idx_from_address ON transaction(fromAddress);
 CREATE INDEX idx_to_address ON transaction(toAddress);
+
+
+-- 타임스탬프 변환을 위한 컬럼 추가
+ALTER TABLE transaction
+    ADD COLUMN converted_date TIMESTAMP;
+
+UPDATE transaction
+SET converted_date = TO_TIMESTAMP(timestamp / 1000);
 ```
 
 ## API 명세 보는법

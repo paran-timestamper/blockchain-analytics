@@ -1,4 +1,4 @@
-package com.timestamper.blockchain_analytics.dto.news;
+package com.timestamper.blockchain_analytics.dto.main.news;
 
 import lombok.Data;
 
