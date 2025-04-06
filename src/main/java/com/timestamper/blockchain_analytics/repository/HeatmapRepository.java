@@ -1,15 +1,13 @@
 package com.timestamper.blockchain_analytics.repository;
 
-import com.timestamper.blockchain_analytics.dto.heatmap.DataTransactionDTO;
 import com.timestamper.blockchain_analytics.entity.Transaction;
-import com.timestamper.blockchain_analytics.service.projection.HeatmapProjection;
-import com.timestamper.blockchain_analytics.service.projection.HeatmapTransactionProjection;
+import com.timestamper.blockchain_analytics.repository.projection.HeatmapProjection;
+import com.timestamper.blockchain_analytics.repository.projection.HeatmapTransactionProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 @Repository
