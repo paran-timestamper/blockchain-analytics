@@ -1,6 +1,6 @@
 package com.timestamper.blockchain_analytics.utils.api;
 
-import com.timestamper.blockchain_analytics.service.CryptoPriceService;
+import com.timestamper.blockchain_analytics.service.crypto.CryptoPriceService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

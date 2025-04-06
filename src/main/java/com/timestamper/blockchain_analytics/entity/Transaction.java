@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @Entity
@@ -44,17 +46,6 @@ public class Transaction {
     @Column(nullable = false, name = "tochain")
     private String toChain;
 
-    public void BlockchainTransaction(String txhash, String type, Long timestamp, Double amount, String denom, String dpdenom,
-                                      String fromAddress, String toAddress, String fromChain, String toChain) {
-        this.txhash = txhash;
-        this.type = type;
-        this.timestamp = timestamp;
-        this.amount = amount;
-        this.denom = denom;
-        this.dpdenom = dpdenom;
-        this.fromAddress = fromAddress;
-        this.toAddress = toAddress;
-        this.fromChain = fromChain;
-        this.toChain = toChain;
-    }
+    @Column(name = "convertedDate")
+    private LocalDateTime convertedDate;
 }
