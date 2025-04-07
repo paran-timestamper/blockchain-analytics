@@ -8,9 +8,9 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class NodeInfoResponseDTO {
+public class NodeInfosResponseDTO {
     List<NodeInfoDTO> nodeInfoList;
 
-    public NodeInfoResponseDTO(String txHash, String type, String toAddress, double totalValue) {
+    public NodeInfosResponseDTO(String txHash, String type, String toAddress, double totalValue) {
     }
 }

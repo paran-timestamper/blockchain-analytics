@@ -1,7 +1,7 @@
 package com.timestamper.blockchain_analytics.service;
 
 import com.timestamper.blockchain_analytics.dto.visual.NodeInfoDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfoResponseDTO;
+import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosResponseDTO;
 import com.timestamper.blockchain_analytics.repository.VisualRepository;
 import com.timestamper.blockchain_analytics.repository.projection.visual.NodeInfoProjection;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ public class VisualService {
 
     private final VisualRepository visualRepository;
 
-    public NodeInfoResponseDTO getNodeInfos(String fromAddress) {
+    public NodeInfosResponseDTO getNodeInfos(String fromAddress) {
         List<NodeInfoProjection> nodeInfos = visualRepository.getNodeInfos(fromAddress);
 
         // TODO totalValue 어떻게 계산하는지 물어보고 구현해야함 ㄱㄱ
@@ -30,6 +30,6 @@ public class VisualService {
                 ))
                 .toList();
 
-        return new NodeInfoResponseDTO(list);
+        return new NodeInfosResponseDTO(list);
     }
 }
