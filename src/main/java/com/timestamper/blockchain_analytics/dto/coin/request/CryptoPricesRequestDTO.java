@@ -1,4 +1,4 @@
-package com.timestamper.blockchain_analytics.dto.main.coin.request;
+package com.timestamper.blockchain_analytics.dto.coin.request;
 
 import lombok.Data;
 

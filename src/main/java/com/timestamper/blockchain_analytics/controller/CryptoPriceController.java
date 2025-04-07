@@ -1,7 +1,7 @@
 package com.timestamper.blockchain_analytics.controller;
 
-import com.timestamper.blockchain_analytics.dto.main.coin.request.CryptoPriceRequestDTO;
-import com.timestamper.blockchain_analytics.dto.main.coin.request.CryptoPricesRequestDTO;
+import com.timestamper.blockchain_analytics.dto.coin.request.CryptoPriceRequestDTO;
+import com.timestamper.blockchain_analytics.dto.coin.request.CryptoPricesRequestDTO;
 import com.timestamper.blockchain_analytics.service.crypto.CryptoPriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
