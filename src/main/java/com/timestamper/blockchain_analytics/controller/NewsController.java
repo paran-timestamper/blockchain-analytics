@@ -1,6 +1,6 @@
 package com.timestamper.blockchain_analytics.controller;
 
-import com.timestamper.blockchain_analytics.dto.main.news.response.NewsResponseDto;
+import com.timestamper.blockchain_analytics.dto.news.response.NewsResponseDto;
 import com.timestamper.blockchain_analytics.utils.api.CryptoNewsAPI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

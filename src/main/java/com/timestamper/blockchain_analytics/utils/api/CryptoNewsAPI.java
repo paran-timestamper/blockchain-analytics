@@ -1,9 +1,8 @@
 package com.timestamper.blockchain_analytics.utils.api;
 
-import com.timestamper.blockchain_analytics.dto.main.news.response.NewsResponseDto;
+import com.timestamper.blockchain_analytics.dto.news.response.NewsResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
