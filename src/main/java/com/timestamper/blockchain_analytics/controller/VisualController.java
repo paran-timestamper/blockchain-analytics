@@ -1,0 +1,23 @@
+package com.timestamper.blockchain_analytics.controller;
+
+import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeAddressRequestDTO;
+import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfoResponseDTO;
+import com.timestamper.blockchain_analytics.service.VisualService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/visual")
+public class VisualController {
+
+    private final VisualService visualService;
+
+    @GetMapping("/nodeInfos")
+    public NodeInfoResponseDTO getNodeInfos(@RequestBody NodeAddressRequestDTO request) {
+        return visualService.getNodeInfos(request.getFromAddress());
+    }
+}
