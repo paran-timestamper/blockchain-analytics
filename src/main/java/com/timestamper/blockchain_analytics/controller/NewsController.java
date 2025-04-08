@@ -1,9 +1,11 @@
 package com.timestamper.blockchain_analytics.controller;
 
+import com.timestamper.blockchain_analytics.dto.news.request.KeywordRequestDTO;
 import com.timestamper.blockchain_analytics.dto.news.response.NewsResponseDto;
 import com.timestamper.blockchain_analytics.utils.api.CryptoNewsAPI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,7 +21,7 @@ public class NewsController {
      * @return NewsResponseDto
      */
     @GetMapping("")
-    public NewsResponseDto getNews() {
-        return cryptoNewsAPI.getNews();
+    public NewsResponseDto getNews(@RequestBody KeywordRequestDTO request) {
+        return cryptoNewsAPI.getNews(request.getKeyword());
     }
 }
