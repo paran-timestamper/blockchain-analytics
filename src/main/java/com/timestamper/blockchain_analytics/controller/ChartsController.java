@@ -22,7 +22,7 @@ public class ChartsController {
      * @param chartsTransactionRequestDTO
      * @return ChartsTransactionResponse
      */
-    @GetMapping("infos/latest")
+    @PostMapping("infos/latest")
     public ChartsTransactionResponseDTO getChartsFilteredByLatest(@RequestBody ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
         return chartsService.getChartsFilteredLatest(chartsTransactionRequestDTO);
     }
@@ -32,7 +32,7 @@ public class ChartsController {
      * @param chartsTransactionRequestDTO
      * @return ChartsTransactionResponse
      */
-    @GetMapping("infos/transactionPrice")
+    @PostMapping("infos/transactionPrice")
     public ChartsTransactionResponseDTO getChartsFilteredByPrice(@RequestBody ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
         return chartsService.getChartsFilteredByPrice(chartsTransactionRequestDTO);
     }
@@ -48,7 +48,7 @@ public class ChartsController {
 //        return chartsService.getChartsFilteredByAmount(chartsTransactionRequest);
 //    }
 
-    @GetMapping("infos/transaction")
+    @PostMapping("infos/transaction")
     public List<Transaction> getTransactionByAddress(@RequestBody AddressTransactionRequestDTO request) {
         return chartsService.getTransactionByAddress(request);
     }
