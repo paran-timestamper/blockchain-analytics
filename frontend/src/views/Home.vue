@@ -85,7 +85,7 @@ export default {
   methods: {
     async fetchLatestArticles() {
       try {
-        const response = await fetch('http://localhost:8082/api/news');  // 백엔드는 100개 반환해야 함
+        const response = await fetch(window.location.host+'/api/news');  // 백엔드는 100개 반환해야 함
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         this.allArticles = data.articles;
@@ -95,16 +95,27 @@ export default {
       }
     },
     async searchArticles() {
-      if (!this.query.trim()) return;
+      if (!this.query || !this.query.trim()) return;
+
       try {
-        const response = await fetch(`http://localhost:8082/api/news/search?query=${encodeURIComponent(this.query)}`);
+        const response = await fetch(`${window.location.origin}/api/news/search`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ query: this.query }),
+        });
+
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
         const data = await response.json();
-        this.articles = data.articles;
+        this.articles = data.articles || [];
       } catch (error) {
         console.error('Search failed:', error);
       }
     },
+
+
     async fetchTokenPrices() {
       try {
         const res = await fetch(

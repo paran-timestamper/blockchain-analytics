@@ -1,16 +1,13 @@
 package com.timestamper.blockchain_analytics.utils.api;
 
-import com.timestamper.blockchain_analytics.dto.main.news.response.NewsResponseDto;
+import com.timestamper.blockchain_analytics.dto.news.response.NewsResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class CryptoNewsAPI {
-
-    //private final static String keyword ="";
 
     @Value("${gnews.api.key}")
     private String apiKey;
@@ -24,10 +21,10 @@ public class CryptoNewsAPI {
         String url = UriComponentsBuilder.fromUriString(baseUrl)
                 .queryParam("q", keyword)
                 .queryParam("lang", "en")
-                .queryParam("max", 10)
+                .queryParam("max", 100)
+                .queryParam("sortby", "publishedAt")
                 .queryParam("token", apiKey)
                 .toUriString();
-
 
         return restTemplate.getForObject(url, NewsResponseDto.class);
     }

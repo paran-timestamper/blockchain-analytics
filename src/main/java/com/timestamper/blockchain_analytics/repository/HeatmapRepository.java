@@ -1,8 +1,8 @@
 package com.timestamper.blockchain_analytics.repository;
 
 import com.timestamper.blockchain_analytics.entity.Transaction;
-import com.timestamper.blockchain_analytics.repository.projection.HeatmapProjection;
-import com.timestamper.blockchain_analytics.repository.projection.HeatmapTransactionProjection;
+import com.timestamper.blockchain_analytics.repository.projection.heatmap.HeatmapProjection;
+import com.timestamper.blockchain_analytics.repository.projection.heatmap.HeatmapTransactionProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -25,7 +25,7 @@ public interface HeatmapRepository extends JpaRepository<Transaction, Long> {
         ),
         tx_data AS (
             SELECT
-                TO_CHAR(t.converted_date, 'Day') AS day,
+                TO_CHAR(t.converted_date, 'FMDay') AS day,
                 EXTRACT(HOUR FROM t.converted_date) AS hour,
                 COUNT(*) AS txCount
             FROM transaction t

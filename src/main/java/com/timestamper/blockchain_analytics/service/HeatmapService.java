@@ -7,7 +7,7 @@ import com.timestamper.blockchain_analytics.dto.heatmap.response.DataInfoRespons
 import com.timestamper.blockchain_analytics.dto.heatmap.response.DataTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.repository.HeatmapRepository;
 import com.timestamper.blockchain_analytics.service.crypto.CryptoPriceService;
-import com.timestamper.blockchain_analytics.repository.projection.HeatmapTransactionProjection;
+import com.timestamper.blockchain_analytics.repository.projection.heatmap.HeatmapTransactionProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
