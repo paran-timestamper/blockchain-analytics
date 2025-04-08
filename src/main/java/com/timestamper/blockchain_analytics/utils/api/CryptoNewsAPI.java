@@ -10,7 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class CryptoNewsAPI {
 
-    private final static String keyword = "bitcoin";
+    //private final static String keyword ="";
 
     @Value("${gnews.api.key}")
     private String apiKey;
@@ -20,13 +20,14 @@ public class CryptoNewsAPI {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public NewsResponseDto getNews() {
+    public NewsResponseDto getNews(String keyword) {
         String url = UriComponentsBuilder.fromUriString(baseUrl)
                 .queryParam("q", keyword)
                 .queryParam("lang", "en")
                 .queryParam("max", 10)
                 .queryParam("token", apiKey)
                 .toUriString();
+
 
         return restTemplate.getForObject(url, NewsResponseDto.class);
     }
