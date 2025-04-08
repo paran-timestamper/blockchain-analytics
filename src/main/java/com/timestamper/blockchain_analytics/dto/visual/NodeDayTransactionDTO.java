@@ -1,6 +1,6 @@
 package com.timestamper.blockchain_analytics.dto.visual;
 
-import com.timestamper.blockchain_analytics.enums.TimeSlot;
+import com.timestamper.blockchain_analytics.enums.DaySlot;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,5 +8,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class NodeDayTransactionDTO {
     private Double transactionAmount;
-    private TimeSlot time;
+    private DaySlot time;
 }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public enum TimeSlot {
+public enum DaySlot {
     MIDNIGHT_TO_FOUR("00:00 ~ 03:59", 0),
     FOUR_TO_EIGHT("04:00 ~ 07:59", 4),
     EIGHT_TO_NOON("08:00 ~ 11:59", 8),
@@ -17,7 +17,7 @@ public enum TimeSlot {
     private final String label;
     private final int startHour;
 
-    TimeSlot(String label, int startHour) {
+    DaySlot(String label, int startHour) {
         this.label = label;
         this.startHour = startHour;
     }
@@ -28,8 +28,8 @@ public enum TimeSlot {
     }
 
     @JsonCreator
-    public static TimeSlot fromLabel(String label) {
-        for (TimeSlot slot : values()) {
+    public static DaySlot fromLabel(String label) {
+        for (DaySlot slot : values()) {
             if (slot.label.equals(label)) {
                 return slot;
             }
