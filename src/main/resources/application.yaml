@@ -30,6 +30,12 @@ gnews:
         key: fa046cc8df54645fc630e6661a27198e
         base-url: https://gnews.io/api/v4/search
 
+# https://etherscan.io/apidashboard
+# 하루에 100,000까지 사용가능
+etherscan:
+    api:
+        key: 1J9Q6D1G1QQM36WUMS2VIPV6WVKRDZ338A
+        base-url: https://api.etherscan.io/v2/api?chainid=1&module=nametag&action=getaddresstag&address=%s&apikey=%s
 
 
 

@@ -1,9 +1,11 @@
 package com.timestamper.blockchain_analytics.service;
 
 import com.timestamper.blockchain_analytics.dto.visual.NodeDayTransactionDTO;
+import com.timestamper.blockchain_analytics.dto.visual.NodeInfoByLatestDTO;
 import com.timestamper.blockchain_analytics.dto.visual.NodeInfoDTO;
 import com.timestamper.blockchain_analytics.dto.visual.NodeMonthTransactionDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeDayTransactionResponseDTO;
+import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosByLatestResponseDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosResponseDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeMonthTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.entity.Transaction;
@@ -11,6 +13,7 @@ import com.timestamper.blockchain_analytics.enums.DaySlot;
 import com.timestamper.blockchain_analytics.enums.MonthSlot;
 import com.timestamper.blockchain_analytics.repository.VisualRepository;
 import com.timestamper.blockchain_analytics.repository.projection.visual.NodeInfoProjection;
+import com.timestamper.blockchain_analytics.utils.api.EtherscanAPI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class VisualService {
 
+    private final EtherscanAPI etherscanAPI;
     private final VisualRepository visualRepository;
 
     public NodeInfosResponseDTO getNodeInfos(String fromAddress) {
@@ -107,5 +111,13 @@ public class VisualService {
                         !tx.getConvertedDate().isAfter(end))
                 .mapToDouble(Transaction::getAmount)
                 .sum();
+    }
+
+    public NodeInfosByLatestResponseDTO getNodeInfosByLatest(String token, String fromAddress) {
+        List<NodeInfoByLatestDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
+                .map(p -> new NodeInfoByLatestDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress())))
+                .toList();
+
+        return new NodeInfosByLatestResponseDTO(result);
     }
 }
