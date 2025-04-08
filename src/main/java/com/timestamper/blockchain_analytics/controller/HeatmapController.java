@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/heatmap")
+
 public class HeatmapController {
 
     private final HeatmapService heatmapService;

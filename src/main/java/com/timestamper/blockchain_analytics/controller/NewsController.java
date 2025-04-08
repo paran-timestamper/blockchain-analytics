@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/news")
+@CrossOrigin(origins = "http://localhost:8081/")
 public class NewsController {
 
     private final CryptoNewsAPI cryptoNewsAPI;

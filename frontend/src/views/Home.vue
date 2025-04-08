@@ -85,7 +85,7 @@ export default {
   methods: {
     async fetchLatestArticles() {
       try {
-        const response = await fetch(window.location.host+'/api/news');  // 백엔드는 100개 반환해야 함
+        const response = await fetch('/api/news');  // 백엔드는 100개 반환해야 함
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         this.allArticles = data.articles;
@@ -98,13 +98,14 @@ export default {
       if (!this.query || !this.query.trim()) return;
 
       try {
-        const response = await fetch(`${window.location.origin}/api/news/search`, {
+        const response = await fetch(`/api/news`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ query: this.query }),
         });
+        console.log("🔍 요청 URL:", response);
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
