@@ -22,24 +22,25 @@ public class EtherscanAPI {
 
     // TODO 제대로 동작하게 수정하기
     public boolean isExchangeAddress(String address) {
-        String url = String.format(baseUrl, address, apiKey);
-
-        try {
-            ResponseEntity<EtherscanResponseDTO> response =
-                    restTemplate.getForEntity(url, EtherscanResponseDTO.class);
-
-            EtherscanResponseDTO body = response.getBody();
-            if (body != null) {
-                EtherscanResultDTO[] results = body.getResult();
-                if (results != null && results.length > 0) {
-                    String[] labels = results[0].getLabels();
-                    return labels != null && Arrays.asList(labels).contains("Exchange");
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("API 호출 실패", e);
-        }
-
         return false;
+//        String url = String.format(baseUrl, address, apiKey);
+//
+//        try {
+//            ResponseEntity<EtherscanResponseDTO> response =
+//                    restTemplate.getForEntity(url, EtherscanResponseDTO.class);
+//
+//            EtherscanResponseDTO body = response.getBody();
+//            if (body != null) {
+//                EtherscanResultDTO[] results = body.getResult();
+//                if (results != null && results.length > 0) {
+//                    String[] labels = results[0].getLabels();
+//                    return labels != null && Arrays.asList(labels).contains("Exchange");
+//                }
+//            }
+//        } catch (Exception e) {
+//            throw new RuntimeException("API 호출 실패", e);
+//        }
+//
+//        return false;
     }
 }
