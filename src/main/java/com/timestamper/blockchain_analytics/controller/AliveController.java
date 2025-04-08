@@ -2,6 +2,7 @@ package com.timestamper.blockchain_analytics.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,7 +14,7 @@ public class AliveController {
     /**
      * @description Test Controller
      */
-    @GetMapping("alive")
+    @PostMapping("alive")
     public String getAliveStatus() {
         log.info("Execute Test Controller");
         return "Alive";

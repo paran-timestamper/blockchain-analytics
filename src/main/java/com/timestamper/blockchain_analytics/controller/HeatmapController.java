@@ -5,10 +5,7 @@ import com.timestamper.blockchain_analytics.dto.heatmap.response.DataInfoRespons
 import com.timestamper.blockchain_analytics.dto.heatmap.response.DataTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.service.HeatmapService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,12 +14,12 @@ public class HeatmapController {
 
     private final HeatmapService heatmapService;
 
-    @GetMapping("/infos")
+    @PostMapping("/infos")
     public DataInfoResponseDTO getInfo(@RequestBody DateInfoRequestDTO request) {
         return heatmapService.getInfo(request);
     }
 
-    @GetMapping("/infos/transaction")
+    @PostMapping("/infos/transaction")
     public DataTransactionResponseDTO getTransactionInfo(@RequestBody DateInfoRequestDTO request) {
         return heatmapService.getTransactionInfo(request);
     }
