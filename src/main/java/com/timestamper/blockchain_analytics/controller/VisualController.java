@@ -1,7 +1,11 @@
 package com.timestamper.blockchain_analytics.controller;
 
 import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeAddressRequestDTO;
+import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeDayTransactionRequestDTO;
+import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeMonthTransactionRequestDTO;
+import com.timestamper.blockchain_analytics.dto.visual.response.NodeDayTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosResponseDTO;
+import com.timestamper.blockchain_analytics.dto.visual.response.NodeMonthTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.service.VisualService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,5 +20,15 @@ public class VisualController {
     @PostMapping("/nodeInfos")
     public NodeInfosResponseDTO getNodeInfos(@RequestBody NodeAddressRequestDTO request) {
         return visualService.getNodeInfos(request.getFromAddress());
+    }
+
+    @PostMapping("/nodeInfo/dayTransaction")
+    public NodeDayTransactionResponseDTO getNodeDayTransaction(@RequestBody NodeDayTransactionRequestDTO request) {
+        return visualService.getNodeDayTransaction(request.getFromAddress(), request.getDate());
+    }
+
+    @PostMapping("/nodeInfo/monthTransaction")
+    public NodeMonthTransactionResponseDTO getNodeMonthTransaction(@RequestBody NodeMonthTransactionRequestDTO request) {
+        return visualService.getNodeMonthTransaction(request.getFromAddress(), request.getDate());
     }
 }
