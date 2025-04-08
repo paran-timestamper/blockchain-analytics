@@ -9,8 +9,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class CryptoNewsAPI {
 
-    private final static String keyword = "bitcoin";
-
     @Value("${gnews.api.key}")
     private String apiKey;
 
@@ -19,11 +17,12 @@ public class CryptoNewsAPI {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public NewsResponseDto getNews() {
+    public NewsResponseDto getNews(String keyword) {
         String url = UriComponentsBuilder.fromUriString(baseUrl)
                 .queryParam("q", keyword)
                 .queryParam("lang", "en")
-                .queryParam("max", 10)
+                .queryParam("max", 100)
+                .queryParam("sortby", "publishedAt")
                 .queryParam("token", apiKey)
                 .toUriString();
 
