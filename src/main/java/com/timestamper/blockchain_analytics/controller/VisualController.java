@@ -44,5 +44,8 @@ public class VisualController {
         return visualService.getNodeInfosByTransactionPrice(request.getToken(), request.getFromAddress());
     }
 
-
+    @PostMapping("/nodeInfos/transactionAmount")
+    public NodeFilteredInfosResponseDTO getNodeInfosByTransactionAmount(@RequestBody NodeFilteredInfosRequestDTO request) {
+        return visualService.getNodeInfosByTransactionAmount(request.getToken(), request.getFromAddress());
+    }
 }

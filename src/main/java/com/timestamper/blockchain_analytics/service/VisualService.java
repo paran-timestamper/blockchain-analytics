@@ -1,7 +1,7 @@
 package com.timestamper.blockchain_analytics.service;
 
 import com.timestamper.blockchain_analytics.dto.visual.NodeDayTransactionDTO;
-import com.timestamper.blockchain_analytics.dto.visual.NodeInfoByLatestDTO;
+import com.timestamper.blockchain_analytics.dto.visual.NodeFilteredInfosDTO;
 import com.timestamper.blockchain_analytics.dto.visual.NodeInfoDTO;
 import com.timestamper.blockchain_analytics.dto.visual.NodeMonthTransactionDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeDayTransactionResponseDTO;
@@ -118,8 +118,8 @@ public class VisualService {
     public NodeFilteredInfosResponseDTO getNodeInfosByLatest(String token, String fromAddress) {
         double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
 
-        List<NodeInfoByLatestDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
-                .map(p -> new NodeInfoByLatestDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
+        List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
+                .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
                                                                   p.getTotalValue() * price, p.getConvertedDate()))
                 .toList();
 
@@ -129,9 +129,20 @@ public class VisualService {
     public NodeFilteredInfosResponseDTO getNodeInfosByTransactionPrice(String token, String fromAddress) {
         double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
 
-        List<NodeInfoByLatestDTO> result = visualRepository.getNodeInfosByTransactionPrice(token, fromAddress).stream()
-                .map(p -> new NodeInfoByLatestDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
+        List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionPrice(token, fromAddress).stream()
+                .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
                                                                   p.getTotalValue() * price, p.getConvertedDate()))
+                .toList();
+
+        return new NodeFilteredInfosResponseDTO(result);
+    }
+
+    public NodeFilteredInfosResponseDTO getNodeInfosByTransactionAmount(String token, String fromAddress) {
+        double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
+
+        List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionAmount(token, fromAddress).stream()
+                .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
+                        p.getTotalValue() * price, p.getConvertedDate()))
                 .toList();
 
         return new NodeFilteredInfosResponseDTO(result);

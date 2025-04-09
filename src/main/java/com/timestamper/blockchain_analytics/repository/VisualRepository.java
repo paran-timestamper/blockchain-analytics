@@ -50,4 +50,16 @@ public interface VisualRepository extends JpaRepository<Transaction, Long> {
     LIMIT 100
 """, nativeQuery = true)
     List<AddressProjection> getNodeInfosByTransactionPrice(@Param("token") String token, @Param("fromAddress") String fromAddress);
+
+    @Query(value = """
+    SELECT TOADDRESS, SUM(AMOUNT) AS TOTAL_VALUE,
+           COUNT(TOADDRESS) AS TRANSACTION_AMOUNT, MAX(CONVERTED_DATE) AS CONVERTED_DATE
+    FROM TRANSACTION
+    WHERE DPDENOM = :token
+      AND (:fromAddress IS NULL OR fromaddress = :fromAddress)
+    GROUP BY TOADDRESS
+    ORDER BY TRANSACTION_AMOUNT DESC
+    LIMIT 100
+""", nativeQuery = true)
+    List<AddressProjection> getNodeInfosByTransactionAmount(@Param("token") String token, @Param("fromAddress") String fromAddress);
 }

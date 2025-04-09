@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class NodeInfoByLatestDTO {
+public class NodeFilteredInfosDTO {
     private String toAddress;
     private boolean isExchange;
     private Double totalValue;
