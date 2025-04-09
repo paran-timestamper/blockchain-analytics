@@ -1,11 +1,11 @@
 package com.timestamper.blockchain_analytics.service;
 
 import com.timestamper.blockchain_analytics.dto.visual.NodeDayTransactionDTO;
-import com.timestamper.blockchain_analytics.dto.visual.NodeInfoByLatestDTO;
+import com.timestamper.blockchain_analytics.dto.visual.NodeFilteredInfosDTO;
 import com.timestamper.blockchain_analytics.dto.visual.NodeInfoDTO;
 import com.timestamper.blockchain_analytics.dto.visual.NodeMonthTransactionDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeDayTransactionResponseDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosByLatestResponseDTO;
+import com.timestamper.blockchain_analytics.dto.visual.response.NodeFilteredInfosResponseDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosResponseDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeMonthTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.entity.Transaction;
@@ -17,7 +17,6 @@ import com.timestamper.blockchain_analytics.service.crypto.CryptoPriceService;
 import com.timestamper.blockchain_analytics.utils.api.EtherscanAPI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -116,14 +115,36 @@ public class VisualService {
                 .sum();
     }
 
-    public NodeInfosByLatestResponseDTO getNodeInfosByLatest(String token, String fromAddress) {
+    public NodeFilteredInfosResponseDTO getNodeInfosByLatest(String token, String fromAddress) {
         double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
 
-        List<NodeInfoByLatestDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
-                .map(p -> new NodeInfoByLatestDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
+        List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
+                .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
                                                                   p.getTotalValue() * price, p.getConvertedDate()))
                 .toList();
 
-        return new NodeInfosByLatestResponseDTO(result);
+        return new NodeFilteredInfosResponseDTO(result);
+    }
+
+    public NodeFilteredInfosResponseDTO getNodeInfosByTransactionPrice(String token, String fromAddress) {
+        double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
+
+        List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionPrice(token, fromAddress).stream()
+                .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
+                                                                  p.getTotalValue() * price, p.getConvertedDate()))
+                .toList();
+
+        return new NodeFilteredInfosResponseDTO(result);
+    }
+
+    public NodeFilteredInfosResponseDTO getNodeInfosByTransactionAmount(String token, String fromAddress) {
+        double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
+
+        List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionAmount(token, fromAddress).stream()
+                .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
+                        p.getTotalValue() * price, p.getConvertedDate()))
+                .toList();
+
+        return new NodeFilteredInfosResponseDTO(result);
     }
 }
