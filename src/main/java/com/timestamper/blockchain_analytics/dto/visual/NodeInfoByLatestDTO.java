@@ -8,4 +8,6 @@ import lombok.Data;
 public class NodeInfoByLatestDTO {
     private String toAddress;
     private boolean isExchange;
+    private Double totalValue;
+    private String convertedDate;
 }
