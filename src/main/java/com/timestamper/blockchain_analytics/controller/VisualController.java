@@ -48,4 +48,6 @@ public class VisualController {
     public NodeFilteredInfosResponseDTO getNodeInfosByTransactionAmount(@RequestBody NodeFilteredInfosRequestDTO request) {
         return visualService.getNodeInfosByTransactionAmount(request.getToken(), request.getFromAddress());
     }
+
+
 }

@@ -31,7 +31,7 @@ public interface VisualRepository extends JpaRepository<Transaction, Long> {
     SELECT TOADDRESS, SUM(AMOUNT) AS TOTAL_VALUE,
            COUNT(TOADDRESS) AS TRANSACTION_AMOUNT, MAX(CONVERTED_DATE) AS CONVERTED_DATE
     FROM TRANSACTION
-    WHERE DPDENOM = :token
+    WHERE (:token IS NULL OR DPDENOM = :token)
       AND (:fromAddress IS NULL OR fromaddress = :fromAddress)
     GROUP BY TOADDRESS
     ORDER BY CONVERTED_DATE DESC
@@ -43,7 +43,7 @@ public interface VisualRepository extends JpaRepository<Transaction, Long> {
     SELECT TOADDRESS, SUM(AMOUNT) AS TOTAL_VALUE,
            COUNT(TOADDRESS) AS TRANSACTION_AMOUNT, MAX(CONVERTED_DATE) AS CONVERTED_DATE
     FROM TRANSACTION
-    WHERE DPDENOM = :token
+    WHERE (:token IS NULL OR DPDENOM = :token)
       AND (:fromAddress IS NULL OR fromaddress = :fromAddress)
     GROUP BY TOADDRESS
     ORDER BY TOTAL_VALUE DESC
@@ -55,7 +55,7 @@ public interface VisualRepository extends JpaRepository<Transaction, Long> {
     SELECT TOADDRESS, SUM(AMOUNT) AS TOTAL_VALUE,
            COUNT(TOADDRESS) AS TRANSACTION_AMOUNT, MAX(CONVERTED_DATE) AS CONVERTED_DATE
     FROM TRANSACTION
-    WHERE DPDENOM = :token
+    WHERE (:token IS NULL OR DPDENOM = :token)
       AND (:fromAddress IS NULL OR fromaddress = :fromAddress)
     GROUP BY TOADDRESS
     ORDER BY TRANSACTION_AMOUNT DESC
