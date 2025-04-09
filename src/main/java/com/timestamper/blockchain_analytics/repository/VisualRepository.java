@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -37,4 +38,16 @@ public interface VisualRepository extends JpaRepository<Transaction, Long> {
     LIMIT 100
 """, nativeQuery = true)
     List<AddressProjection> getNodeInfosByLatest(@Param("token") String token, @Param("fromAddress") String fromAddress);
+
+    @Query(value = """
+    SELECT TOADDRESS, SUM(AMOUNT) AS TOTAL_VALUE,
+           COUNT(TOADDRESS) AS TRANSACTION_AMOUNT, MAX(CONVERTED_DATE) AS CONVERTED_DATE
+    FROM TRANSACTION
+    WHERE DPDENOM = :token
+      AND (:fromAddress IS NULL OR fromaddress = :fromAddress)
+    GROUP BY TOADDRESS
+    ORDER BY TOTAL_VALUE DESC
+    LIMIT 100
+""", nativeQuery = true)
+    List<AddressProjection> getNodeInfosByTransactionPrice(@Param("token") String token, @Param("fromAddress") String fromAddress);
 }

@@ -8,6 +8,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class NodeInfosByLatestResponseDTO {
+public class NodeFilteredInfosResponseDTO {
     private List<NodeInfoByLatestDTO> list;
 }

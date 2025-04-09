@@ -2,10 +2,10 @@ package com.timestamper.blockchain_analytics.controller;
 
 import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeAddressRequestDTO;
 import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeDayTransactionRequestDTO;
-import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeInfosByLatestRequestDTO;
+import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeFilteredInfosRequestDTO;
 import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeMonthTransactionRequestDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeDayTransactionResponseDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosByLatestResponseDTO;
+import com.timestamper.blockchain_analytics.dto.visual.response.NodeFilteredInfosResponseDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosResponseDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeMonthTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.service.VisualService;
@@ -35,7 +35,14 @@ public class VisualController {
     }
 
     @PostMapping("/nodeInfos/latest")
-    public NodeInfosByLatestResponseDTO getNodeInfosByLatest(@RequestBody NodeInfosByLatestRequestDTO request) {
+    public NodeFilteredInfosResponseDTO getNodeInfosByLatest(@RequestBody NodeFilteredInfosRequestDTO request) {
         return visualService.getNodeInfosByLatest(request.getToken(), request.getFromAddress());
     }
+
+    @PostMapping("/nodeInfos/transactionPrice")
+    public NodeFilteredInfosResponseDTO getNodeInfosByTransactionPrice(@RequestBody NodeFilteredInfosRequestDTO request) {
+        return visualService.getNodeInfosByTransactionPrice(request.getToken(), request.getFromAddress());
+    }
+
+
 }
