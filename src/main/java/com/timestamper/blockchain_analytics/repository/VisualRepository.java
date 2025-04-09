@@ -27,12 +27,14 @@ public interface VisualRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByFromAddressAndConvertedDateBetween(String fromAddress, LocalDateTime startOfDay, LocalDateTime endOfDay);
 
     @Query(value = """
-    SELECT toAddress
-    FROM transaction
-    WHERE dpdenom = :token
+    SELECT TOADDRESS, SUM(AMOUNT) AS TOTAL_VALUE,
+           COUNT(TOADDRESS) AS TRANSACTION_AMOUNT, MAX(CONVERTED_DATE) AS CONVERTED_DATE
+    FROM TRANSACTION
+    WHERE DPDENOM = :token
       AND (:fromAddress IS NULL OR fromaddress = :fromAddress)
-    ORDER BY timestamp DESC
-    LIMIT 2
+    GROUP BY TOADDRESS
+    ORDER BY CONVERTED_DATE DESC
+    LIMIT 100
 """, nativeQuery = true)
     List<AddressProjection> getNodeInfosByLatest(@Param("token") String token, @Param("fromAddress") String fromAddress);
 }
