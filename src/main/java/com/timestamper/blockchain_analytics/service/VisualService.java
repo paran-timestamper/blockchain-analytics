@@ -24,6 +24,7 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -116,7 +117,9 @@ public class VisualService {
     }
 
     public NodeFilteredInfosResponseDTO getNodeInfosByLatest(String token, String fromAddress) {
-        double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
+        Double price = Optional.ofNullable(token)
+                .map(t -> cryptoPriceService.getCryptoPrice(t, "USD").block())
+                .orElse(0.0);
 
         List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
                 .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
@@ -127,7 +130,9 @@ public class VisualService {
     }
 
     public NodeFilteredInfosResponseDTO getNodeInfosByTransactionPrice(String token, String fromAddress) {
-        double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
+        Double price = Optional.ofNullable(token)
+                .map(t -> cryptoPriceService.getCryptoPrice(t, "USD").block())
+                .orElse(0.0);
 
         List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionPrice(token, fromAddress).stream()
                 .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
@@ -138,7 +143,9 @@ public class VisualService {
     }
 
     public NodeFilteredInfosResponseDTO getNodeInfosByTransactionAmount(String token, String fromAddress) {
-        double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
+        Double price = Optional.ofNullable(token)
+                .map(t -> cryptoPriceService.getCryptoPrice(t, "USD").block())
+                .orElse(0.0);
 
         List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionAmount(token, fromAddress).stream()
                 .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
