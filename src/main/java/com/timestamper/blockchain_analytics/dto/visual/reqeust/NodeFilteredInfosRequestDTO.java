@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class NodeInfosByLatestRequestDTO {
+public class NodeFilteredInfosRequestDTO {
     private String token;
     private String fromAddress;
 }
