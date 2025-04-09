@@ -62,18 +62,25 @@ export default {
       links: [],
       svg: null,
       searchQuery: "",
-      showWarning: false, // 경고창 표시 여부
+      showWarning: false,
     };
   },
+  mounted() {
+    this.fetchTokenList(); // 초기 토큰 리스트 불러오기
+  },
   methods: {
-    async mounted() {
-      await this.fetchTokenList();
-    },
     async fetchTokenList() {
       try {
-        const response = await fetch("/api/tokens");
+        const response = await fetch("http://localhost:8080/api/common/tokens", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({}),
+        });
         if (!response.ok) throw new Error("Failed to fetch tokens");
         const data = await response.json();
+        console.log("data", data);
         this.tokenList = data;
       } catch (error) {
         console.error("Error fetching tokens:", error);
@@ -109,56 +116,146 @@ export default {
     closeWarning() {
       this.showWarning = false;
     },
-
-    // API 요청 보내기 전에 조건에 맞는 요청 보내기
     async checkAndDrawGraph() {
-      // TOKEN과 FILTER가 모두 선택되었을 때, 요청하기
       if (this.selectedToken.clicked && this.selectedFilter.clicked) {
-        let requestBody = {
-          token: this.selectedToken.name, // 선택된 토큰 이름
-          address: this.searchQuery || "",  // 검색어(Address)가 있으면 포함
+        const requestBody = {
+          token: this.selectedToken.name,
+          address: "cosmos1t5u0jfg3ljsjrh2m9e47d4ny2hea7eehxrzdgd",//this.searchQuery || "",
         };
 
-        let apiEndpoint = "";
 
-        // FILTER에 따른 API 엔드포인트 구분
         if (this.selectedFilter.name === "거래 대금") {
-          apiEndpoint = "/api/transactions/byAmount";
+          await this.Transaction_price({
+            requestBody,
+            //노션보고 경로 보면서 짜고 매개변수로 TOKEN과 address를 어떻게 넘길지 작성.
+          })
         } else if (this.selectedFilter.name === "트랜잭션량") {
-          apiEndpoint = "/api/transactions/byVolume";
+          await this.Transaction_volume( {
+            requestBody,
+          })
         } else if (this.selectedFilter.name === "최신순") {
-          apiEndpoint = "/api/transactions/byLatest";
+          await this.up_to_date_order({
+              requestBody,
+            //노션보고 경로 보면서 짜고 매개변수로 TOKEN과 address를 어떻게 넘길지 작성.
+            })
         }
-
-        const res = await fetch(apiEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody)
-        });
-
-        const data = await res.json();
-        this.drawGraph(data);
       }
     },
+
+    async Transaction_price({ requestBody }) {
+      try {
+        const response = await fetch('http://localhost:8080/api/visual/nodeInfos/latest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "token" : requestBody.token,
+            "fromAddress" : requestBody.fromAddress,
+          }),
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        console.log("data" , data);
+        this.drawGraph(data);
+      } catch (error) {
+        console.error('Latest news fetch failed:', error);
+      }
+      // 거래대금 API 짜서 거래대금과 TOKEN 기준으로 address 100개 받아서 노드로 그려야 함.
+      // const data = await res.json(); this.drawGraph(data);
+    },
+    async Transaction_volume({requestBody}) {
+      try {
+        const response = await fetch('http://localhost:8080/api/visual/nodeInfos/latest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "token" : requestBody.token,
+            "fromAddress" : requestBody.fromAddress,
+          }),
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        console.log("data" , data);
+        this.drawGraph(data);
+
+      } catch (error) {
+        console.error('Latest news fetch failed:', error);
+      }
+      //트랜잭션량 API 쏴서 트랜잭션량과 TOKEN 기준으로 address 100개 받아서 노드로 그려야 함.
+      // const data = await res.json(); this.drawGraph(data);
+    },
+    async up_to_date_order({requestBody}) {
+      try {
+        const response = await fetch('http://localhost:8080/api/visual/nodeInfos/latest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "token" : requestBody.token,
+            "fromAddress" : requestBody.fromAddress,
+          }),
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        console.log("data" , data);
+        this.drawGraph(data);
+
+      } catch (error) {
+        console.error('Latest news fetch failed:', error);
+      }
+      //최신순 API 쏴서 최신순과 TOKEN 기준으로 address 100개 받아서 노드로 그려야 함.
+      // const data = await res.json(); this.drawGraph(data);
+    },
+
+
+
 
     drawGraph(data) {
       this.nodes = [];
       this.links = [];
-      const central = data[0];
-      this.nodes.push({ id: central.address, label: this.selectedToken.name, group: 0, size: 30 });
-      for (let i = 1; i < data.length; i++) {
-        const tx = data[i];
-        this.nodes.push({ id: tx.address, label: tx.address, group: 1, size: 12, txhash: tx.txhash });
-        this.links.push({ source: central.address, target: tx.address });
+
+      const centralNodeId = this.searchQuery || this.selectedToken.name;
+      const central = {
+        id: centralNodeId,
+        label: centralNodeId,
+        group: 0,
+        size: 30,
+      };
+      this.nodes.push(central);
+
+      const relatedNodes = data.slice(0, 100);
+      for (let i = 0; i < relatedNodes.length; i++) {
+        const tx = relatedNodes[i];
+        if (tx.address === centralNodeId) continue;
+
+        this.nodes.push({
+          id: tx.address,
+          label: tx.address,
+          group: 1,
+          size: 12,
+          txhash: tx.txhash,
+        });
+
+        this.links.push({
+          source: centralNodeId,
+          target: tx.address,
+        });
       }
+
       this.$nextTick(this.createD3Graph);
     },
-
     createD3Graph() {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      d3.select(this.$refs.chart).select("svg").remove();
-      this.svg = d3.select(this.$refs.chart)
+      const container = this.$refs.chart;
+      const width = container.clientWidth || window.innerWidth;
+      const height = container.clientHeight || window.innerHeight;
+
+      d3.select(container).select("svg").remove();
+
+      this.svg = d3.select(container)
           .append("svg")
           .attr("width", width)
           .attr("height", height)
@@ -189,8 +286,7 @@ export default {
 
       const label = this.svg.selectAll("text")
           .data(this.nodes)
-          .enter()
-          .append("text")
+          .enter().append("text")
           .text(d => d.label)
           .attr("fill", "white")
           .attr("font-size", "10px")
@@ -212,20 +308,20 @@ export default {
             .attr("y", d => d.y - d.size - 2);
       });
     },
-
     async searchAddressOrTx() {
       if (!this.searchQuery) return;
       alert(`검색된 값: ${this.searchQuery}`);
-    }
-  }
+    },
+  },
 };
 </script>
+
 
 
 <style scoped>
 .app-container {
   position: relative;
-  width: 100vw;
+  width: 100%;         /* ✅ 100%로 수정 */
   height: 100vh;
   background: black;
   overflow: hidden;
@@ -286,6 +382,9 @@ button.wide-button {
 }
 
 .chart {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
 }

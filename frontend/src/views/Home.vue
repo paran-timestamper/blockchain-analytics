@@ -10,13 +10,25 @@
       </div>
 
       <!-- 뉴스 그리드 -->
-      <div class="news-grid" v-if="articles.length">
-        <div v-for="article in articles" :key="article.url" class="news-card">
+      <div class="news-grid" v-if="paginatedArticles.length">
+        <div v-for="article in paginatedArticles" :key="article.url" class="news-card">
           <img :src="article.image" alt="thumbnail" class="news-image" v-if="article.image"/>
           <h3>{{ article.title }}</h3>
           <p>{{ article.description }}</p>
           <a :href="article.url" target="_blank">Read more</a>
         </div>
+      </div>
+
+      <!-- 페이지네이션 -->
+      <div class="pagination" v-if="allArticles.length">
+        <button
+            v-for="page in Math.ceil(allArticles.length / pageSize)"
+            :key="page"
+            @click="changePage(page)"
+            :class="{ active: currentPage === page }"
+        >
+          {{ page }}
+        </button>
       </div>
     </div>
 
@@ -85,11 +97,19 @@ export default {
   methods: {
     async fetchLatestArticles() {
       try {
-        const response = await fetch('/api/news');  // 백엔드는 100개 반환해야 함
+        const response = await fetch('http://localhost:8080/api/news', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "keyword": "bitcoin"
+          })
+        });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         this.allArticles = data.articles;
-        this.updatePaginatedArticles();  // 초기 첫 페이지
+        this.updatePaginatedArticles(); // 초기 페이지 렌더링
       } catch (error) {
         console.error('Latest news fetch failed:', error);
       }
@@ -98,25 +118,33 @@ export default {
       if (!this.query || !this.query.trim()) return;
 
       try {
-        const response = await fetch(`/api/news`, {
+        const response = await fetch(`http://localhost:8080/api/news`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ query: this.query }),
+          body: JSON.stringify({ "keyword" : this.query }),
         });
-        console.log("🔍 요청 URL:", response);
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const data = await response.json();
-        this.articles = data.articles || [];
+        this.allArticles = data.articles || [];
+        this.currentPage = 1;
+        this.updatePaginatedArticles();
       } catch (error) {
         console.error('Search failed:', error);
       }
     },
-
-
+    updatePaginatedArticles() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      this.paginatedArticles = this.allArticles.slice(start, end);
+    },
+    changePage(page) {
+      this.currentPage = page;
+      this.updatePaginatedArticles();
+    },
     async fetchTokenPrices() {
       try {
         const res = await fetch(
@@ -139,7 +167,6 @@ export default {
 </script>
 
 <style scoped>
-/* 전체 레이아웃 */
 .home-layout {
   display: flex;
   gap: 24px;
@@ -148,12 +175,10 @@ export default {
   background: #0d1117;
 }
 
-/* 왼쪽 뉴스 페이지 */
 .home-page {
   width: 75%;
 }
 
-/* 검색 바 */
 .search-bar {
   display: flex;
   gap: 8px;
@@ -174,7 +199,6 @@ button {
   cursor: pointer;
 }
 
-/* 뉴스 카드 */
 .news-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -192,6 +216,26 @@ button {
   margin-bottom: 8px;
 }
 
+/* 페이지네이션 */
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.pagination button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background: #333;
+  color: white;
+  cursor: pointer;
+}
+.pagination button.active {
+  background: #2196f3;
+  font-weight: bold;
+}
+
 /* 사이드바 */
 .sidebar {
   position: fixed;
@@ -207,8 +251,6 @@ button {
 .sidebar h3 {
   margin-bottom: 16px;
 }
-
-/* 토큰 카드 */
 .token-box {
   background: #1f2630;
   padding: 12px;
