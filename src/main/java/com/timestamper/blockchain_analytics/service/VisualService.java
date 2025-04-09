@@ -13,9 +13,11 @@ import com.timestamper.blockchain_analytics.enums.DaySlot;
 import com.timestamper.blockchain_analytics.enums.MonthSlot;
 import com.timestamper.blockchain_analytics.repository.VisualRepository;
 import com.timestamper.blockchain_analytics.repository.projection.visual.NodeInfoProjection;
+import com.timestamper.blockchain_analytics.service.crypto.CryptoPriceService;
 import com.timestamper.blockchain_analytics.utils.api.EtherscanAPI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +33,7 @@ import java.util.stream.Stream;
 public class VisualService {
 
     private final EtherscanAPI etherscanAPI;
+    private final CryptoPriceService cryptoPriceService;
     private final VisualRepository visualRepository;
 
     public NodeInfosResponseDTO getNodeInfos(String fromAddress) {
@@ -114,8 +117,11 @@ public class VisualService {
     }
 
     public NodeInfosByLatestResponseDTO getNodeInfosByLatest(String token, String fromAddress) {
+        double price = cryptoPriceService.getCryptoPrice(token, "USD").block();
+
         List<NodeInfoByLatestDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
-                .map(p -> new NodeInfoByLatestDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress())))
+                .map(p -> new NodeInfoByLatestDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
+                                                                  p.getTotalValue() * price, p.getConvertedDate()))
                 .toList();
 
         return new NodeInfosByLatestResponseDTO(result);

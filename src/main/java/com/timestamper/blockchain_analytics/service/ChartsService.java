@@ -103,45 +103,6 @@ public class ChartsService {
         return pageResult;
     }
 
-    public ChartsTransactionResponseDTO getChartsFilteredByAmount(ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
-        Pageable pageable = getPageable(chartsTransactionRequestDTO);
-        double currentTokenPrice = tokenPriceAPIClient.updatePrice(chartsTransactionRequestDTO.getToken(), CURRENCY);
-        Page<TransactionInfoDTO> pageResult = getResultByTransactionAmount(chartsTransactionRequestDTO, pageable, currentTokenPrice);
-
-        return new ChartsTransactionResponseDTO(
-                pageResult.getContent(),
-                currentTokenPrice,
-                chartsTransactionRequestDTO.getPage(),
-                chartsTransactionRequestDTO.getSize(),
-                pageResult.getTotalElements()
-        );
-    }
-
-    private Page<TransactionInfoDTO> getResultByTransactionAmount(ChartsTransactionRequestDTO chartsTransactionRequestDTO, Pageable pageable, double currentTokenPrice) {
-        Page<TransactionInfoDTO> pageResult;
-
-        // 날짜 필터링이 있는 경우
-        if (chartsTransactionRequestDTO.getStartDate() != null && chartsTransactionRequestDTO.getEndDate() != null) {
-            LocalDateTime startDate = chartsTransactionRequestDTO.getStartDate().atStartOfDay();
-            LocalDateTime endDate = chartsTransactionRequestDTO.getEndDate().plusDays(1).atStartOfDay();
-
-            pageResult = chartsRepository.findFilteredTransactionsByAmountAndDate(
-                    chartsTransactionRequestDTO.getToken(),
-                    currentTokenPrice,
-                    startDate,
-                    endDate,
-                    pageable
-            );
-        } else {
-            pageResult = chartsRepository.findFilteredTransactionsByAmount(
-                    chartsTransactionRequestDTO.getToken(),
-                    currentTokenPrice,
-                    pageable
-            );
-        }
-        return pageResult;
-    }
-
     private Pageable getPageable(ChartsTransactionRequestDTO chartsTransactionRequestDTO) {
         return PageRequest.of(
                 Math.max(0, chartsTransactionRequestDTO.getPage() - 1),

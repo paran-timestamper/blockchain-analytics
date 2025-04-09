@@ -107,52 +107,5 @@ public interface ChartsRepository extends PagingAndSortingRepository<Transaction
             Pageable pageable
     );
 
-    // 트랜잭션량 & 날짜 필터링
-    @Query("""
-        SELECT new com.timestamper.blockchain_analytics.dto.charts.TransactionInfoDTO(
-            t.txhash,
-            t.fromAddress,
-            t.toAddress,
-            t.amount,
-            (t.amount * :currentTokenPrice) totalPrice,
-            t.dpdenom,
-            t.convertedDate
-        )
-        FROM Transaction t
-        WHERE t.dpdenom = :token
-          AND t.convertedDate >= :startDate
-          AND t.convertedDate < :endDatePlusOne
-        ORDER BY t.amount DESC
-    """)
-    Page<TransactionInfoDTO> findFilteredTransactionsByAmountAndDate(
-            @Param("token") String token,
-            @Param("currentTokenPrice") double currentTokenPrice,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDatePlusOne") LocalDateTime endDatePlusOne,
-            Pageable pageable
-    );
-
-    // 트랜잭션량 필터링
-    @Query("""
-        SELECT new com.timestamper.blockchain_analytics.dto.charts.TransactionInfoDTO(
-            t.txhash,
-            t.fromAddress,
-            t.toAddress,
-            t.amount,
-            (t.amount * :currentTokenPrice) totalPrice,
-            t.dpdenom,
-            t.convertedDate
-        )
-        FROM Transaction t
-        WHERE t.dpdenom = :token
-        ORDER BY t.amount DESC
-    """)
-    Page<TransactionInfoDTO> findFilteredTransactionsByAmount(
-            @Param("token") String token,
-            @Param("currentTokenPrice") double currentTokenPrice,
-            Pageable pageable
-    );
-
-
     List<Transaction> findByFromAddressOrderByTimestampDesc(String fromAddress);
 }
