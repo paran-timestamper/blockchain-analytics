@@ -9,6 +9,6 @@ public class NodeFilteredInfosDTO {
     private String toAddress;
     private boolean isExchange;
     private Double totalValue;
-    private int transactionCount;
+    private Integer transactionCount;
     private String convertedDate;
 }
