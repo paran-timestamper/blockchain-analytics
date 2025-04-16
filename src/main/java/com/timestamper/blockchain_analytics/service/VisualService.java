@@ -180,4 +180,8 @@ public class VisualService {
 
         return new NodeFilteredInfosResponseDTO(result);
     }
+
+    public double getNodeInfoPrice(String token, double amount) {
+        return cryptoPriceService.getCryptoPrice(token, "USD").block() * amount;
+    }
 }
