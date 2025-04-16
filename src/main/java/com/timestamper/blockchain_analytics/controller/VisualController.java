@@ -1,13 +1,7 @@
 package com.timestamper.blockchain_analytics.controller;
 
-import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeAddressRequestDTO;
-import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeDayTransactionRequestDTO;
-import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeFilteredInfosRequestDTO;
-import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeMonthTransactionRequestDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeDayTransactionResponseDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeFilteredInfosResponseDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosResponseDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeMonthTransactionResponseDTO;
+import com.timestamper.blockchain_analytics.dto.visual.reqeust.*;
+import com.timestamper.blockchain_analytics.dto.visual.response.*;
 import com.timestamper.blockchain_analytics.service.VisualService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +29,7 @@ public class VisualController {
     }
 
     @PostMapping("/nodeInfos/latest")
-    public NodeFilteredInfosResponseDTO getNodeInfosByLatest(@RequestBody NodeFilteredInfosRequestDTO request) {
+    public NodeDpdenomFilteredInfosResponseDTO getNodeInfosByLatest(@RequestBody NodeFilteredInfosRequestDTO request) {
         return visualService.getNodeInfosByLatest(request.getToken(), request.getFromAddress());
     }
 
@@ -49,5 +43,8 @@ public class VisualController {
         return visualService.getNodeInfosByTransactionAmount(request.getToken(), request.getFromAddress());
     }
 
-
+    @PostMapping("nodeInfo/price")
+    public double getNodeInfoPrice(@RequestBody NodePriceRequestDTO request) {
+        return visualService.getNodeInfoPrice(request.getToken(), request.getAmount());
+    }
 }

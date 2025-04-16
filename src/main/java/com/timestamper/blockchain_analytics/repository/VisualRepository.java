@@ -1,6 +1,7 @@
 package com.timestamper.blockchain_analytics.repository;
 
 import com.timestamper.blockchain_analytics.entity.Transaction;
+import com.timestamper.blockchain_analytics.repository.projection.visual.AddressAddDpdenomProjection;
 import com.timestamper.blockchain_analytics.repository.projection.visual.AddressProjection;
 import com.timestamper.blockchain_analytics.repository.projection.visual.NodeInfoEmptyTokenProjection;
 import com.timestamper.blockchain_analytics.repository.projection.visual.NodeInfoProjection;
@@ -39,15 +40,15 @@ public interface VisualRepository extends JpaRepository<Transaction, Long> {
 
     @Query(value = """
     SELECT TOADDRESS, SUM(AMOUNT) AS TOTAL_VALUE,
-           COUNT(TOADDRESS) AS TRANSACTION_COUNT, MAX(CONVERTED_DATE) AS CONVERTED_DATE
+           COUNT(TOADDRESS) AS TRANSACTION_COUNT, MAX(CONVERTED_DATE) AS CONVERTED_DATE, DPDENOM
     FROM TRANSACTION
     WHERE (:token IS NULL OR DPDENOM = :token)
       AND (:fromAddress IS NULL OR fromaddress = :fromAddress)
-    GROUP BY TOADDRESS
+    GROUP BY TOADDRESS, DPDENOM
     ORDER BY CONVERTED_DATE DESC
     LIMIT 100
 """, nativeQuery = true)
-    List<AddressProjection> getNodeInfosByLatest(@Param("token") String token, @Param("fromAddress") String fromAddress);
+    List<AddressAddDpdenomProjection> getNodeInfosByLatest(@Param("token") String token, @Param("fromAddress") String fromAddress);
 
     @Query(value = """
     SELECT TOADDRESS, SUM(AMOUNT) AS TOTAL_VALUE,
