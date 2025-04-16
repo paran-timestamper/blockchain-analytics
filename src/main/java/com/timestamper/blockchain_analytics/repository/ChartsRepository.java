@@ -107,5 +107,5 @@ public interface ChartsRepository extends PagingAndSortingRepository<Transaction
             Pageable pageable
     );
 
-    List<Transaction> findByFromAddressOrderByTimestampDesc(String fromAddress);
+    List<Transaction> findByFromAddressOrderByTimestampDesc(@Param("fromAddress") String fromAddress);
 }
