@@ -2,6 +2,7 @@ package com.timestamper.blockchain_analytics.repository;
 
 import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.repository.projection.visual.AddressProjection;
+import com.timestamper.blockchain_analytics.repository.projection.visual.NodeInfoEmptyTokenProjection;
 import com.timestamper.blockchain_analytics.repository.projection.visual.NodeInfoProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,15 +16,24 @@ import java.util.List;
 @Repository
 public interface VisualRepository extends JpaRepository<Transaction, Long> {
 
+    @Query(value = """
+        SELECT txhash, type, toaddress, amount
+        FROM transaction
+        WHERE fromaddress = :fromAddress
+          AND DPDENOM = :token
+        ORDER BY timestamp DESC
+        LIMIT 10
+    """, nativeQuery = true)
+    List<NodeInfoProjection> getNodeInfos(String fromAddress, String token);
 
     @Query(value = """
-        SELECT txhash, type, toaddress
+        SELECT txhash, type, toaddress, amount, dpdenom
         FROM transaction
         WHERE fromaddress = :fromAddress
         ORDER BY timestamp DESC
         LIMIT 10
     """, nativeQuery = true)
-    List<NodeInfoProjection> getNodeInfos(String fromAddress);
+    List<NodeInfoEmptyTokenProjection> getNodeInfosEmptyToken(String fromAddress);
 
     List<Transaction> findByFromAddressAndConvertedDateBetween(String fromAddress, LocalDateTime startOfDay, LocalDateTime endOfDay);
 
