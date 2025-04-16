@@ -143,7 +143,7 @@ public class VisualService {
 
         List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
                 .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
-                                                                  p.getTotalValue() * price, p.getConvertedDate()))
+                                                                  p.getTotalValue() * price, p.getTransactionCount(),  p.getConvertedDate()))
                 .toList();
 
         return new NodeFilteredInfosResponseDTO(result);
@@ -156,7 +156,7 @@ public class VisualService {
 
         List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionPrice(token, fromAddress).stream()
                 .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
-                                                                  p.getTotalValue() * price, p.getConvertedDate()))
+                                                                  p.getTotalValue() * price, p.getTransactionCount(), p.getConvertedDate()))
                 .toList();
 
         return new NodeFilteredInfosResponseDTO(result);
@@ -169,7 +169,7 @@ public class VisualService {
 
         List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionAmount(token, fromAddress).stream()
                 .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
-                        p.getTotalValue() * price, p.getConvertedDate()))
+                        p.getTotalValue() * price, p.getTransactionCount(), p.getConvertedDate()))
                 .toList();
 
         return new NodeFilteredInfosResponseDTO(result);
