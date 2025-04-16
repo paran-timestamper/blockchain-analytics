@@ -4,6 +4,7 @@ import com.timestamper.blockchain_analytics.dto.visual.NodeDayTransactionDTO;
 import com.timestamper.blockchain_analytics.dto.visual.NodeFilteredInfosDTO;
 import com.timestamper.blockchain_analytics.dto.visual.NodeInfoDTO;
 import com.timestamper.blockchain_analytics.dto.visual.NodeMonthTransactionDTO;
+import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeAddressRequestDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeDayTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeFilteredInfosResponseDTO;
 import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosResponseDTO;
@@ -12,6 +13,7 @@ import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.enums.DaySlot;
 import com.timestamper.blockchain_analytics.enums.MonthSlot;
 import com.timestamper.blockchain_analytics.repository.VisualRepository;
+import com.timestamper.blockchain_analytics.repository.projection.visual.NodeInfoEmptyTokenProjection;
 import com.timestamper.blockchain_analytics.repository.projection.visual.NodeInfoProjection;
 import com.timestamper.blockchain_analytics.service.crypto.CryptoPriceService;
 import com.timestamper.blockchain_analytics.utils.api.EtherscanAPI;
@@ -36,23 +38,41 @@ public class VisualService {
     private final CryptoPriceService cryptoPriceService;
     private final VisualRepository visualRepository;
 
-    public NodeInfosResponseDTO getNodeInfos(String fromAddress) {
-        List<NodeInfoProjection> nodeInfos = visualRepository.getNodeInfos(fromAddress);
+    public NodeInfosResponseDTO getNodeInfos(NodeAddressRequestDTO request) {
+        if (request.getToken() == null) {
+            List<NodeInfoEmptyTokenProjection> nodeInfos = visualRepository.getNodeInfosEmptyToken(request.getFromAddress());
+            List<NodeInfoDTO> nodeInfoDTOs = nodeInfos.stream()
+                    .map(node -> {
+                        Double currentPrice = cryptoPriceService.getCryptoPrice(node.getDpdenom(), "USD").block();
+                        return new NodeInfoDTO(
+                                node.getTxHash(),
+                                node.getType(),
+                                node.getToAddress(),
+                                node.getAmount() * currentPrice
+                        );
+                    })
+                    .toList();
 
-        // TODO totalValue 어떻게 계산하는지 물어보고 구현해야함 ㄱㄱ
-        double totalValue = 0.0;
+            return new NodeInfosResponseDTO(nodeInfoDTOs);
+        } else {
+            List<NodeInfoProjection> nodeInfos = visualRepository.getNodeInfos(request.getFromAddress(), request.getToken());
+            Double currentPrice = cryptoPriceService.getCryptoPrice(request.getToken(), "USD").block();
 
-        List<NodeInfoDTO> list = nodeInfos.stream()
-                .map(nodeInfo -> new NodeInfoDTO(
-                        nodeInfo.getTxHash(),
-                        nodeInfo.getType(),
-                        nodeInfo.getToAddress(),
-                        totalValue
-                ))
-                .toList();
+            List<NodeInfoDTO> list = nodeInfos.stream()
+                    .map(nodeInfo -> new NodeInfoDTO(
+                            nodeInfo.getTxHash(),
+                            nodeInfo.getType(),
+                            nodeInfo.getToAddress(),
+                            nodeInfo.getAmount() * currentPrice
+                    ))
+                    .toList();
 
-        return new NodeInfosResponseDTO(list);
+            return new NodeInfosResponseDTO(list);
+        }
     }
+
+    // 토큰의 정보가 있으면 해당 토큰 가격을 들고와서 totalValue를 계산하고
+    // 토큰의 정보가 없으면 각 트랜잭션에서 각각의 가격을 들고와서 계산한다.
 
     public NodeDayTransactionResponseDTO getNodeDayTransaction(String fromAddress, LocalDate date) {
         LocalDateTime startOfDay = date.atStartOfDay();

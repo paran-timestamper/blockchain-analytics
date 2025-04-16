@@ -4,4 +4,5 @@ public interface NodeInfoProjection {
     String getTxHash();
     String getType();
     String getToAddress();
+    Double getAmount();
 }
