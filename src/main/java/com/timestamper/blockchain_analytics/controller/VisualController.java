@@ -21,7 +21,7 @@ public class VisualController {
 
     @PostMapping("/nodeInfos")
     public NodeInfosResponseDTO getNodeInfos(@RequestBody NodeAddressRequestDTO request) {
-        return visualService.getNodeInfos(request.getFromAddress());
+        return visualService.getNodeInfos(request);
     }
 
     @PostMapping("/nodeInfo/dayTransaction")
