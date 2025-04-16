@@ -1,14 +1,8 @@
 package com.timestamper.blockchain_analytics.service;
 
-import com.timestamper.blockchain_analytics.dto.visual.NodeDayTransactionDTO;
-import com.timestamper.blockchain_analytics.dto.visual.NodeFilteredInfosDTO;
-import com.timestamper.blockchain_analytics.dto.visual.NodeInfoDTO;
-import com.timestamper.blockchain_analytics.dto.visual.NodeMonthTransactionDTO;
+import com.timestamper.blockchain_analytics.dto.visual.*;
 import com.timestamper.blockchain_analytics.dto.visual.reqeust.NodeAddressRequestDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeDayTransactionResponseDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeFilteredInfosResponseDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeInfosResponseDTO;
-import com.timestamper.blockchain_analytics.dto.visual.response.NodeMonthTransactionResponseDTO;
+import com.timestamper.blockchain_analytics.dto.visual.response.*;
 import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.enums.DaySlot;
 import com.timestamper.blockchain_analytics.enums.MonthSlot;
@@ -136,17 +130,29 @@ public class VisualService {
                 .sum();
     }
 
-    public NodeFilteredInfosResponseDTO getNodeInfosByLatest(String token, String fromAddress) {
-        Double price = Optional.ofNullable(token)
+    // 토큰의 정보가 있으면 해당 토큰 가격을 들고와서 totalValue를 계산하고
+    // 토큰의 정보가 없으면 각 트랜잭션에서 amount 값을 넘겨주고 mouseover를 통해서 가격을 계산한다.
+    public NodeDpdenomFilteredInfosResponseDTO getNodeInfosByLatest(String token, String fromAddress) {
+        double price = Optional.ofNullable(token)
                 .map(t -> cryptoPriceService.getCryptoPrice(t, "USD").block())
                 .orElse(0.0);
 
-        List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
-                .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
-                                                                  p.getTotalValue() * price, p.getConvertedDate()))
+        List<NodeDpdenomFilteredInfosDTO> result = visualRepository.getNodeInfosByLatest(token, fromAddress).stream()
+                .map(p -> {
+                    double value = (price == 0.0) ? p.getTotalValue() : p.getTotalValue() * price;
+
+                    return new NodeDpdenomFilteredInfosDTO(
+                            p.getToAddress(),
+                            etherscanAPI.isExchangeAddress(p.getToAddress()),
+                            value,
+                            p.getTransactionCount(),
+                            p.getConvertedDate(),
+                            p.getDpdenom()
+                    );
+                })
                 .toList();
 
-        return new NodeFilteredInfosResponseDTO(result);
+        return new NodeDpdenomFilteredInfosResponseDTO(result);
     }
 
     public NodeFilteredInfosResponseDTO getNodeInfosByTransactionPrice(String token, String fromAddress) {
@@ -156,7 +162,7 @@ public class VisualService {
 
         List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionPrice(token, fromAddress).stream()
                 .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
-                                                                  p.getTotalValue() * price, p.getConvertedDate()))
+                                                                  p.getTotalValue() * price, p.getTransactionCount(), p.getConvertedDate()))
                 .toList();
 
         return new NodeFilteredInfosResponseDTO(result);
@@ -169,9 +175,13 @@ public class VisualService {
 
         List<NodeFilteredInfosDTO> result = visualRepository.getNodeInfosByTransactionAmount(token, fromAddress).stream()
                 .map(p -> new NodeFilteredInfosDTO(p.getToAddress(), etherscanAPI.isExchangeAddress(p.getToAddress()),
-                        p.getTotalValue() * price, p.getConvertedDate()))
+                        p.getTotalValue() * price, p.getTransactionCount(), p.getConvertedDate()))
                 .toList();
 
         return new NodeFilteredInfosResponseDTO(result);
+    }
+
+    public double getNodeInfoPrice(String token, double amount) {
+        return cryptoPriceService.getCryptoPrice(token, "USD").block() * amount;
     }
 }
