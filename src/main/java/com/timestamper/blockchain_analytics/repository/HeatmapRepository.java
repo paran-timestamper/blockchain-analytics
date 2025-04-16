@@ -5,6 +5,7 @@ import com.timestamper.blockchain_analytics.repository.projection.heatmap.Heatma
 import com.timestamper.blockchain_analytics.repository.projection.heatmap.HeatmapTransactionProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -55,7 +56,7 @@ public interface HeatmapRepository extends JpaRepository<Transaction, Long> {
         FROM merged
         ORDER BY day_order, hour
     """, nativeQuery = true)
-    List<HeatmapProjection> getInfo(LocalDateTime startDateTime, LocalDateTime endDateTime);
+    List<HeatmapProjection> getInfo(@Param("startDateTime") LocalDateTime startDateTime, @Param("endDateTime") LocalDateTime endDateTime);
 
     @Query(value = """
         SELECT
@@ -71,5 +72,5 @@ public interface HeatmapRepository extends JpaRepository<Transaction, Long> {
         ORDER BY transactionCount DESC
         LIMIT 3
     """, nativeQuery = true)
-    List<HeatmapTransactionProjection> getTransactionInfo(LocalDateTime startDateTime, LocalDateTime endDateTime);
+    List<HeatmapTransactionProjection> getTransactionInfo(@Param("startDateTime") LocalDateTime startDateTime, @Param("endDateTime") LocalDateTime endDateTime);
 }

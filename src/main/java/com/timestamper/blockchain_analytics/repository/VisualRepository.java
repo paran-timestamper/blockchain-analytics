@@ -25,7 +25,7 @@ public interface VisualRepository extends JpaRepository<Transaction, Long> {
         ORDER BY timestamp DESC
         LIMIT 10
     """, nativeQuery = true)
-    List<NodeInfoProjection> getNodeInfos(String fromAddress, String token);
+    List<NodeInfoProjection> getNodeInfos(@Param("fromAddress") String fromAddress, @Param("token") String token);
 
     @Query(value = """
         SELECT txhash, type, toaddress, amount, dpdenom
@@ -34,9 +34,11 @@ public interface VisualRepository extends JpaRepository<Transaction, Long> {
         ORDER BY timestamp DESC
         LIMIT 10
     """, nativeQuery = true)
-    List<NodeInfoEmptyTokenProjection> getNodeInfosEmptyToken(String fromAddress);
+    List<NodeInfoEmptyTokenProjection> getNodeInfosEmptyToken(@Param("fromAddress") String fromAddress);
 
-    List<Transaction> findByFromAddressAndConvertedDateBetween(String fromAddress, LocalDateTime startOfDay, LocalDateTime endOfDay);
+    List<Transaction> findByFromAddressAndConvertedDateBetween(@Param("fromAddress") String fromAddress,
+                                                               @Param("startOfDay") LocalDateTime startOfDay,
+                                                               @Param("endOfDay") LocalDateTime endOfDay);
 
     @Query(value = """
     SELECT TOADDRESS, SUM(AMOUNT) AS TOTAL_VALUE,
