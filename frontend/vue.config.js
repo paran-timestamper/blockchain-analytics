@@ -1,4 +1,7 @@
 module.exports = {
+  transpileDependencies: [
+    "chart.js"
+  ],
   devServer: {
     port: 8082, // 프론트 포트
     proxy: {
