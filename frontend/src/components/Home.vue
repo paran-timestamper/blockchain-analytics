@@ -1,13 +1,7 @@
 <template>
   <div class="home-layout">
-    <!-- 왼쪽: 뉴스 영역 -->
     <div class="home-page">
-      <h2>📡 News Search</h2>
-      <!-- 검색 바 -->
-      <div class="search-bar">
-        <input v-model="query" @keyup.enter="searchArticles" placeholder="Enter a keyword" />
-        <button @click="searchArticles">Search</button>
-      </div>
+      <h2>📡 News Feed</h2>
 
       <!-- 뉴스 그리드 -->
       <div class="news-grid" v-if="paginatedArticles.length">
@@ -36,9 +30,15 @@
 
 <script>
 export default {
+  name: "Home",
+  props: {
+    keyword: {
+      type: String,
+      default: '' // 나중에 노드에서 토큰을 받을 예정
+    }
+  },
   data() {
     return {
-      query: '',
       articles: [],
       paginatedArticles: [],
       allArticles: [],
@@ -47,48 +47,23 @@ export default {
     };
   },
   mounted() {
-    this.fetchLatestArticles();
+    const fixedKeyword = this.keyword?.trim() || "bitcoin";
+    this.fetchArticles(fixedKeyword);
   },
   methods: {
-    async fetchLatestArticles() {
+    async fetchArticles(keyword) {
       try {
         const response = await fetch('http://localhost:8080/api/news', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            "keyword": "bitcoin"
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ keyword })  // 여기서 keyword 전달
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        this.allArticles = data.articles;
+        this.allArticles = (data.articles || []).slice(0, 100); // 최대 100개 제한
         this.updatePaginatedArticles();
       } catch (error) {
-        console.error('Latest news fetch failed:', error);
-      }
-    },
-    async searchArticles() {
-      if (!this.query || !this.query.trim()) return;
-
-      try {
-        const response = await fetch(`http://localhost:8080/api/news`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ "keyword" : this.query }),
-        });
-
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-        const data = await response.json();
-        this.allArticles = data.articles || [];
-        this.currentPage = 1;
-        this.updatePaginatedArticles();
-      } catch (error) {
-        console.error('Search failed:', error);
+        console.error('뉴스 가져오기 실패:', error);
       }
     },
     updatePaginatedArticles() {
@@ -115,26 +90,6 @@ export default {
 
 .home-page {
   width: 100%;
-}
-
-.search-bar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-input {
-  flex: 1;
-  padding: 8px;
-  border-radius: 4px;
-  border: none;
-}
-button {
-  padding: 8px 12px;
-  background: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
 .news-grid {

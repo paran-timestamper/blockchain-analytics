@@ -1,6 +1,9 @@
 <template>
   <div class="broken-line-graph">
-    <h3>Broken Line Graph ({{ address }})</h3>
+    <div class="address-line">
+      <span class="address-text" :title="address">{{ truncateText(address) }}</span>
+      <button @click="copyToClipboard(address)">📋</button>
+    </div>
     <canvas ref="lineChart" width="300" height="150"></canvas>
   </div>
 </template>
@@ -72,6 +75,16 @@ export default {
         }
       }
     });
+  },
+  methods: {
+    truncateText(text) {
+      return text.length > 10 ? text.slice(0, 10) + "..." : text;
+    },
+    copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard: " + text);
+      });
+    }
   }
 };
 </script>
@@ -81,6 +94,40 @@ export default {
   width: 100%;
   height: 100%;
 }
+
+.address-line {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.address-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #ccc;
+}
+
+button {
+  font-size: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ccc;
+  padding: 0;
+  margin: 0 0 0 5px;
+  vertical-align: middle;
+}
+
+button:hover {
+  color: #fff;
+}
+
 canvas {
   background: #222;
 }
