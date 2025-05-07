@@ -69,15 +69,4 @@ public class TransactionController {
     public List<Transaction> getTransactionsByAddress(@RequestParam String token, @RequestParam String fromAddress) {
         return transactionService.getTransactionByAddress(token, fromAddress);
     }
-
-    // TODO infos/address 필터링 기능
-
-
-    // TODO infos/address 일, 월 그래프 데이터 필터링 기능
-
-
-    // TODO 고래 데이터 필터링 기능
-
-
-    // TODO 히트맵 데이터 필터링 기능
 }

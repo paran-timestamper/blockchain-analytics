@@ -1,26 +1,45 @@
 package com.timestamper.blockchain_analytics.controller;
 
+import com.timestamper.blockchain_analytics.dto.node.request.NodeInfosRequestDTO;
+import com.timestamper.blockchain_analytics.dto.node.request.NodeTransactionRequestDTO;
+import com.timestamper.blockchain_analytics.dto.node.response.NodeInfosResponseDTO;
+import com.timestamper.blockchain_analytics.dto.node.response.NodeTransactionResponseDTO;
+import com.timestamper.blockchain_analytics.dto.node.response.TOP1AddressResponseDTO;
+import com.timestamper.blockchain_analytics.service.NodeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/node")
 public class NodeController {
 
-    // Main > Node > TOP1 Address 출력
-    public void getTOP1Address() {
+    private final NodeService nodeService;
 
+    @PostMapping("TOP1Address")
+    public TOP1AddressResponseDTO getTOP1Address() {
+        return nodeService.getTOP1Address();
     }
 
-    // Main > Node > 좌클릭 > TOKEN, FILTER를 기준으로  클릭된 노드와 트랜잭션을 발생시킨 노드 10개를 추가로 생성 및 브랜치 확장.
-    public void getNodeInfos() {
-
+    @PostMapping("nodeInfos")
+    public NodeInfosResponseDTO getNodeInfos(@RequestBody NodeInfosRequestDTO request) {
+        return nodeService.getNodeInfos(request);
     }
 
-    // Main > Node > 우클릭 > 노드 트랜잭션 내역(txhash,direction,to address, value) - paging 적용
-    public void getNodeTransaction() {
+    @PostMapping("clickNodeInfos")
+    public NodeInfosResponseDTO getNodeClickInfos(@RequestBody NodeInfosRequestDTO request) {
+        return nodeService.getNodeClickInfos(request);
+    }
 
+    // TODO paging 기능 되도록 구현
+    @PostMapping("nodeTransaction")
+    public List<NodeTransactionResponseDTO> getNodeTransaction(@RequestBody NodeTransactionRequestDTO request, Pageable pageable) {
+        return nodeService.getNodeTransaction(request, pageable);
     }
 }

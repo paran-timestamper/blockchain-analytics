@@ -24,4 +24,24 @@ public class HeatmapController {
         return heatmapService.getTransactionInfo(request);
     }
 
+    // TODO Main > Node > 우클릭 > Heatmap > 월 거래량
+    public void getMonthlyTransactionVolume() {
+
+    }
+
+    // TODO Main > Node > 우클릭 > Heatmap > 일 거래량
+    public void getDailyTransactionVolume() {
+
+    }
+
+    // TODO Main > Node > 우클릭 > Heatmap > 월 거래량 > 클릭 시 rank/token/tx 수/총 value/토큰 현재가
+    public void getMonthlyTransactionVolumeDetail() {
+
+    }
+
+    // TODO Main > Node > 우클릭 > Heatmap > 일 거래량 > 클릭 시 rank/token/tx 수/총 value/토큰 현재가
+    public void getDailyTransactionVolumeDetail() {
+
+    }
+
 }
