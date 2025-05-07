@@ -1,6 +1,5 @@
 <template>
   <div class="graph-wrapper">
-    <!-- 컨트롤 바 -->
     <div class="graph-controls">
       <div class="dropdown">
         <button class="control-button" @click="toggleTokenDropdown">
@@ -12,7 +11,6 @@
           </button>
         </div>
       </div>
-
       <div class="dropdown">
         <button class="control-button" @click="toggleFilterDropdown">
           {{ selectedFilter || 'FILTER' }}
@@ -23,14 +21,11 @@
           </button>
         </div>
       </div>
-
       <input class="search-input" v-model="searchQuery" @keyup.enter="onSearchEnter" placeholder="Search Address" />
     </div>
 
-    <!-- D3 영역 -->
     <div ref="chart" class="chart"></div>
 
-    <!-- 팝업 -->
     <div v-if="popup.visible" class="popup-overlay">
       <div class="popup-content">
         <button class="close-button" @click="closePopup">×</button>
@@ -38,14 +33,8 @@
           <div class="popup-box popup-box1a">
             <TransactionTable :address="popup.nodeAddress" />
           </div>
-          <div class="popup-box popup-box1b">
-            <MonthDayGraph :address="popup.nodeAddress" />
-          </div>
           <div class="popup-box popup-box2a">
             <HeatmapView :address="popup.nodeAddress" />
-          </div>
-          <div class="popup-box popup-box2b">
-            <HeatmapTable :address="popup.nodeAddress" />
           </div>
           <div class="popup-box popup-box3">
             <div class="toggle-buttons">
@@ -55,7 +44,15 @@
             <BrokenLineGraph v-if="currentChart==='broken'" :address="popup.nodeAddress" />
             <Treemap v-else :address="popup.nodeAddress" />
           </div>
-          <div class="popup-box popup-box4">
+          <div class="popup-box popup-box1b">
+            <MonthDayGraph :address="popup.nodeAddress" />
+          </div>
+          <div class="popup-box popup-box2b">
+            <div class="scrollable-table">
+              <HeatmapTable :address="popup.nodeAddress" />
+            </div>
+          </div>
+          <div class="popup-box popup-box4-news">
             <Home :address="popup.nodeAddress" />
           </div>
         </div>
@@ -150,8 +147,7 @@ export default {
       const centerY = H / 2;
 
       d3.select(C).select("svg").remove();
-      const svg = d3.select(C)
-          .append("svg")
+      const svg = d3.select(C).append("svg")
           .attr("width", W)
           .attr("height", H)
           .style("background", "#000");
@@ -216,13 +212,8 @@ export default {
         });
       }
     },
-    onNodeClick(d) {
-      // eslint-disable-next-line no-unused-vars
-      const newNodes = Array.from({ length: 10 }, (_, i) => ({
-        id: `${d.id}_${i}`,
-        color: '#64b5f6'
-      }));
-      this.generateMockData(); // You may want to call another method to dynamically add to graph
+    onNodeClick() {
+      this.generateMockData();
     },
     onNodeContextMenu(e, d) {
       e.preventDefault();
@@ -277,17 +268,6 @@ export default {
   flex-direction: column;
   z-index: 999;
 }
-.dropdown-menu button {
-  background: none;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  cursor: pointer;
-  text-align: left;
-}
-.dropdown-menu button:hover {
-  background-color: #3b4252;
-}
 .search-input {
   background: #1e1e1e;
   border: 1px solid #555;
@@ -295,7 +275,6 @@ export default {
   padding: 8px 12px;
   border-radius: 6px;
 }
-
 .popup-overlay {
   position: absolute;
   top: 0;
@@ -306,16 +285,17 @@ export default {
   z-index: 1000;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  overflow: auto;
 }
 .popup-content {
   width: 100%;
-  height: 100%;
+  max-height: 100%;
   background: transparent;
-  padding: 20px;
+  padding: 10px;
   box-sizing: border-box;
   position: relative;
-  padding-top: 1px;
+  overflow-y: auto;
 }
 .close-button {
   position: absolute;
@@ -327,18 +307,17 @@ export default {
   color: #fff;
   cursor: pointer;
 }
-
 .popup-grid {
   display: grid;
   grid-template-areas:
     "area1a area2a area3"
-    "area1b area2b area4";
+    "area1b area2b area2b"
+    "area4  area4  area4";
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: auto auto 1fr;
   gap: 10px;
-  height: 100%;
+  height: auto;
 }
-
 .popup-box {
   border-radius: 10px;
   padding: 10px;
@@ -348,13 +327,22 @@ export default {
   justify-content: center;
   background-color: rgba(42, 42, 42, 0.8);
 }
-.popup-box1a {
-  grid-area: area1a;
-  min-height: 350px;
+.scrollable-table {
+  max-height: 250px;
+  overflow-y: auto;
+  width: 100%;
 }
-.popup-box1b { grid-area: area1b; }
+.popup-box1a { grid-area: area1a; min-height: 350px; }
 .popup-box2a { grid-area: area2a; }
-.popup-box2b { grid-area: area2b; }
 .popup-box3  { grid-area: area3; }
-.popup-box4  { grid-area: area4; }
+.popup-box1b { grid-area: area1b; }
+.popup-box2b { grid-area: area2b; }
+.popup-box4-news {
+  grid-area: area4;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow-y: auto;
+  max-height: 100%;
+  padding-right: 5px;
+}
 </style>
