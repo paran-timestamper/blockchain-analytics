@@ -3,10 +3,8 @@
     <div class="controls">
       <div class="dropdown">
         <button class="token-button" @click="toggleTokenCategory">{{ selectedToken || 'TOKEN' }}</button>
-        <div v-if="showTokenCategory" class="dropdown-content">
-          <button class="dropdown-option" @click="selectToken('ETH')">ETH</button>
-          <button class="dropdown-option" @click="selectToken('BTC')">BTC</button>
-          <button class="dropdown-option" @click="selectToken('USDT')">USDT</button>
+        <div v-if="showTokenCategory" class="dropdown-content scrollable-dropdown">
+          <button class="dropdown-option" v-for="token in tokenList" :key="token" @click="selectToken(token)">{{ token }}</button>
         </div>
       </div>
 
@@ -14,7 +12,6 @@
         <button class="token-button" @click="toggleFilterCategory">{{ selectedFilter || 'FILTER' }}</button>
         <div v-if="showFilterCategory" class="dropdown-content">
           <button class="dropdown-option" @click="selectFilter('거래 대금')">거래 대금</button>
-          <button class="dropdown-option" @click="selectFilter('트랜잭션량')">트랜잭션량</button>
           <button class="dropdown-option" @click="selectFilter('최신순')">최신순</button>
         </div>
       </div>
@@ -27,30 +24,30 @@
       </div>
     </div>
 
-    <div v-if="filteredTxs.length" class="tx-table">
-      <table>
+    <div v-if="transactions.length" class="tx-table">
+      <table class="styled-table">
         <thead>
         <tr>
           <th>Tx Hash</th>
           <th>From</th>
           <th>To</th>
-          <th>Value(ETH)</th>
+          <th>Value(USDT)</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="tx in paginatedTxs" :key="tx.hash">
-          <td>{{ tx.hash }}</td>
-          <td>{{ tx.from }}</td>
-          <td>{{ tx.to }}</td>
-          <td>{{ tx.value }}</td>
+        <tr v-for="tx in transactions" :key="tx.txHash">
+          <td>{{ tx.txHash }}</td>
+          <td>{{ tx.fromAddress }}</td>
+          <td>{{ tx.toAddress }}</td>
+          <td>{{ tx.totalPrice.toFixed(2) }}</td>
         </tr>
         </tbody>
       </table>
 
       <div class="pagination">
-        <button :disabled="currentPage === 1" @click="currentPage--">Prev</button>
-        <span>Page {{ currentPage }} / {{ totalPages }}</span>
-        <button :disabled="currentPage === totalPages" @click="currentPage++">Next</button>
+        <button :disabled="page === 1" @click="changePage(page - 1)">Prev</button>
+        <span>Page {{ page }} / {{ totalPages }}</span>
+        <button :disabled="page === totalPages" @click="changePage(page + 1)">Next</button>
       </div>
     </div>
   </div>
@@ -60,35 +57,26 @@
 export default {
   data() {
     return {
+      tokenList: [],
       selectedToken: '',
       selectedFilter: '',
       showTokenCategory: false,
       showFilterCategory: false,
       filterStart: '',
       filterEnd: '',
-      currentPage: 1,
-      txs: [],
-      rawTxs: []
+      transactions: [],
+      page: 1,
+      size: 10,
+      totalCount: 0,
     };
   },
   computed: {
-    filteredTxs() {
-      if (!this.filterStart || !this.filterEnd) return this.txs;
-      const start = new Date(this.filterStart);
-      const end = new Date(this.filterEnd);
-      return this.txs.filter(tx => {
-        const txDate = new Date(tx.timestamp);
-        return txDate >= start && txDate <= end;
-      });
-    },
-    paginatedTxs() {
-      const start = (this.currentPage - 1) * 10;
-      const end = start + 10;
-      return this.filteredTxs.slice(start, end);
-    },
     totalPages() {
-      return Math.ceil(this.filteredTxs.length / 10);
+      return Math.ceil(this.totalCount / this.size);
     }
+  },
+  mounted() {
+    this.fetchTokens();
   },
   methods: {
     toggleTokenCategory() {
@@ -100,39 +88,71 @@ export default {
     selectToken(token) {
       this.selectedToken = token;
       this.showTokenCategory = false;
-      this.generateMockTxs();
+      this.page = 1;
+      this.fetchTransactions();
     },
     selectFilter(filter) {
       this.selectedFilter = filter;
       this.showFilterCategory = false;
-      this.generateMockTxs();
-    },
-    generateMockTxs() {
-      if (!this.selectedToken || !this.selectedFilter) return;
-      this.rawTxs = Array.from({ length: 100 }, () => ({
-        hash: `0x${Math.random().toString(16).slice(2, 10)}`,
-        from: `0x${Math.random().toString(16).slice(2, 12)}`,
-        to: `0x${Math.random().toString(16).slice(2, 12)}`,
-        value: (Math.random() * 10).toFixed(3),
-        timestamp: this.generateRandomTimestamp()
-      }));
-      this.txs = [...this.rawTxs];
-      this.currentPage = 1;
-    },
-    generateRandomTimestamp() {
-      const start = new Date("2024-01-01T00:00:00").getTime();
-      const end = new Date("2025-03-31T23:59:59").getTime();
-      const randomTime = new Date(start + Math.random() * (end - start));
-      const pad = (n) => (n < 10 ? '0' + n : n);
-      return `${randomTime.getFullYear()}-${pad(randomTime.getMonth() + 1)}-${pad(randomTime.getDate())}`;
+      this.page = 1;
+      this.fetchTransactions();
     },
     applyDateFilter() {
-      this.currentPage = 1;
+      this.page = 1;
+      this.fetchTransactions();
     },
     resetDateFilter() {
       this.filterStart = '';
       this.filterEnd = '';
-      this.currentPage = 1;
+      this.page = 1;
+      this.fetchTransactions();
+    },
+    changePage(newPage) {
+      this.page = newPage;
+      this.fetchTransactions();
+    },
+    async fetchTokens() {
+      try {
+        const res = await fetch('http://localhost:8080/api/common/tokens', { method: 'POST' });
+        const data = await res.json();
+        this.tokenList = data || [];
+      } catch (err) {
+        console.error('토큰 목록 로드 실패:', err);
+      }
+    },
+    async fetchTransactions() {
+      if (!this.selectedToken || !this.selectedFilter) return;
+
+      const payload = {
+        token: this.selectedToken,
+        page: this.page,
+        size: this.size,
+        startDate: this.filterStart || null,
+        endDate: this.filterEnd || null
+      };
+
+      let endpoint = '';
+      if (this.selectedFilter === '최신순') {
+        endpoint = 'latest';
+      } else if (this.selectedFilter === '거래 대금') {
+        endpoint = 'transactionPrice';
+      } else {
+        endpoint = 'latest'; // 기본값 fallback
+      }
+
+      try {
+        const res = await fetch(`http://localhost:8080/api/charts/infos/${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        this.transactions = data.transactions || [];
+        this.totalCount = data.totalCount || 0;
+      } catch (err) {
+        console.error('트랜잭션 로드 실패:', err);
+      }
     }
   }
 };
@@ -180,6 +200,8 @@ export default {
   flex-direction: column;
   gap: 8px;
   z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
 }
 .dropdown-option {
   background-color: #1f2630;
@@ -200,19 +222,33 @@ export default {
   align-items: center;
   gap: 8px;
 }
-.tx-table table {
+.tx-table {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+.styled-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
   font-size: 14px;
+  background-color: #1a1a1a;
 }
 th, td {
-  padding: 8px;
-  border: 1px solid #555;
+  padding: 12px 16px;
+  border: 1px solid #444;
   text-align: left;
 }
+th {
+  background-color: #222;
+  color: #ddd;
+}
+tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
+tr:hover {
+  background-color: #333;
+}
 .pagination {
-  margin-top: 12px;
+  margin-top: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
