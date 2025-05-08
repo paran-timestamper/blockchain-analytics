@@ -132,7 +132,8 @@ export default {
     generateMockData(centerId = this.centerNode.id) {
       const colors = ['#FF6E6E', '#78EFAD', '#FFFA78'];
       const txs = Array.from({ length: 100 }, (_, i) => ({
-        toAddress: "0x" + Math.random().toString(16).substr(2, 6),
+        toAddress: '0x' + Math.random().toString(16).substr(2, 40).padEnd(40, '0'),
+        txHash: '0x' + Math.random().toString(16).substr(2, 64).padEnd(64, '0'),
         value: Math.floor(Math.random() * 10000),
         color: colors[i % 3]
       })).sort((a, b) => b.value - a.value);
