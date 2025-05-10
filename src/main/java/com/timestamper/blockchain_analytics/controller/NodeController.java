@@ -7,6 +7,7 @@ import com.timestamper.blockchain_analytics.dto.node.response.NodeTransactionRes
 import com.timestamper.blockchain_analytics.dto.node.response.TOP1AddressResponseDTO;
 import com.timestamper.blockchain_analytics.service.NodeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,7 +40,11 @@ public class NodeController {
 
     // TODO paging 기능 되도록 구현
     @PostMapping("nodeTransaction")
-    public List<NodeTransactionResponseDTO> getNodeTransaction(@RequestBody NodeTransactionRequestDTO request, Pageable pageable) {
+    public List<NodeTransactionResponseDTO> getNodeTransaction(@RequestBody NodeTransactionRequestDTO request) {
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize()
+        );
         return nodeService.getNodeTransaction(request, pageable);
     }
 }

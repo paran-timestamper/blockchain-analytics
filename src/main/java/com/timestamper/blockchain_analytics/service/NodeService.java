@@ -11,6 +11,7 @@ import com.timestamper.blockchain_analytics.repository.NodeRepository;
 import com.timestamper.blockchain_analytics.repository.projection.node.NodeTransactionProjection;
 import com.timestamper.blockchain_analytics.service.crypto.CryptoPriceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -78,9 +79,9 @@ public class NodeService {
     public List<NodeTransactionResponseDTO> getNodeTransaction(NodeTransactionRequestDTO request, Pageable pageable) {
         double tokenPrice = cryptoPriceService.getCryptoPrice(request.getToken(), "USD").block();
 
-        List<NodeTransactionProjection> nodeTransaction = nodeRepository.findNodeTransaction(request.getFromAddress(), request.getToken(), pageable);
+        Page<NodeTransactionProjection> nodeTransaction = nodeRepository.findNodeTransaction(request.getFromAddress(), request.getToken(), pageable);
 
-        return nodeTransaction.stream()
+        return nodeTransaction.getContent().stream()
                 .map(item -> {
                     Double amount = item.getAmount();
                     double value = (amount != null ? amount : 0.0) * tokenPrice;
