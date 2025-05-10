@@ -38,7 +38,6 @@ public class NodeController {
         return nodeService.getNodeClickInfos(request);
     }
 
-    // TODO paging 기능 되도록 구현
     @PostMapping("nodeTransaction")
     public List<NodeTransactionResponseDTO> getNodeTransaction(@RequestBody NodeTransactionRequestDTO request) {
         Pageable pageable = PageRequest.of(
