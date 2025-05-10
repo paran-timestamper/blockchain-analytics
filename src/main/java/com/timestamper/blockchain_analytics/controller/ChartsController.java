@@ -42,4 +42,9 @@ public class ChartsController {
         return chartsService.getTransactionByAddress(request);
     }
 
+    // TODO Main > Chart > Chart 데이터 불러오기 (필터링 : 최신순, 거래대금 2가지 경우만 고려, Address 입력도 고려)
+    public void getChartsData() {
+
+    }
+
 }
