@@ -19,6 +19,7 @@ public interface NodeRepository  extends JpaRepository<Transaction, Long> {
         SELECT toaddress, dpdenom
         FROM transaction
         WHERE fromaddress = :fromAddress
+          AND dpdenom <> 'Unknown'
         ORDER BY amount DESC
         LIMIT 100
     """, nativeQuery = true)
