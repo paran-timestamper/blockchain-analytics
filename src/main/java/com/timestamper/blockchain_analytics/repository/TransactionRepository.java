@@ -14,9 +14,6 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    @Query("SELECT DISTINCT t.dpdenom FROM Transaction t ORDER BY t.dpdenom")
-    List<String> findDistinctDpdenom();
-
     @Query("""
         SELECT new com.timestamper.blockchain_analytics.dto.TransactionFilteredVolumeDTO(t.fromAddress, COUNT(t))
         FROM Transaction t

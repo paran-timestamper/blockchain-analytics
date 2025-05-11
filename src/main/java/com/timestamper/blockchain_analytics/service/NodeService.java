@@ -11,6 +11,7 @@ import com.timestamper.blockchain_analytics.repository.NodeRepository;
 import com.timestamper.blockchain_analytics.repository.projection.node.NodeTransactionProjection;
 import com.timestamper.blockchain_analytics.service.crypto.CryptoPriceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -23,17 +24,25 @@ public class NodeService {
     private final NodeRepository nodeRepository;
     private final CryptoPriceService cryptoPriceService;
 
-    // TODO topFromAddress 변경 필요
+    private final static String TOP1_ADDRESS = "axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k";
+
+//    TOP1_ADDRESS 출력 쿼리
+//    SELECT t.fromaddress, SUM(t.amount * tok.price) AS total_capital
+//    FROM transaction t
+//    JOIN token tok ON t.dpdenom = tok.token
+//    GROUP BY t.fromaddress
+//    ORDER BY total_capital DESC
+//    LIMIT 1;
+
     public TOP1AddressResponseDTO getTOP1Address() {
-        String topFromAddress = "cro1yjjlx5qsrj5rxn5xtd5rkm6dcqzlchxkrvsmg6";
-        List<NodeInfoDTO> lists = nodeRepository.findTopToAddressesByFromAddress(topFromAddress);
+        List<NodeInfoDTO> lists = nodeRepository.findTopToAddressesByFromAddress(TOP1_ADDRESS);
         List<NodeInfoDTO> toAddressesDTO = lists.stream()
                 .map(list -> {
                     return new NodeInfoDTO(list.getToAddresses(), list.getDpdenom(), calculateRiskLevel());
                 })
                 .toList();
 
-        return new TOP1AddressResponseDTO(topFromAddress, toAddressesDTO);
+        return new TOP1AddressResponseDTO(TOP1_ADDRESS, toAddressesDTO);
     }
 
     // TODO riskLevel 구하는 로직 필요
@@ -78,9 +87,9 @@ public class NodeService {
     public List<NodeTransactionResponseDTO> getNodeTransaction(NodeTransactionRequestDTO request, Pageable pageable) {
         double tokenPrice = cryptoPriceService.getCryptoPrice(request.getToken(), "USD").block();
 
-        List<NodeTransactionProjection> nodeTransaction = nodeRepository.findNodeTransaction(request.getFromAddress(), request.getToken(), pageable);
+        Page<NodeTransactionProjection> nodeTransaction = nodeRepository.findNodeTransaction(request.getFromAddress(), request.getToken(), pageable);
 
-        return nodeTransaction.stream()
+        return nodeTransaction.getContent().stream()
                 .map(item -> {
                     Double amount = item.getAmount();
                     double value = (amount != null ? amount : 0.0) * tokenPrice;

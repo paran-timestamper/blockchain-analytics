@@ -1,11 +1,18 @@
 package com.timestamper.blockchain_analytics.controller;
 
-import com.timestamper.blockchain_analytics.dto.heatmap.request.DateInfoRequestDTO;
-import com.timestamper.blockchain_analytics.dto.heatmap.response.DataInfoResponseDTO;
-import com.timestamper.blockchain_analytics.dto.heatmap.response.DataTransactionResponseDTO;
+import com.timestamper.blockchain_analytics.dto.heatmap.request.DailyInfoDetailRequestDTO;
+import com.timestamper.blockchain_analytics.dto.heatmap.request.DailyInfoRequestDTO;
+import com.timestamper.blockchain_analytics.dto.heatmap.request.MonthlyInfoDetailRequestDTO;
+import com.timestamper.blockchain_analytics.dto.heatmap.request.MonthlyInfoRequestDTO;
+import com.timestamper.blockchain_analytics.dto.heatmap.response.DailyInfoDetailResponseDTO;
+import com.timestamper.blockchain_analytics.dto.heatmap.response.DailyInfoResponseDTO;
+import com.timestamper.blockchain_analytics.dto.heatmap.response.MonthlyInfoDetailResponseDTO;
+import com.timestamper.blockchain_analytics.dto.heatmap.response.MonthlyInfoResponseDTO;
 import com.timestamper.blockchain_analytics.service.HeatmapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,34 +22,23 @@ public class HeatmapController {
 
     private final HeatmapService heatmapService;
 
-    @PostMapping("/infos")
-    public DataInfoResponseDTO getInfo(@RequestBody DateInfoRequestDTO request) {
-        return heatmapService.getInfo(request);
+    @PostMapping("/monthly")
+    public List<MonthlyInfoResponseDTO> getMonthlyInfo(@RequestBody MonthlyInfoRequestDTO request) {
+        return heatmapService.getMonthlyInfo(request.getFromAddress(), request.getDate());
     }
 
-    @PostMapping("/infos/transaction")
-    public DataTransactionResponseDTO getTransactionInfo(@RequestBody DateInfoRequestDTO request) {
-        return heatmapService.getTransactionInfo(request);
+    @PostMapping("/daily")
+    public DailyInfoResponseDTO getDailyInfo(@RequestBody DailyInfoRequestDTO request) {
+        return heatmapService.getDailyInfo(request.getFromAddress(), request.getDate());
     }
 
-    // TODO Main > Node > 우클릭 > Heatmap > 월 거래량
-    public void getMonthlyTransactionVolume() {
-
+    @PostMapping("/monthly/detail")
+    public MonthlyInfoDetailResponseDTO getMonthlyInfoDetail(@RequestBody MonthlyInfoDetailRequestDTO request) {
+        return heatmapService.getMonthlyInfoDetail(request.getFromAddress(), request.getDate());
     }
 
-    // TODO Main > Node > 우클릭 > Heatmap > 일 거래량
-    public void getDailyTransactionVolume() {
-
+    @PostMapping("/daily/detail")
+    public DailyInfoDetailResponseDTO getDailyInfoDetail(@RequestBody DailyInfoDetailRequestDTO request) {
+        return heatmapService.getDailyInfoDetail(request.getFromAddress(), request.getDate());
     }
-
-    // TODO Main > Node > 우클릭 > Heatmap > 월 거래량 > 클릭 시 rank/token/tx 수/총 value/토큰 현재가
-    public void getMonthlyTransactionVolumeDetail() {
-
-    }
-
-    // TODO Main > Node > 우클릭 > Heatmap > 일 거래량 > 클릭 시 rank/token/tx 수/총 value/토큰 현재가
-    public void getDailyTransactionVolumeDetail() {
-
-    }
-
 }

@@ -3,6 +3,7 @@ package com.timestamper.blockchain_analytics.repository;
 import com.timestamper.blockchain_analytics.dto.node.NodeInfoDTO;
 import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.repository.projection.node.NodeTransactionProjection;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,7 @@ public interface NodeRepository  extends JpaRepository<Transaction, Long> {
         SELECT toaddress, dpdenom
         FROM transaction
         WHERE fromaddress = :fromAddress
+          AND dpdenom <> 'Unknown'
         ORDER BY amount DESC
         LIMIT 100
     """, nativeQuery = true)
@@ -94,7 +96,7 @@ public interface NodeRepository  extends JpaRepository<Transaction, Long> {
           AND t.dpdenom = :token
         ORDER BY t.timestamp DESC
 """)
-    List<NodeTransactionProjection> findNodeTransaction(
+    Page<NodeTransactionProjection> findNodeTransaction(
             @Param("fromAddress") String fromAddress,
             @Param("token") String token,
             Pageable pageable

@@ -20,7 +20,6 @@ public class EtherscanAPI {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // TODO 제대로 동작하게 수정하기
     public boolean isExchangeAddress(String address) {
         return false;
 //        String url = String.format(baseUrl, address, apiKey);
