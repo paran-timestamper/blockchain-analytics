@@ -31,13 +31,11 @@ public class HeatmapController {
         return heatmapService.getDailyInfo(request.getFromAddress(), request.getDate());
     }
 
-    // TODO Main > Node > 우클릭 > Heatmap > 월 거래량 > 클릭 시 rank/token/tx 수/총 value/토큰 현재가
     @PostMapping("/monthly/detail")
     public MonthlyInfoDetailResponseDTO getMonthlyInfoDetail(@RequestBody MonthlyInfoDetailRequestDTO request) {
         return heatmapService.getMonthlyInfoDetail(request.getFromAddress(), request.getDate());
     }
 
-    // TODO Main > Node > 우클릭 > Heatmap > 일 거래량 > 클릭 시 rank/token/tx 수/총 value/토큰 현재가
     @PostMapping("/daily/detail")
     public DailyInfoDetailResponseDTO getDailyInfoDetail(@RequestBody DailyInfoDetailRequestDTO request) {
         return heatmapService.getDailyInfoDetail(request.getFromAddress(), request.getDate());
