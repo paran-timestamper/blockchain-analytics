@@ -21,7 +21,7 @@ public class BarGraphService {
     private final BarGraphRepository barGraphRepository;
 
     public MonthTransactionResponseDTO getMonthlyTransactionVolume(MonthTransactionRequestDTO request) {
-        List<Object[]> rawData = barGraphRepository.selectMonthlyTransactionVolume(request.getFromAddress(), request.getDate().toString());
+        List<Object[]> rawData = barGraphRepository.selectMonthlyTransactionVolume(request.getFromAddress(), request.getToken(), request.getDate().toString());
         List<MonthTransactionItem> result = rawData.stream()
                 .map(row -> {
                     int transactionAmount = ((Number) row[0]).intValue();
@@ -35,7 +35,7 @@ public class BarGraphService {
     }
 
     public DailyTransactionResponseDTO getDailyTransactionVolume(DailyTransactionRequestDTO request) {
-        List<Object[]> rawData = barGraphRepository.selectDailyTransactionVolume(request.getFromAddress(), request.getDate().toString());
+        List<Object[]> rawData = barGraphRepository.selectDailyTransactionVolume(request.getFromAddress(), request.getToken(), request.getDate().toString());
         List<DailyTransactionItem> result = rawData.stream()
                 .map(row -> {
                     int transactionAmount = ((Number) row[0]).intValue();

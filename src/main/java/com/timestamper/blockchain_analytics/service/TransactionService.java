@@ -18,8 +18,6 @@ public class TransactionService {
     private final TokenPriceAPIClient tokenPriceAPIClient;
     private final TransactionRepository transactionRepository;
 
-    public List<String> getAllTokens() { return transactionRepository.findDistinctDpdenom(); }
-
     public List<TransactionFilteredVolumeDTO> getTransactionFilteredVolume(String token) {
         return transactionRepository.findByTransactionFilteredVolume(token);
     }

@@ -29,6 +29,7 @@ public interface BarGraphRepository extends JpaRepository<Transaction, Long> {
                          END AS time
                  FROM transaction t
                  WHERE t.fromaddress = :fromAddress
+                   AND t.dpdenom = :token
                    AND TO_TIMESTAMP(t.timestamp / 1000) >= DATE_TRUNC('month', TO_DATE(:yearMonth || '-01', 'YYYY-MM-DD'))
                    AND TO_TIMESTAMP(t.timestamp / 1000) < (DATE_TRUNC('month', TO_DATE(:yearMonth || '-01', 'YYYY-MM-DD')) + INTERVAL '1 month')
              ) grouped
@@ -45,6 +46,7 @@ public interface BarGraphRepository extends JpaRepository<Transaction, Long> {
         """, nativeQuery = true)
     List<Object[]> selectMonthlyTransactionVolume(
             @Param("fromAddress") String fromAddress,
+            @Param("token") String token,
             @Param("yearMonth") String yearMonth
     );
 
@@ -62,6 +64,7 @@ public interface BarGraphRepository extends JpaRepository<Transaction, Long> {
                          END AS timeRange
                  FROM transaction t
                  WHERE t.fromaddress = :fromAddress
+                   AND t.dpdenom = :token
                    AND TO_TIMESTAMP(t.timestamp / 1000) >= TO_DATE(:time, 'YYYY-MM-DD')
                    AND TO_TIMESTAMP(t.timestamp / 1000) <  (TO_DATE(:time, 'YYYY-MM-DD') + INTERVAL '1 day')
              ) grouped
@@ -76,5 +79,9 @@ public interface BarGraphRepository extends JpaRepository<Transaction, Long> {
                 ELSE 6
                 END
         """, nativeQuery = true)
-    List<Object[]> selectDailyTransactionVolume(String fromAddress, String time);
+    List<Object[]> selectDailyTransactionVolume(
+            @Param("fromAddress") String fromAddress,
+            @Param("token") String token,
+            @Param("time") String time
+    );
 }

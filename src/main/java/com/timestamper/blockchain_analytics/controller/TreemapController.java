@@ -18,7 +18,6 @@ public class TreemapController {
 
     private final TreemapService treemapService;
 
-    // TODO Main > Node > 우클릭 > 트리맵(default)
     @PostMapping("info")
     public List<TreemapInfoResponseDTO> getTreemapInfo(@RequestBody TreemapInfoRequestDTO request) {
         return treemapService.getTreemapInfo(request.getFromAddress());

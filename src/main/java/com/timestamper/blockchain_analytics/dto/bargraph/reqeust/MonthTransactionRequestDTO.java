@@ -8,6 +8,7 @@ import java.time.YearMonth;
 @Data
 public class MonthTransactionRequestDTO {
     private String fromAddress;
+    private String token;
 
     @JsonFormat(pattern = "yyyy-MM")
     private YearMonth date;
