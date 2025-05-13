@@ -34,22 +34,29 @@
             <TransactionTable :address="popup.nodeAddress" />
           </div>
           <div class="popup-box popup-box2a">
-            <HeatmapView :address="popup.nodeAddress" />
+            <HeatmapView
+                :address="popup.nodeAddress"
+                @update:selectedDate="popup.selectedDate = $event"
+                @update:mode="popup.mode = $event"
+            />
+
           </div>
           <div class="popup-box popup-box3">
-            <div class="toggle-buttons">
-              <button @click="currentChart='broken'" :class="{ active: currentChart==='broken' }">Broken Line</button>
-              <button @click="currentChart='tree'" :class="{ active: currentChart==='tree' }">Treemap</button>
-            </div>
-            <BrokenLineGraph v-if="currentChart==='broken'" :address="popup.nodeAddress" />
-            <Treemap v-else :address="popup.nodeAddress" />
+            <!-- ✅ Toggle 컴포넌트만 유지 -->
+            <GraphView
+            :address="popup.nodeAddress"
+            :date="popup.selectedDate"
+            />
           </div>
           <div class="popup-box popup-box1b">
-            <MonthDayGraph :address="popup.nodeAddress" />
-          </div>
+   -        <MonthDayGraph :address="popup.nodeAddress" />
+            </div>
           <div class="popup-box popup-box2b">
             <div class="scrollable-table">
-              <HeatmapTable :address="popup.nodeAddress" />
+              <HeatmapTable :address="popup.nodeAddress"
+              :date="popup.selectedDate"
+                  :mode="popup.mode"
+              />
             </div>
           </div>
           <div class="popup-box popup-box4-news">
@@ -67,9 +74,8 @@ import TransactionTable from '@/components/TransactionTable.vue';
 import MonthDayGraph from '@/components/MonthDayGraph.vue';
 import HeatmapView from '@/components/HeatmapView.vue';
 import HeatmapTable from '@/components/HeatmapTable.vue';
-import BrokenLineGraph from '@/components/BrokenLineGraph.vue';
-import Treemap from '@/components/Treemap.vue';
 import Home from '@/components/Home.vue';
+import GraphView from '@/components/GraphView.vue';
 
 export default {
   name: "NodeGraph",
@@ -78,9 +84,8 @@ export default {
     MonthDayGraph,
     HeatmapView,
     HeatmapTable,
-    BrokenLineGraph,
-    Treemap,
-    Home
+    Home,
+    GraphView
   },
   data() {
     return {
@@ -98,9 +103,10 @@ export default {
       filterOptions: ['거래 대금', '트랜잭션량', '최신순'],
       popup: {
         visible: false,
-        nodeAddress: ''
-      },
-      currentChart: 'broken'
+        nodeAddress: '',
+        selectedDate: '',  // ⬅️ 추가
+        mode: 'daily'       // ⬅️ 추가
+      }
     };
   },
   mounted() {
@@ -227,6 +233,7 @@ export default {
   }
 };
 </script>
+
 
 
 <style scoped>

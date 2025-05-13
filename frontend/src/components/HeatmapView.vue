@@ -1,40 +1,16 @@
 <template>
   <div class="heatmap-page">
-    <!-- 월/일 토글 버튼 -->
-    <div class="toggle-wrapper">
-      <button @click="toggleView">
-        {{ isMonthly ? '🔁 일 거래량 보기' : '🔁 월 거래량 보기' }}
-      </button>
+    <div class="controls">
+      <input type="date" v-model="selectedDate" @change="fetchHeatmapData" />
+      <select v-model="mode" @change="fetchHeatmapData">
+        <option value="daily">일간</option>
+        <option value="monthly">월간</option>
+      </select>
     </div>
 
-    <!-- 날짜 선택 -->
-    <div class="calendar-controls">
-      <input type="month" v-if="isMonthly" v-model="selectedMonth" @change="fetchMonthlyTxs" />
-      <input type="date" v-else v-model="startDate" @change="onDateChange" />
-    </div>
+    <div ref="heatmapContainer"></div>
 
-    <!-- 날짜 표시 -->
-    <div v-if="startDate && !isMonthly" class="date-range-text">
-      <p>{{ startDate }} ~ {{ endDate }} (7일간 데이터)</p>
-    </div>
 
-    <!-- Heatmap 영역 -->
-    <div v-if="hasData" class="heatmap-wrapper">
-      <div class="heatmap-container" ref="heatmap"></div>
-    </div>
-
-    <!-- 범례 -->
-    <div v-if="hasData" class="legend-wrapper">
-      <p>범례</p>
-      <div class="legend-bar">
-        <span v-for="i in 5" :key="i" class="legend-box" :style="{ backgroundColor: legendColor(i) }"></span>
-      </div>
-      <div class="legend-labels">
-        <span>0</span>
-        <span>{{ Math.floor(maxVal / 2) }}</span>
-        <span>{{ maxVal }}</span>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -42,242 +18,185 @@
 import * as d3 from "d3";
 
 export default {
+  name: "HeatmapView",
+  props: {
+    address: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
-      isMonthly: false,
-      startDate: '',
-      endDate: '',
-      selectedMonth: '',
-      heatmapData: [],
-      maxVal: 1
+      selectedDate: '',
+      mode: 'daily',
+      maxVal: 1,
+      heatmapData: []
     };
   },
-  computed: {
-    hasData() {
-      return this.isMonthly ? Object.keys(this.heatmapData).length > 0 : this.heatmapData.length > 0;
+  watch: {
+    selectedDate(val) {
+      this.$emit('update:selectedDate', val);
+    },
+    mode(val) {
+      this.$emit('update:mode', val);
     }
   },
   methods: {
-    toggleView() {
-      this.isMonthly = !this.isMonthly;
-      this.heatmapData = [];
-    },
-    onDateChange() {
-      if (this.startDate) {
-        const start = new Date(this.startDate);
-        const end = new Date(start);
-        end.setDate(start.getDate() + 6);
-        this.endDate = end.toISOString().split('T')[0];
-        this.fetchDailyTxs();
-      }
-    },
-    async fetchDailyTxs() {
-      try {
-        const res = await fetch(`http://localhost:8080/api/heatmap/infos`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ startDate: `${this.startDate} 00:00:00` })
-        });
-        const result = await res.json();
-        const list = result.dates || [];
+    async fetchHeatmapData() {
+      if (!this.selectedDate) return;
 
-        const matrix = Array.from({ length: 24 }, () => Array(7).fill(0));
-        const baseDay = new Date(this.startDate).getDay();
-        const dayToIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const endpoint = this.mode === 'daily'
+          ? 'http://localhost:8080/api/heatmap/daily'
+          : 'http://localhost:8080/api/heatmap/monthly';
 
-        list.forEach(({ day, hour, txCount }) => {
-          const originalIdx = dayToIndex.indexOf(day);
-          const rotatedIdx = (originalIdx - baseDay + 7) % 7;
-          if (hour >= 0 && hour <= 23 && rotatedIdx >= 0 && rotatedIdx <= 6) {
-            matrix[hour][rotatedIdx] += txCount;
-          }
-        });
+      // ⛳ 수정된 날짜 포맷
+      const payloadDate = this.mode === 'monthly'
+          ? this.selectedDate.slice(0, 7)  // "yyyy-MM"
+          : this.selectedDate;             // "yyyy-MM-dd"
 
-        this.heatmapData = matrix;
-        this.maxVal = d3.max(matrix.flat()) || 1;
-        this.$nextTick(this.drawDailyHeatmap);
-      } catch (err) {
-        console.error("일 거래량 API 오류:", err);
-        this.heatmapData = [];
-      }
-    },
-    async fetchMonthlyTxs() {
-      try {
-        const [year, month] = this.selectedMonth.split('-').map(Number);
-        const res = await fetch(`http://localhost:8080/api/heatmap/infos/monthly?year=${year}&month=${month}`);
-        const list = await res.json();
-
-        const data = {};
-        for (const item of list) {
-          const num = parseInt(item.day);
-          data[num] = item.txCount;
-        }
-
-        if (Object.keys(data).length) {
-          this.heatmapData = data;
-          this.maxVal = Math.max(...Object.values(data), 1);
-          this.$nextTick(() => this.drawMonthlyCalendar(year, month));
-        } else {
-          this.heatmapData = {};
-        }
-      } catch (err) {
-        console.error("월 거래량 API 오류:", err);
-        this.heatmapData = {};
-      }
-    },
-    drawDailyHeatmap() {
-      const margin = { top: 60, right: 40, bottom: 40, left: 80 };
-      const cellSize = 30;
-      const width = cellSize * 7 + margin.left + margin.right;
-      const height = cellSize * 24 + margin.top + margin.bottom;
-
-      d3.select(this.$refs.heatmap).select("svg").remove();
-
-      const svg = d3.select(this.$refs.heatmap)
-          .append("svg")
-          .attr("width", width)
-          .attr("height", height)
-          .style("display", "block")
-          .style("margin", "0 auto");
-
-      const colorScale = d3.scaleSequential(d3.interpolateReds).domain([0, this.maxVal]);
-      const days = ['월', '화', '수', '목', '금', '토', '일'];
-
-      this.heatmapData.forEach((row, hour) => {
-        row.forEach((val, day) => {
-          svg.append("rect")
-              .attr("x", margin.left + day * cellSize)
-              .attr("y", margin.top + hour * cellSize)
-              .attr("width", cellSize)
-              .attr("height", cellSize)
-              .attr("fill", colorScale(val))
-              .attr("stroke", "#222");
-        });
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({fromAddress: this.address, date: payloadDate})
       });
 
-      svg.selectAll(".day-label")
-          .data(days)
-          .enter()
-          .append("text")
-          .attr("x", (_, i) => margin.left + i * cellSize + cellSize / 2)
-          .attr("y", margin.top - 10)
-          .attr("text-anchor", "middle")
-          .attr("fill", "white")
-          .attr("font-size", "14px")
-          .text(d => d);
+      let result = await res.json();
+      if (!Array.isArray(result)) result = [result];
 
-      svg.selectAll(".hour-label")
-          .data(d3.range(24))
-          .enter()
-          .append("text")
-          .attr("x", margin.left - 10)
-          .attr("y", i => margin.top + i * cellSize + cellSize / 1.5)
-          .attr("text-anchor", "end")
-          .attr("fill", "white")
-          .attr("font-size", "12px")
-          .text(d => `${d}~${d + 1}`);
+      if (this.mode === 'daily') {
+        const timeRanges = ["00시~04시", "04시~08시", "08시~12시", "12시~16시", "16시~20시", "20시~24시"];
+        const dayObj = result[0] || {timeBlocks: []};
+        const blocks = dayObj.timeBlocks?.length
+            ? dayObj.timeBlocks
+            : timeRanges.map(range => ({range, txCount: 0}));
+
+        this.heatmapData = [{day: this.selectedDate, timeBlocks: blocks}];
+        this.maxVal = d3.max(blocks.map(b => b.txCount)) || 1;
+      } else {
+        if (result.length === 0) {
+          const daysInMonth = 31;
+          this.heatmapData = Array.from({length: daysInMonth}, (_, i) => ({
+            day: `${i + 1}일`,
+            txCount: 0
+          }));
+        } else {
+          this.heatmapData = result;
+        }
+        this.maxVal = d3.max(this.heatmapData.map(d => d.txCount)) || 1;
+      }
+
+      this.$nextTick(() => this.drawHeatmap());
     },
-    drawMonthlyCalendar(year, month) {
-      const firstDay = new Date(year, month - 1, 1).getDay();
-      const lastDate = new Date(year, month, 0).getDate();
-      const cellSize = 50;
-      const cols = 7;
-      const rows = Math.ceil((firstDay + lastDate) / 7);
 
-      d3.select(this.$refs.heatmap).select("svg").remove();
+    drawHeatmap() {
+      const container = this.$refs.heatmapContainer;
+      d3.select(container).select("svg").remove();
 
-      const svg = d3.select(this.$refs.heatmap)
+      const margin = { top: 80, right: 40, bottom: 40, left: 80 };
+      const cellWidth = 80;
+      const cellHeight = 40;
+
+      const svg = d3.select(container)
           .append("svg")
-          .attr("width", cellSize * cols + 40)
-          .attr("height", cellSize * rows + 40)
-          .style("display", "block")
-          .style("margin", "0 auto");
+          .attr("width", cellWidth * 7 + margin.left + margin.right)
+          .attr("height", cellHeight * 6 + margin.top + margin.bottom);
 
       const colorScale = d3.scaleSequential(d3.interpolateReds).domain([0, this.maxVal]);
 
-      let dayCount = 1;
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          const dayIndex = row * cols + col;
-          const isInMonth = dayIndex >= firstDay && dayCount <= lastDate;
+      if (this.mode === 'daily') {
+        const timeRanges = ["00-04", "04-08", "08-12", "12-16", "16-20", "20-24"];
+        const blocks = this.heatmapData[0]?.timeBlocks || timeRanges.map(range => ({ range, txCount: 0 }));
 
-          if (isInMonth) {
-            const val = this.heatmapData[dayCount] || 0;
-            svg.append("rect")
-                .attr("x", col * cellSize + 20)
-                .attr("y", row * cellSize + 20)
-                .attr("width", cellSize)
-                .attr("height", cellSize)
-                .attr("fill", colorScale(val))
-                .attr("stroke", "#333");
+        svg.selectAll(".cell")
+            .data(blocks)
+            .enter()
+            .append("rect")
+            .attr("x", (_, i) => margin.left + i * cellWidth)
+            .attr("y", margin.top)
+            .attr("width", cellWidth)
+            .attr("height", cellHeight)
+            .attr("fill", d => colorScale(d.txCount))
+            .attr("stroke", "#333");
 
-            svg.append("text")
-                .attr("x", col * cellSize + 45)
-                .attr("y", row * cellSize + 45)
-                .attr("text-anchor", "middle")
-                .attr("fill", "white")
-                .text(dayCount);
+        svg.selectAll(".label")
+            .data(timeRanges)
+            .enter()
+            .append("text")
+            .attr("x", (_, i) => margin.left + i * cellWidth + cellWidth / 2)
+            .attr("y", margin.top - 10)
+            .attr("text-anchor", "middle")
+            .attr("fill", "white")
+            .text(d => d);
+      } else {
+        const yearMonth = this.selectedDate.slice(0, 7); // "YYYY-MM"
+        const [year, month] = yearMonth.split('-').map(Number);
 
-            dayCount++;
-          }
+        const firstDay = new Date(year, month - 1, 1);
+        const startWeekday = firstDay.getDay(); // 0 (Sun) ~ 6 (Sat)
+
+        const daysInMonth = new Date(year, month, 0).getDate(); // 해당 월의 마지막 일
+        const calendarCells = [];
+
+        // 앞에 빈 칸
+        for (let i = 0; i < startWeekday; i++) {
+          calendarCells.push({ day: '', txCount: 0 });
         }
+
+        // 날짜 채우기
+        for (let i = 1; i <= daysInMonth; i++) {
+          const targetDay = `${i}일`;
+          const dataItem = this.heatmapData.find(d => d.day === targetDay) || { day: targetDay, txCount: 0 };
+          calendarCells.push(dataItem);
+        }
+
+        // 7×5나 7×6 유지 위해 남은 칸 채움
+        const totalCells = Math.ceil(calendarCells.length / 7) * 7;
+        while (calendarCells.length < totalCells) {
+          calendarCells.push({ day: '', txCount: 0 });
+        }
+
+        // 요일 헤더 추가
+        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+        svg.selectAll(".weekday-label")
+            .data(weekdays)
+            .enter()
+            .append("text")
+            .attr("x", (_, i) => margin.left + i * cellWidth + cellWidth / 2)
+            .attr("y", margin.top - 30)
+            .attr("text-anchor", "middle")
+            .attr("fill", "white")
+            .attr("font-weight", "bold")
+            .text(d => d);
+
+        // 셀 그리기
+        svg.selectAll(".cell")
+            .data(calendarCells)
+            .enter()
+            .append("rect")
+            .attr("x", (_, i) => margin.left + (i % 7) * cellWidth)
+            .attr("y", (_, i) => margin.top + Math.floor(i / 7) * cellHeight)
+            .attr("width", cellWidth)
+            .attr("height", cellHeight)
+            .attr("fill", d => colorScale(d.txCount))
+            .attr("stroke", "#333");
+
+        // 날짜 텍스트 표시
+        svg.selectAll(".cell-label")
+            .data(calendarCells)
+            .enter()
+            .append("text")
+            .attr("x", (_, i) => margin.left + (i % 7) * cellWidth + 4)
+            .attr("y", (_, i) => margin.top + Math.floor(i / 7) * cellHeight + 14)
+            .attr("fill", "white")
+            .attr("font-size", "12px")
+            .text(d => d.day.replace("일", ""));
       }
-    },
-    legendColor(i) {
-      return d3.interpolateReds(i / 5);
     }
   }
 };
 </script>
 
 <style scoped>
-.heatmap-page {
-  padding: 24px;
-  color: white;
-}
-.toggle-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-.calendar-controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-.legend-wrapper {
-  text-align: center;
-  margin-top: 16px;
-  margin-bottom: 12px;
-}
-.legend-bar {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  margin: 4px 0;
-}
-.legend-box {
-  width: 30px;
-  height: 20px;
-  border: 1px solid #333;
-}
-.legend-labels {
-  display: flex;
-  justify-content: space-between;
-  max-width: 200px;
-  margin: 0 auto;
-  font-size: 12px;
-}
-.heatmap-wrapper {
-  display: flex;
-  justify-content: center;
-}
-.heatmap-container {
-  background: #111;
-  padding: 16px;
-  border-radius: 8px;
-  transform: scale(0.85);
-  transform-origin: top center;
-}
+.heatmap-page { padding: 24px; color: white; }
+.controls { margin-bottom: 16px; display: flex; gap: 10px; align-items: center; }
 </style>

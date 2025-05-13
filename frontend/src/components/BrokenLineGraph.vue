@@ -1,8 +1,5 @@
 <template>
-  <div class="broken-line-graph">
-    <h3>Broken Line Graph ({{ address }})</h3>
-    <canvas ref="lineChart" width="300" height="150"></canvas>
-  </div>
+  <canvas ref="lineChart" width="600" height="300"></canvas>
 </template>
 
 <script>
@@ -33,55 +30,149 @@ export default {
     address: {
       type: String,
       required: true
+    },
+    date: {
+      type: String,
+      required: true
+    },
+    metric: {
+      type: String,
+      required: true // 'txCount' or 'value'
     }
   },
-  mounted() {
-    const ctx = this.$refs.lineChart.getContext("2d");
-    const labels = Array.from({ length: 12 }, (_, i) => `${i + 1}월`);
-    const values = Array.from({ length: 12 }, () => Math.floor(Math.random() * 100));
+  data() {
+    return {
+      chartInstance: null
+    };
+  },
+  watch: {
+    date: 'fetchData',
+    metric: 'fetchData'
+  },
+  methods: {
+    async fetchData() {
+      try {
+        const endpoint = this.metric === 'txCount'
+            ? "http://localhost:8080/api/brokenLineGraph/weeklyTransactionCount"
+            : "http://localhost:8080/api/brokenLineGraph/weeklyTransactionVolume";
 
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [{
-          label: "월별 변화",
-          data: values,
-          fill: false,
-          borderColor: "#42a5f5",
-          tension: 0.3
-        }]
-      },
-      options: {
-        responsive: false,
-        plugins: {
-          title: {
-            display: true,
-            text: "Broken Line Graph",
-            color: "#fff"
-          },
-          legend: {
-            labels: {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: this.address, date: this.date ? this.date + 'T00:00:00' : null })
+        });
+
+        let data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("⚠️ 응답 데이터 없음, 기본 0값 사용");
+          const baseDate = new Date(this.date);
+          data = Array.from({ length: 7 }, (_, i) => {
+            const d = new Date(baseDate);
+            d.setDate(d.getDate() + i);
+            return {
+              day: `${d.getMonth() + 1}/${d.getDate()}`,
+              txCount: 0,
+              totalValue: 0
+            };
+          });
+        } else {
+          // 날짜 문자열이 '26일' 형태라면, 이를 기준으로 날짜 계산
+          const baseDate = new Date(this.date);
+          data = data.map((item, i) => {
+            const offsetDate = new Date(baseDate);
+            offsetDate.setDate(baseDate.getDate() + i);
+            return {
+              ...item,
+              day: `${offsetDate.getMonth() + 1}/${offsetDate.getDate()}`
+            };
+          });
+        }
+
+        const labels = data.map(d => d.day);
+        const values = this.metric === 'txCount'
+            ? data.map(d => parseInt(d.txCount || 0))
+            : data.map(d => parseFloat(d.totalValue || 0));
+
+        this.renderLineChart(labels, values);
+      } catch (err) {
+        console.error("📉 라인 그래프 데이터 오류:", err);
+      }
+    },
+    renderLineChart(labels, values) {
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
+
+      const ctx = this.$refs.lineChart?.getContext("2d");
+      if (!ctx) {
+        console.error("❌ 캔버스 컨텍스트를 가져올 수 없습니다.");
+        return;
+      }
+
+      this.chartInstance = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: this.metric === 'txCount'
+                  ? "트랜잭션 수"
+                  : "총 거래 대금 (USDT)",
+              data: values,
+              fill: false,
+              borderColor: "#42a5f5",
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: false,
+          plugins: {
+            title: {
+              display: true,
+              text: this.metric === 'txCount'
+                  ? "최근 1주일 간 트랜잭션 수 추이"
+                  : "최근 1주일 간 거래 대금 추이",
               color: "#fff"
+            },
+            legend: {
+              labels: {
+                color: "#fff"
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: "#fff" }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: "#fff",
+                callback: (val) =>
+                    this.metric === 'txCount'
+                        ? parseInt(val)
+                        : parseFloat(val).toFixed(2)
+              }
             }
           }
-        },
-        scales: {
-          x: { ticks: { color: "#fff" } },
-          y: { beginAtZero: true, ticks: { color: "#fff" } }
         }
-      }
-    });
+      });
+    }
+  },
+  beforeUnmount() {
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+    }
   }
 };
 </script>
 
 <style scoped>
-.broken-line-graph {
-  width: 100%;
-  height: 100%;
-}
 canvas {
-  background: #222;
+  background-color: #222;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
 </style>

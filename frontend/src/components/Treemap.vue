@@ -1,8 +1,5 @@
 <template>
-  <div class="treemap-container">
-    <h3>Top 16 Token Treemap ({{ address }})</h3>
-    <div ref="chart" class="treemap-chart"></div>
-  </div>
+  <div ref="treemapContainer"></div>
 </template>
 
 <script>
@@ -14,39 +11,67 @@ export default {
     address: {
       type: String,
       required: true
+    },
+    date: {
+      type: String,
+      required: true
     }
   },
-  data() {
-    return {
-      tokenData: []
-    };
-  },
-  mounted() {
-    this.fetchTreemapData();
+  watch: {
+    date: {
+      immediate: true,
+      handler() {
+        this.fetchTreemapData();
+      }
+    }
   },
   methods: {
     async fetchTreemapData() {
-      try {
-        const res = await fetch(`http://localhost:8080/api/treemap?address=${this.address}`);
-        const data = await res.json();
+      const endpoint = "http://localhost:8080/api/treemap/info";
+      const payload = { fromAddress: this.address, date: this.date ? this.date + 'T00:00:00' : null };
 
-        this.tokenData = data.slice(0, 16);
-        this.drawTreemap();
+      try {
+        console.log("📡 요청 URL:", endpoint);
+        console.log("📨 요청 Payload:", payload);
+
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP 오류! 상태 코드: ${res.status}`);
+        }
+
+        let data = await res.json();
+        console.log("📦 응답 데이터:", data);
+
+        if (!Array.isArray(data) || data.length === 0) {
+          console.warn("⚠️ Treemap 데이터 없음. 기본값 사용.");
+          data = [
+            { token: "NO DATA", value: 1, percentage: "100%" }
+          ];
+        }
+
+        this.drawTreemap(data.slice(0, 16));
       } catch (err) {
-        console.error("Treemap 데이터 로딩 실패:", err);
+        console.error("🗺️ 트리맵 데이터 오류:", err);
       }
     },
-    drawTreemap() {
+    drawTreemap(data) {
+      const container = this.$refs.treemapContainer;
+      d3.select(container).select("svg").remove();
+
       const width = 600;
       const height = 400;
-      d3.select(this.$refs.chart).select("svg").remove();
 
-      const svg = d3.select(this.$refs.chart)
+      const svg = d3.select(container)
           .append("svg")
           .attr("width", width)
           .attr("height", height);
 
-      const root = d3.hierarchy({ children: this.tokenData })
+      const root = d3.hierarchy({ children: data.map(d => ({ name: d.token, value: d.value })) })
           .sum(d => d.value);
 
       d3.treemap()
@@ -54,11 +79,12 @@ export default {
           .padding(2)(root);
 
       const color = d3.scaleSequential(d3.interpolateOranges)
-          .domain([0, d3.max(this.tokenData, d => d.value)]);
+          .domain([0, d3.max(data, d => d.value)]);
 
       const nodes = svg.selectAll("g")
           .data(root.leaves())
-          .enter().append("g")
+          .enter()
+          .append("g")
           .attr("transform", d => `translate(${d.x0},${d.y0})`);
 
       nodes.append("rect")
@@ -72,23 +98,23 @@ export default {
           .attr("y", 16)
           .attr("fill", "white")
           .attr("font-size", "12px")
-          .text(d => d.data.name);
+          .selectAll("tspan")
+          .data(d => [d.data.name, `(${d.data.value}USDT)`])
+          .enter()
+          .append("tspan")
+          .attr("x", 4)
+          .attr("dy", (d, i) => i === 0 ? "0" : "1.2em")
+          .text(d => d);
+
     }
   }
 };
 </script>
 
 <style scoped>
-.treemap-container {
-  width: 100%;
-  height: auto;
-  color: white;
-  padding: 16px;
-}
-.treemap-chart {
-  background: #1e1e1e;
-  border-radius: 8px;
-  padding: 12px;
-  overflow-x: auto;
+div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

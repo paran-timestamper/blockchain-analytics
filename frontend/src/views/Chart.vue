@@ -127,8 +127,8 @@ export default {
         token: this.selectedToken,
         page: this.page,
         size: this.size,
-        startDate: this.filterStart || null,
-        endDate: this.filterEnd || null
+        startDate: this.filterStart ? this.filterStart + 'T00:00:00' : null,
+        endDate: this.filterEnd ? this.filterEnd + 'T00:00:00' : null
       };
 
       let endpoint = '';
