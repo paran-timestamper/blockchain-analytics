@@ -36,4 +36,13 @@ public class CryptoPriceController {
         String currency = request.getCurrency() != null ? request.getCurrency() : "USD";
         return cryptoPriceService.getMultipleCryptoPrices(request.getSymbols(), currency);
     }
+
+    /**
+     * @description token 테이블에 자동으로 price 업데이트 (1회성 API)
+     * @return
+     */
+    @PostMapping("/update")
+    public void updateCryptoPrice() {
+        cryptoPriceService.updateCryptoPrices();
+    }
 }

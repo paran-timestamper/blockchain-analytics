@@ -71,7 +71,7 @@ CREATE TABLE transaction (
      type VARCHAR(20) NOT NULL,
      txhash VARCHAR(100) UNIQUE NOT NULL,
      timestamp BIGINT NOT NULL,
-     amount NUMERIC(30,10) NOT NULL,
+     amount NUMERIC(40,10) NOT NULL,
      denom VARCHAR(100) NOT NULL,
      dpDenom VARCHAR(30) NOT NULL,
      fromAddress VARCHAR(100) NOT NULL,

@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface CommonRepository extends JpaRepository<Transaction, Long> {
 
-    @Query("SELECT DISTINCT t.dpdenom FROM Transaction t ORDER BY t.dpdenom")
+    @Query("SELECT t.token FROM Token t ORDER BY t.token")
     List<String> findDistinctDpdenom();
 
 }
