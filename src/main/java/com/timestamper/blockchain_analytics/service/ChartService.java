@@ -30,7 +30,7 @@ public class ChartService {
     }
 
     private ChartDataResponse getChartDataByLatest(String token, String fromAddress, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         List<Object[]> rawList = chartRepository.findByLatest(token, fromAddress, pageable);
         int totalCount = chartRepository.countFiltered(token, fromAddress);
 
