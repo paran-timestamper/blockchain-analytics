@@ -94,6 +94,9 @@ ALTER TABLE transaction
 
 UPDATE transaction
 SET converted_date = TO_TIMESTAMP(timestamp / 1000);
+
+-- category column 추가
+ALTER TABLE token ADD COLUMN category VARCHAR(20);
 ```
 
 ## API 명세 보는법
