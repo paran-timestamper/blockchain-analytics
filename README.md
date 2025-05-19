@@ -97,6 +97,8 @@ SET converted_date = TO_TIMESTAMP(timestamp / 1000);
 
 -- category column 추가
 ALTER TABLE token ADD COLUMN category VARCHAR(20);
+
+ALTER TABLE token ADD COLUMN generation_date VARCHAR(20);
 ```
 
 ## API 명세 보는법
