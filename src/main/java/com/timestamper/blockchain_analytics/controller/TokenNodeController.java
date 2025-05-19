@@ -1,9 +1,12 @@
 package com.timestamper.blockchain_analytics.controller;
 
+import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeTransactionRequestDTO;
 import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeGraphResponseDTO;
+import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.service.TokenNodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,4 +21,28 @@ public class TokenNodeController {
     public TokenNodeGraphResponseDTO getGraph() {
         return tokenNodeService.getTokenNodeGraphData();
     }
+
+    @PostMapping("transaction")
+    public TokenNodeTransactionResponseDTO getTransaction(@RequestBody TokenNodeTransactionRequestDTO requestDTO) {
+        return tokenNodeService.getTransaction(requestDTO);
+    }
+
+    // TODO Main > TokenNode > 두 노드 클릭 > 일간 거래량
+
+
+    // TODO Main > TokenNode > 두 노드 클릭 > 월간 거래량
+
+
+    // TODO Main > TokenNode > 두 노드 클릭 > 전체 거래량
+
+
+    // TODO Main > TokenNode > 두 노드 클릭 > heatmap
+
+
+    // TODO Main > TokenNode > 두 노드 클릭 > heatmap > 클릭 시 테이블
+
+
+    // TODO Main > TokenNode > 두 노드 클릭 > 주로 사용한 체인
+
+
 }
