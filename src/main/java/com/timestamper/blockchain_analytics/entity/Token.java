@@ -23,4 +23,6 @@ public class Token {
 
     @Column(nullable = false, precision = 30, scale = 10)
     private BigDecimal price;
+
+    private String category;
 }
