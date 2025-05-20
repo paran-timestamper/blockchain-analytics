@@ -28,7 +28,7 @@ export default {
   methods: {
     async fetchTreemapData() {
       const endpoint = "http://localhost:8080/api/treemap/info";
-      const payload = { fromAddress: this.address, date: this.date ? this.date + 'T00:00:00' : null };
+      const payload = { fromAddress: "axelar19xjz4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k" };
 
       try {
         console.log("📡 요청 URL:", endpoint);

@@ -50,14 +50,14 @@ export default {
           : 'http://localhost:8080/api/heatmap/monthly';
 
       // ⛳ 수정된 날짜 포맷
-      const payloadDate = this.mode === 'monthly'
-          ? this.selectedDate.slice(0, 7)  // "yyyy-MM"
-          : this.selectedDate;             // "yyyy-MM-dd"
+      // const payloadDate = this.mode === 'monthly'
+      //     ? this.selectedDate.slice(0, 7)  // "yyyy-MM"
+      //     : this.selectedDate;             // "yyyy-MM-dd"
 
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({fromAddress: this.address, date: payloadDate})
+        body: JSON.stringify({fromAddress: "axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k", date: "2022-10-25"})
       });
 
       let result = await res.json();

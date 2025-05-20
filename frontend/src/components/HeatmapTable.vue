@@ -55,11 +55,12 @@ export default {
             : 'http://localhost:8080/api/heatmap/daily/detail';
 
         const payload = {
-          fromAddress: this.address,
-          date: this.mode === 'daily' && this.date
-              ? this.date + 'T00:00:00'
-              : null
+          fromAddress: "axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k",
+          date: this.mode === 'daily'
+              ? '2022-10-01T02:00:00' // 예: "2022-10-31T00:00:00"
+              : '2022-10-01T02:00:00'               // 예: "2022-10-31"
         };
+
 
         console.log("🚀 [fetchTop3] POST", endpoint, "with payload:", payload);
 

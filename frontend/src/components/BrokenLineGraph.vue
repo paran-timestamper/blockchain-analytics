@@ -27,18 +27,10 @@ Chart.register(
 export default {
   name: "BrokenLineGraph",
   props: {
-    address: {
-      type: String,
-      required: true
-    },
-    date: {
-      type: String,
-      required: true
-    },
-    metric: {
-      type: String,
-      required: true // 'txCount' or 'value'
-    }
+    address: { type: String, required: true },
+    token: { type: String, required: true }, // ✅ 추가
+    date: { type: String, required: true },
+    metric: { type: String, required: true } // 'txCount' or 'value'
   },
   data() {
     return {
@@ -56,11 +48,21 @@ export default {
             ? "http://localhost:8080/api/brokenLineGraph/weeklyTransactionCount"
             : "http://localhost:8080/api/brokenLineGraph/weeklyTransactionVolume";
 
+        const payload = {
+          fromAddress: "axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k", // ✅ 수정 //this.address
+          token: "USDC.axl",         // ✅ 추가 this.token
+          date: "2022-10-25"           // ✅ 'T00:00:00' 제거 this.date
+        };
+
+        console.log("payload = ", payload);
+
         const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address: this.address, date: this.date ? this.date + 'T00:00:00' : null })
+          body: JSON.stringify(payload)
         });
+
+        console.log("res = ", res);
 
         let data = await res.json();
 
@@ -77,7 +79,6 @@ export default {
             };
           });
         } else {
-          // 날짜 문자열이 '26일' 형태라면, 이를 기준으로 날짜 계산
           const baseDate = new Date(this.date);
           data = data.map((item, i) => {
             const offsetDate = new Date(baseDate);
@@ -114,17 +115,13 @@ export default {
         type: "line",
         data: {
           labels,
-          datasets: [
-            {
-              label: this.metric === 'txCount'
-                  ? "트랜잭션 수"
-                  : "총 거래 대금 (USDT)",
-              data: values,
-              fill: false,
-              borderColor: "#42a5f5",
-              tension: 0.3
-            }
-          ]
+          datasets: [{
+            label: this.metric === 'txCount' ? "트랜잭션 수" : "총 거래 대금 (USDT)",
+            data: values,
+            fill: false,
+            borderColor: "#42a5f5",
+            tension: 0.3
+          }]
         },
         options: {
           responsive: false,
@@ -137,15 +134,11 @@ export default {
               color: "#fff"
             },
             legend: {
-              labels: {
-                color: "#fff"
-              }
+              labels: { color: "#fff" }
             }
           },
           scales: {
-            x: {
-              ticks: { color: "#fff" }
-            },
+            x: { ticks: { color: "#fff" } },
             y: {
               beginAtZero: true,
               ticks: {
