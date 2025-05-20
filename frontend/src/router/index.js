@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../components/Home.vue';
-import Visual from '../components/Visual.vue';
-import ChartView from '../components/ChartView.vue';
-import HeatmapView from '../components/HeatmapView.vue'; // ✅ 추가
+import Home from '../components/v1/Home.vue';
+import Visual from '../components/v1/Visual.vue';
+import ChartView from '../components/v1/ChartView.vue';
+import HeatmapView from '../components/v1/HeatmapView.vue'; // ✅ 추가
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
