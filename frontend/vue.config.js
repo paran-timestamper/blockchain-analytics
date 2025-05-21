@@ -6,7 +6,7 @@ module.exports = {
     port: 8082, // 프론트 포트
     proxy: {
       '/api': {
-        target: 'http://localhost:8083', // 백엔드 포트
+        target: 'http://localhost:8080', // 백엔드 포트
         changeOrigin: true,
       },
     },

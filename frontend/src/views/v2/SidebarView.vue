@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, provide } from 'vue'
 import TokenType from '@/components/v2/TokenType.vue'
 import NodeFinder from '@/components/v2/nodefinder.vue'
 
@@ -69,6 +69,8 @@ export default {
   },
   setup(props, { emit }) {
     const selectedNodeType = ref('tx')
+    provide('selectedNodeType', selectedNodeType) // ✅ 반드시 setup() 내부에서 실행해야 함
+
     const tokenTypes = ref([])
     const selectedTokens = ref([])
     const prices = ref({ BTC: '-', ETH: '-', SOL: '-' })
@@ -123,6 +125,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .sidebar-wrapper {
@@ -181,7 +184,7 @@ export default {
 
 .token-type-box .scrollable-list {
   flex: 1;
-  max-height: 220px; /* 필요 시 더 길게 조절 가능 */
+  max-height: 420px; /* 필요 시 더 길게 조절 가능 */
   overflow-y: auto;
   padding-right: 4px; /* ✅ 스크롤바 공간 확보 */
   box-sizing: border-box;

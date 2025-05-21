@@ -1,9 +1,12 @@
-// ✅ TokenType.vue (기존 토큰 타입 UI 분리)
 <template>
-  <div class="token-type-box box">
+  <div class="box token-type-box">
     <h4 class="section-title">Token Type</h4>
     <div class="scrollable-list">
-      <label class="checkbox" v-for="token in tokenTypes" :key="token">
+      <label class="checkbox">
+        <input type="checkbox" v-model="selectedTokens" value="All Token" />
+        All Token
+      </label>
+      <label class="checkbox" v-for="token in tokenList" :key="token">
         <input type="checkbox" v-model="selectedTokens" :value="token" />
         {{ token }}
       </label>
@@ -14,30 +17,43 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-const tokenTypes = ref([])
+const tokenList = ref([])
 const selectedTokens = ref([])
 
-onMounted(() => {
-  const tokenList = Array.from({ length: 105 }, (_, i) => `TOKEN-${i + 1}`)
-  tokenTypes.value = ['All Token', ...tokenList]
+onMounted(async () => {
+  try {
+    const res = await fetch('/api/common/tokens', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    })
+    const data = await res.json()
+    tokenList.value = data // ✅ 변수명 수정
+  } catch (err) {
+    console.error('Token 목록을 불러오는 중 오류 발생:', err)
+  }
 })
 </script>
 
 <style scoped>
 .token-type-box {
-  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
+
 .scrollable-list {
-  max-height: 220px;
+  max-height: 200px;
   overflow-y: auto;
+  padding-right: 4px;
+  box-sizing: border-box;
 }
+
 .checkbox {
   font-size: 12px;
   margin: 4px 0;
   display: block;
-}
-.section-title {
-  font-weight: bold;
-  margin-bottom: 6px;
 }
 </style>
