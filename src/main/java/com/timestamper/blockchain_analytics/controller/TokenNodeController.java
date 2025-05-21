@@ -47,7 +47,6 @@ public class TokenNodeController {
     // TODO Main > TokenNode > 두 노드 클릭 > heatmap > 클릭 시 테이블
 
 
-    // TODO Main > TokenNode > 두 노드 클릭 > 주로 사용한 체인
     @PostMapping("chainInfo")
     public TokenNodeChainInfoResponseDTO getChainInfo(@RequestBody TokenNodeChainInfoRequestDTO requestDTO) {
         return tokenNodeService.getChainInfo(requestDTO);
