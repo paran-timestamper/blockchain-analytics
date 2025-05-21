@@ -1,15 +1,13 @@
 package com.timestamper.blockchain_analytics.service;
 
 import com.timestamper.blockchain_analytics.dto.tokenNode.TransactionDTO;
+import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeDailyVolumeRequestDTO;
 import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeMonthlyVolumeRequestDTO;
 import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeTotalVolumeRequestDTO;
 import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeTransactionRequestDTO;
-import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeGraphResponseDTO;
-import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeMonthlyVolumeResponseDTO;
+import com.timestamper.blockchain_analytics.dto.tokenNode.response.*;
 import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeMonthlyVolumeResponseDTO.MonthlyTimeBlock;
-import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeTotalVolumeResponseDTO;
 import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeTotalVolumeResponseDTO.TimeBlock;
-import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.repository.TokenNodeRepository;
 import com.timestamper.blockchain_analytics.repository.TokenNodeTransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -175,5 +173,44 @@ public class TokenNodeService {
 
           return start.format(DateTimeFormatter.ofPattern("yyyy.MM")) + "~" +
                  end.format(DateTimeFormatter.ofPattern("yyyy.MM"));
+     }
+
+     public TokenNodeDailyVolumeResponseDTO getDailyTransactionVolume(TokenNodeDailyVolumeRequestDTO request) {
+          List<String> tokens = request.getTokens();
+          LocalDate date = request.getDate();
+
+          List<Object[]> rows = tokenNodeTransactionRepository.findHourlyVolumeByTokensFromView(tokens, date);
+
+          Map<String, Map<String, Double>> grouped = new LinkedHashMap<>();
+          List<String> ranges = getTimeRanges();
+
+          for (Object[] row : rows) {
+               String token = (String) row[0];
+               String range = (String) row[1];
+               double amount = ((Number) row[2]).doubleValue();
+
+               grouped
+                       .computeIfAbsent(range, k -> new HashMap<>())
+                       .put(token, amount);
+          }
+
+          List<TokenNodeDailyVolumeResponseDTO.TimeBlock> timeBlocks = new ArrayList<>();
+          for (String range : ranges) {
+               Map<String, Double> values = grouped.getOrDefault(range, new HashMap<>());
+               timeBlocks.add(new TokenNodeDailyVolumeResponseDTO.TimeBlock(range, values));
+          }
+
+          return new TokenNodeDailyVolumeResponseDTO(tokens, timeBlocks);
+     }
+
+     private List<String> getTimeRanges() {
+          return List.of(
+                  "00:00 ~ 03:59",
+                  "04:00 ~ 07:59",
+                  "08:00 ~ 11:59",
+                  "12:00 ~ 15:59",
+                  "16:00 ~ 19:59",
+                  "20:00 ~ 23:59"
+          );
      }
 }

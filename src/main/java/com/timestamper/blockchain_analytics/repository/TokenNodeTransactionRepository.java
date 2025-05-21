@@ -59,4 +59,18 @@ public interface TokenNodeTransactionRepository extends JpaRepository<Transactio
         """, nativeQuery = true)
     List<Object[]> findTotalVolumeByTokens(@Param("tokens") List<String> tokens);
 
+    @Query(value = """
+        SELECT 
+            dpdenom,
+            hour_block,
+            total_amount
+        FROM mv_token_hourly_volume
+        WHERE dpdenom IN :tokens
+          AND day = :targetDate
+        ORDER BY hour_block
+        """, nativeQuery = true)
+    List<Object[]> findHourlyVolumeByTokensFromView(
+            @Param("tokens") List<String> tokens,
+            @Param("targetDate") LocalDate targetDate
+    );
 }
