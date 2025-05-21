@@ -35,8 +35,8 @@ import { ref, onMounted } from 'vue'
 
 //eslint-disable-next-line no-unused-vars
 const svgRef = ref(null)
-const center = 300 // 중심 좌표 (viewBox 기준)
-const monthRadii = [60, 120, 180] // 원 반지름 (최근 → 과거)
+const center = 250 // 중심 좌표 (viewBox 기준)
+const monthRadii = [90, 180, 270] // 원 반지름 (최근 → 과거)
 
 // eslint-disable-next-line no-unused-vars
 const daysInMonth = 30
@@ -57,8 +57,13 @@ const getAngleFromYearMonth = (year, month) => {
 const monthToIndex = { 2: 2, 3: 1, 4: 0 }
 
 const dummyNodes = tokens.map((token) => {
-  const angle = getAngleFromYearMonth(token.year, token.month)
-  const radius = monthRadii[monthToIndex[token.month]]
+  const baseRadius = monthRadii[monthToIndex[token.month]]
+  const nextRadius = monthRadii[monthToIndex[token.month] - 1] || baseRadius + 100 // fallback
+
+  const radiusStep = (nextRadius - baseRadius) / daysInMonth
+  const radius = baseRadius + radiusStep * (token.day - 1)
+
+  const angle = getAngleFromYearMonth(token.year, token.month) // 여전히 month 기준 각도
   const rad = (angle * Math.PI) / 180
   const xOffset = radius * Math.cos(rad)
   const yOffset = radius * Math.sin(rad)
@@ -84,13 +89,13 @@ onMounted(() => {
 .graph-wrapper {
   width: 100%;
   height: 100%;
-  background: repeating-radial-gradient(
+  background: none;/*repeating-radial-gradient(
       circle at center,
       #f9f9f9,
       #f9f9f9 10px,
       #f0f0f0 10px,
       #f0f0f0 20px
-  );
+  );*/
   display: flex;
   justify-content: center;
   align-items: center;

@@ -55,77 +55,53 @@
   </div>
 </template>
 
-<script>
-import { ref, onMounted, watch, provide } from 'vue'
+<script setup>
+import { ref, inject, onMounted } from 'vue'
 import TokenType from '@/components/v2/TokenType.vue'
 import NodeFinder from '@/components/v2/nodefinder.vue'
 
-export default {
-  name: 'SidebarView',
-  emits: ['update:nodeType'],
-  components: {
-    TokenType,
-    NodeFinder
+// 👉 App.vue에서 제공한 selectedNodeType 주입받기
+const selectedNodeType = inject('selectedNodeType')
+
+const tokenIcons = [
+  {
+    name: 'BTC',
+    icon: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png'
   },
-  setup(props, { emit }) {
-    const selectedNodeType = ref('tx')
-    provide('selectedNodeType', selectedNodeType) // ✅ 반드시 setup() 내부에서 실행해야 함
-
-    const tokenTypes = ref([])
-    const selectedTokens = ref([])
-    const prices = ref({ BTC: '-', ETH: '-', SOL: '-' })
-    const showChart = ref(false)
-
-    const tokenIcons = [
-      {
-        name: 'BTC',
-        icon: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png'
-      },
-      {
-        name: 'ETH',
-        icon: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png'
-      },
-      {
-        name: 'SOL',
-        icon: 'https://assets.coingecko.com/coins/images/4128/small/solana.png'
-      }
-    ]
-
-    watch(selectedNodeType, (newValue) => {
-      emit('update:nodeType', newValue)
-    })
-
-    onMounted(async () => {
-      const tokenList = Array.from({ length: 105 }, (_, i) => `TOKEN-${i + 1}`)
-      tokenTypes.value = ['All Token', ...tokenList]
-
-      try {
-        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd')
-        const data = await res.json()
-        prices.value = {
-          BTC: data.bitcoin?.usd ?? '-',
-          ETH: data.ethereum?.usd ?? '-',
-          SOL: data.solana?.usd ?? '-'
-        }
-      } catch (err) {
-        console.error('가격 요청 실패:', err)
-      }
-    })
-
-    return {
-      selectedNodeType,
-      tokenTypes,
-      selectedTokens,
-      prices,
-      showChart,
-      tokenIcons,
-      TokenType,
-      NodeFinder
-    }
+  {
+    name: 'ETH',
+    icon: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png'
+  },
+  {
+    name: 'SOL',
+    icon: 'https://assets.coingecko.com/coins/images/4128/small/solana.png'
   }
-}
-</script>
+]
 
+const prices = ref({
+  BTC: '-',
+  ETH: '-',
+  SOL: '-'
+})
+
+const showChart = ref(false)
+
+onMounted(async () => {
+  try {
+    const res = await fetch(
+        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd'
+    )
+    const data = await res.json()
+    prices.value = {
+      BTC: data.bitcoin?.usd ?? '-',
+      ETH: data.ethereum?.usd ?? '-',
+      SOL: data.solana?.usd ?? '-'
+    }
+  } catch (err) {
+    console.error('가격 요청 실패:', err)
+  }
+})
+</script>
 
 <style scoped>
 .sidebar-wrapper {
@@ -174,20 +150,6 @@ export default {
   margin: 4px 0;
   display: block;
   word-break: keep-all;
-}
-
-.token-type-box {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* ✅ 스크롤이 box를 벗어나지 않도록 */
-}
-
-.token-type-box .scrollable-list {
-  flex: 1;
-  max-height: 420px; /* 필요 시 더 길게 조절 가능 */
-  overflow-y: auto;
-  padding-right: 4px; /* ✅ 스크롤바 공간 확보 */
-  box-sizing: border-box;
 }
 
 .token-price-box {
