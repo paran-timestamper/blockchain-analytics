@@ -34,18 +34,13 @@ public class TokenNodeService {
                   "2022_02", "2022_05", "2022_08"
           );
 
-          List<SectionData> sections = new ArrayList<>();
-
-          for (String section : sectionDates) {
-               String tableName = "token_node_" + section;
-
-               List<TokenData> tokens = tokenNodeRepository.findAllFromTable(tableName);
-
-               sections.add(new SectionData(
-                       section.replace("_", "-"),
-                       tokens
-               ));
-          }
+          List<SectionData> sections = sectionDates.parallelStream()
+                  .map(section -> {
+                       String tableName = "token_node_" + section;
+                       List<TokenData> tokens = tokenNodeRepository.findAllFromTable(tableName);
+                       return new SectionData(section.replace("_", "-"), tokens);
+                  })
+                  .toList();
 
           return new TokenNodeGraphResponseDTO(sections);
      }
