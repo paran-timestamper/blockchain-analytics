@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -30,4 +31,32 @@ public interface TokenNodeTransactionRepository extends JpaRepository<Transactio
             @Param("cursor") String cursor,
             Pageable pageable
     );
+
+    @Query(value = """
+        SELECT 
+            dpdenom,
+            day,
+            total_amount
+        FROM mv_token_daily_amount
+        WHERE dpdenom IN :tokens
+          AND day BETWEEN :start AND :end
+        ORDER BY day
+        """, nativeQuery = true)
+    List<Object[]> findMonthlyTransactions(
+            @Param("tokens") List<String> tokens,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
+    );
+
+    @Query(value = """
+        SELECT 
+            dpdenom, 
+            TO_CHAR(month, 'YYYY.MM') AS year_month, 
+            total_amount
+        FROM mv_total_token_volume
+        WHERE dpdenom IN :tokens
+        ORDER BY year_month
+        """, nativeQuery = true)
+    List<Object[]> findTotalVolumeByTokens(@Param("tokens") List<String> tokens);
+
 }

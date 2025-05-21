@@ -1,7 +1,12 @@
 package com.timestamper.blockchain_analytics.controller;
 
+import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeDailyVolumeRequestDTO;
+import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeMonthlyVolumeRequestDTO;
+import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeTotalVolumeRequestDTO;
 import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeTransactionRequestDTO;
 import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeGraphResponseDTO;
+import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeMonthlyVolumeResponseDTO;
+import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeTotalVolumeResponseDTO;
 import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeTransactionResponseDTO;
 import com.timestamper.blockchain_analytics.service.TokenNodeService;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +33,22 @@ public class TokenNodeController {
     }
 
     // TODO Main > TokenNode > 두 노드 클릭 > 일간 거래량
-
-
-    // TODO Main > TokenNode > 두 노드 클릭 > 월간 거래량
-
+//    @PostMapping("dailyVolume")
+//    public TokenNodeDailyVolumeResponseDTO getDailyTransactionVolume(@RequestBody TokenNodeDailyVolumeRequestDTO requestDTO) {
+//        return tokenNodeService.getDailyTransactionVolume(requestDTO);
+//    }
+//
+//    // TODO Main > TokenNode > 두 노드 클릭 > 월간 거래량
+    @PostMapping("monthlyVolume")
+    public TokenNodeMonthlyVolumeResponseDTO getMonthlyTransactionVolume(@RequestBody TokenNodeMonthlyVolumeRequestDTO requestDTO) {
+        return tokenNodeService.getMonthlyVolume(requestDTO);
+    }
 
     // TODO Main > TokenNode > 두 노드 클릭 > 전체 거래량
-
+    @PostMapping("totalVolume")
+    public TokenNodeTotalVolumeResponseDTO getTotalTransactionVolume(@RequestBody TokenNodeTotalVolumeRequestDTO requestDTO) {
+        return tokenNodeService.getTotalTransactionVolume(requestDTO);
+    }
 
     // TODO Main > TokenNode > 두 노드 클릭 > heatmap
 
