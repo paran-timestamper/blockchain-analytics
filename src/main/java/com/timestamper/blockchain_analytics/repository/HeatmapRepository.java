@@ -73,7 +73,7 @@ public interface HeatmapRepository extends JpaRepository<Transaction, Long> {
         WHERE t.fromaddress = :fromAddress
           AND t.dpdenom <> 'Unknown'
           AND TO_TIMESTAMP(t.timestamp / 1000) >= TO_DATE(:startDate, 'YYYY-MM-DD')
-          AND TO_TIMESTAMP(t.timestamp / 1000) <  TO_DATE(:startDate, 'YYYY-MM-DD') + INTERVAL '1 month'
+          AND TO_TIMESTAMP(t.timestamp / 1000) <  TO_DATE(:startDate, 'YYYY-MM-DD') + INTERVAL '1 day'
         GROUP BY t.dpdenom, COALESCE(p.price, 0), p.price
         ORDER BY transactionCount DESC
         limit 3
