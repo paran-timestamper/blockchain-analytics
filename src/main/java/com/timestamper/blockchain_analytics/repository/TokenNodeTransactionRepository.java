@@ -73,4 +73,23 @@ public interface TokenNodeTransactionRepository extends JpaRepository<Transactio
             @Param("tokens") List<String> tokens,
             @Param("targetDate") LocalDate targetDate
     );
+
+    @Query(value = """
+        WITH ranked_tx AS (
+            SELECT
+                dpdenom,
+                fromchain,
+                COUNT(*) AS cnt,
+                ROW_NUMBER() OVER (PARTITION BY dpdenom ORDER BY COUNT(*) DESC) AS rn
+            FROM transaction
+            WHERE dpdenom IN :tokens
+              AND fromchain IS NOT NULL
+            GROUP BY dpdenom, fromchain
+        )
+        SELECT dpdenom, fromchain, rn
+        FROM ranked_tx
+        WHERE rn <= 3
+        ORDER BY dpdenom, rn;
+        """, nativeQuery = true)
+    List<Object[]> selectTopChains(@Param("tokens") List<String> tokens);
 }

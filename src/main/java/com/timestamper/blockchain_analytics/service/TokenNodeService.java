@@ -1,11 +1,10 @@
 package com.timestamper.blockchain_analytics.service;
 
 import com.timestamper.blockchain_analytics.dto.tokenNode.TransactionDTO;
-import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeDailyVolumeRequestDTO;
-import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeMonthlyVolumeRequestDTO;
-import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeTotalVolumeRequestDTO;
-import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeTransactionRequestDTO;
+import com.timestamper.blockchain_analytics.dto.tokenNode.request.*;
 import com.timestamper.blockchain_analytics.dto.tokenNode.response.*;
+import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeChainInfoResponseDTO.ChainRank;
+import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeChainInfoResponseDTO.TokenChainData;
 import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeMonthlyVolumeResponseDTO.MonthlyTimeBlock;
 import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeTotalVolumeResponseDTO.TimeBlock;
 import com.timestamper.blockchain_analytics.repository.TokenNodeRepository;
@@ -15,10 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -212,5 +209,23 @@ public class TokenNodeService {
                   "16:00 ~ 19:59",
                   "20:00 ~ 23:59"
           );
+     }
+
+     public TokenNodeChainInfoResponseDTO getChainInfo(TokenNodeChainInfoRequestDTO requestDTO) {
+          List<String> tokens = requestDTO.getTokens();
+          List<Object[]> result = tokenNodeTransactionRepository.selectTopChains(tokens);
+          Map<String, TokenChainData> tokenChains = new LinkedHashMap<>();
+
+          for (Object[] row : result) {
+               String tokenName = (String) row[0];
+               String chain = (String) row[1];
+               int rank = ((Number) row[2]).intValue();
+
+               tokenChains.computeIfAbsent(tokenName, t -> new TokenChainData(new ArrayList<>()))
+                       .getTopChains()
+                       .add(new ChainRank(rank, chain));
+          }
+
+          return new TokenNodeChainInfoResponseDTO(tokenChains);
      }
 }

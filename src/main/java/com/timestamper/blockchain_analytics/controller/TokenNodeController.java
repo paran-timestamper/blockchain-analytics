@@ -1,9 +1,6 @@
 package com.timestamper.blockchain_analytics.controller;
 
-import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeDailyVolumeRequestDTO;
-import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeMonthlyVolumeRequestDTO;
-import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeTotalVolumeRequestDTO;
-import com.timestamper.blockchain_analytics.dto.tokenNode.request.TokenNodeTransactionRequestDTO;
+import com.timestamper.blockchain_analytics.dto.tokenNode.request.*;
 import com.timestamper.blockchain_analytics.dto.tokenNode.response.*;
 import com.timestamper.blockchain_analytics.service.TokenNodeService;
 import lombok.RequiredArgsConstructor;
@@ -51,5 +48,9 @@ public class TokenNodeController {
 
 
     // TODO Main > TokenNode > 두 노드 클릭 > 주로 사용한 체인
+    @PostMapping("chainInfo")
+    public TokenNodeChainInfoResponseDTO getChainInfo(@RequestBody TokenNodeChainInfoRequestDTO requestDTO) {
+        return tokenNodeService.getChainInfo(requestDTO);
+    }
 
 }
