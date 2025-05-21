@@ -38,13 +38,11 @@ public class TokenNodeController {
 //        return tokenNodeService.getDailyTransactionVolume(requestDTO);
 //    }
 //
-//    // TODO Main > TokenNode > 두 노드 클릭 > 월간 거래량
     @PostMapping("monthlyVolume")
     public TokenNodeMonthlyVolumeResponseDTO getMonthlyTransactionVolume(@RequestBody TokenNodeMonthlyVolumeRequestDTO requestDTO) {
         return tokenNodeService.getMonthlyVolume(requestDTO);
     }
 
-    // TODO Main > TokenNode > 두 노드 클릭 > 전체 거래량
     @PostMapping("totalVolume")
     public TokenNodeTotalVolumeResponseDTO getTotalTransactionVolume(@RequestBody TokenNodeTotalVolumeRequestDTO requestDTO) {
         return tokenNodeService.getTotalTransactionVolume(requestDTO);
