@@ -41,15 +41,11 @@ public class TokenNodeController {
         return tokenNodeService.getTotalTransactionVolume(requestDTO);
     }
 
-    // TODO Main > TokenNode > 두 노드 클릭 > heatmap
-
-
-    // TODO Main > TokenNode > 두 노드 클릭 > heatmap > 클릭 시 테이블
-
-
     @PostMapping("chainInfo")
     public TokenNodeChainInfoResponseDTO getChainInfo(@RequestBody TokenNodeChainInfoRequestDTO requestDTO) {
         return tokenNodeService.getChainInfo(requestDTO);
     }
+
+    // TODO Main > Transaction Node > Graph 그리기
 
 }
