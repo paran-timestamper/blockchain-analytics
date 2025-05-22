@@ -1,13 +1,7 @@
 package com.timestamper.blockchain_analytics.controller;
 
-import com.timestamper.blockchain_analytics.dto.heatmap.request.DailyInfoDetailRequestDTO;
-import com.timestamper.blockchain_analytics.dto.heatmap.request.DailyInfoRequestDTO;
-import com.timestamper.blockchain_analytics.dto.heatmap.request.MonthlyInfoDetailRequestDTO;
-import com.timestamper.blockchain_analytics.dto.heatmap.request.MonthlyInfoRequestDTO;
-import com.timestamper.blockchain_analytics.dto.heatmap.response.DailyInfoDetailResponseDTO;
-import com.timestamper.blockchain_analytics.dto.heatmap.response.DailyInfoResponseDTO;
-import com.timestamper.blockchain_analytics.dto.heatmap.response.MonthlyInfoDetailResponseDTO;
-import com.timestamper.blockchain_analytics.dto.heatmap.response.MonthlyInfoResponseDTO;
+import com.timestamper.blockchain_analytics.dto.heatmap.request.*;
+import com.timestamper.blockchain_analytics.dto.heatmap.response.*;
 import com.timestamper.blockchain_analytics.service.HeatmapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -40,4 +34,15 @@ public class HeatmapController {
     public DailyInfoDetailResponseDTO getDailyInfoDetail(@RequestBody DailyInfoDetailRequestDTO request) {
         return heatmapService.getDailyInfoDetail(request.getFromAddress(), request.getDate());
     }
+
+    // 두 토큰의 value를 비교하는 API
+    @PostMapping("/compare/monthly")
+    public CompareMonthlyResponseDTO getCompareMonthlyInfo(@RequestBody CompareMonthlyRequestDTO request) {
+        return heatmapService.getCompareMonthlyInfo(request.getTokens(), request.getDate());
+    }
+
+//    @PostMapping("/compare/daily")
+//    public CompareDailyResponseDTO getCompareDailyInfo(@RequestBody CompareDailyRequestDTO request) {
+//        return heatmapService.getCompareDailyInfo();
+//    }
 }
