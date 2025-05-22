@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -103,5 +104,37 @@ public interface HeatmapRepository extends JpaRepository<Transaction, Long> {
             @Param("fromAddress") String fromAddress,
             @Param("startDateTime") String startDateTime,
             @Param("endDateTime") String endDateTime
+    );
+
+    @Query(value = """
+            SELECT 
+                day,
+                dpdenom AS token,
+                total_amount
+            FROM daily_token_summary
+            WHERE day BETWEEN :startDate AND :endDate
+              AND dpdenom IN (:tokens)
+            ORDER BY day, token
+        """, nativeQuery = true)
+    List<Object[]> findTokenDailySums(
+            @Param("tokens") List<String> tokens,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query(value = """
+            SELECT 
+                token,
+                transaction_amount,
+                total_value,
+                current_price
+            FROM token_daily_summary_mv
+            WHERE day = :date
+              AND token IN (:tokens)
+            ORDER BY token
+        """, nativeQuery = true)
+    List<Object[]> findDailySummaryByDateAndTokens(
+            @Param("tokens") List<String> tokens,
+            @Param("date") LocalDate date
     );
 }
