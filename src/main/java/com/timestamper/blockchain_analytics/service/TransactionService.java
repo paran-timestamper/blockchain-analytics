@@ -43,7 +43,7 @@ public class TransactionService {
     public TransactionGraphResponseDTO getGraph(String fromAddress) {
         return (fromAddress == null || fromAddress.isBlank())
                 ? getGlobalGraph()
-                : null;
+                : getAddressGraph(fromAddress);
     }
 
     private TransactionGraphResponseDTO getGlobalGraph() {
@@ -96,4 +96,7 @@ public class TransactionService {
         return new TransactionGraphResponseDTO("GLOBAL", sections);
     }
 
+    private TransactionGraphResponseDTO getAddressGraph(String fromAddress) {
+        return null;
+    }
 }
