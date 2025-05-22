@@ -88,7 +88,7 @@ public interface TokenNodeTransactionRepository extends JpaRepository<Transactio
         )
         SELECT dpdenom, fromchain, rn
         FROM ranked_tx
-        WHERE rn <= 3
+        WHERE rn <= 10
         ORDER BY dpdenom, rn;
         """, nativeQuery = true)
     List<Object[]> selectTopChains(@Param("tokens") List<String> tokens);
