@@ -17,17 +17,13 @@
         </div>
       </div>
 
-      <!-- 2. TokenType.vue or nodefinder.vue -->
+      <!-- 2. TokenType.vue or NodeFinder.vue -->
       <component :is="selectedNodeType === 'token' ? TokenType : NodeFinder" />
 
       <!-- 3. Token Price -->
       <div class="box token-price-box">
         <h4 class="section-title">Token Price</h4>
-        <div
-            class="token-card"
-            v-for="token in tokenIcons"
-            :key="token.name"
-        >
+        <div class="token-card" v-for="token in tokenIcons" :key="token.name">
           <img :src="token.icon" :alt="token.name" class="token-icon" />
           <div class="token-info">
             <div class="token-name">{{ token.name }}</div>
@@ -45,11 +41,11 @@
       </div>
     </div>
 
-    <!-- 팝업 -->
+    <!-- 차트 팝업 -->
     <div v-if="showChart" class="popup-overlay">
-      <div class="popup">
+      <div class="popup fixed-popup">
         <button class="close-btn" @click="showChart = false">×</button>
-        <p>📊 차트 영역입니다</p>
+        <Chart />
       </div>
     </div>
   </div>
@@ -59,13 +55,15 @@
 import { ref, onMounted, watch } from 'vue'
 import TokenType from '@/components/v2/TokenType.vue'
 import NodeFinder from '@/components/v2/nodefinder.vue'
+import Chart from '@/components/v2/Chart.vue'
 
 export default {
   name: 'SidebarView',
   emits: ['update:nodeType'],
   components: {
     TokenType,
-    NodeFinder
+    NodeFinder,
+    Chart
   },
   setup(props, { emit }) {
     const selectedNodeType = ref('tx')
@@ -118,7 +116,8 @@ export default {
       showChart,
       tokenIcons,
       TokenType,
-      NodeFinder
+      NodeFinder,
+      Chart
     }
   }
 }
@@ -176,14 +175,14 @@ export default {
 .token-type-box {
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* ✅ 스크롤이 box를 벗어나지 않도록 */
+  overflow: hidden;
 }
 
 .token-type-box .scrollable-list {
   flex: 1;
-  max-height: 220px; /* 필요 시 더 길게 조절 가능 */
+  max-height: 220px;
   overflow-y: auto;
-  padding-right: 4px; /* ✅ 스크롤바 공간 확보 */
+  padding-right: 4px;
   box-sizing: border-box;
 }
 
@@ -254,11 +253,17 @@ export default {
 
 .popup {
   background: white;
-  padding: 20px;
   border-radius: 16px;
   text-align: center;
   position: relative;
-  width: 300px;
+  overflow: hidden;
+}
+
+/* ✅ 팝업 고정 크기 설정 */
+.fixed-popup {
+  width: 1200px;
+  height: 800px;
+  padding: 20px;
 }
 
 .close-btn {

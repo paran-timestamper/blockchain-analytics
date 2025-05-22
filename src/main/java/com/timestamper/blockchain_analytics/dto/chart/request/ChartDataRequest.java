@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.Nulls;
 import com.timestamper.blockchain_analytics.enums.Filter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ChartDataRequest {
     private int page;
     private int size;

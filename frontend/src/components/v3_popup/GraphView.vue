@@ -1,3 +1,5 @@
+//오른쪽 상단 토글같은거 여기에서 구현해놨음
+
 <template>
   <div class="graph-wrapper">
     <div class="top-controls">
@@ -28,8 +30,8 @@
 </template>
 
 <script>
-import LineGraph from "@/components/BrokenLineGraph.vue"; // ✅ 실제 파일명 기준
-import Treemap from "@/components/Treemap.vue";
+import LineGraph from "@/components/v1/BrokenLineGraph.vue"; // ✅ 실제 파일명 기준
+import Treemap from "@/components/v1/Treemap.vue";
 
 export default {
   name: "GraphView",

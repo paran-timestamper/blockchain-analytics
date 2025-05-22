@@ -75,7 +75,7 @@ import MonthDayGraph from '@/components/MonthDayGraph.vue';
 import HeatmapView from '@/components/HeatmapView.vue';
 import HeatmapTable from '@/components/HeatmapTable.vue';
 import Home from '@/components/Home.vue';
-import GraphView from '@/components/GraphView.vue';
+import GraphView from '@/components/v1/GraphView.vue';
 
 export default {
   name: "NodeGraph",
