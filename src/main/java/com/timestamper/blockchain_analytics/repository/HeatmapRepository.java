@@ -121,4 +121,20 @@ public interface HeatmapRepository extends JpaRepository<Transaction, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @Query(value = """
+            SELECT 
+                token,
+                transaction_amount,
+                total_value,
+                current_price
+            FROM token_daily_summary_mv
+            WHERE day = :date
+              AND token IN (:tokens)
+            ORDER BY token
+        """, nativeQuery = true)
+    List<Object[]> findDailySummaryByDateAndTokens(
+            @Param("tokens") List<String> tokens,
+            @Param("date") LocalDate date
+    );
 }

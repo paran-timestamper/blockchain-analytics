@@ -1,6 +1,7 @@
 package com.timestamper.blockchain_analytics.service;
 
 import com.timestamper.blockchain_analytics.dto.heatmap.response.*;
+import com.timestamper.blockchain_analytics.dto.heatmap.response.CompareDailyResponseDTO.TokenDetail;
 import com.timestamper.blockchain_analytics.dto.heatmap.response.CompareMonthlyResponseDTO.CompareMonthlyTimeBlock;
 import com.timestamper.blockchain_analytics.repository.HeatmapRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.timestamper.blockchain_analytics.dto.heatmap.response.DailyInfoDetailResponseDTO.*;
 import static com.timestamper.blockchain_analytics.dto.heatmap.response.MonthlyInfoDetailResponseDTO.*;
@@ -139,5 +141,27 @@ public class HeatmapService {
             blocks.add(new CompareMonthlyTimeBlock(day, values, percentage));
         }
         return new CompareMonthlyResponseDTO(tokens, blocks);
+    }
+
+    public CompareDailyResponseDTO getCompareDailyInfo(List<String> tokens, LocalDate date) {
+        List<Object[]> results = heatmapRepository.findDailySummaryByDateAndTokens(
+                tokens,
+                date
+        );
+
+        List<TokenDetail> detailList = results.stream()
+                .map(row -> new TokenDetail(
+                        row[0].toString(),
+                        ((Number) row[1]).intValue(),
+                        ((Number) row[2]).doubleValue(),
+                        ((Number) row[3]).doubleValue()
+                ))
+                .collect(Collectors.toList());
+
+        return new CompareDailyResponseDTO(
+                date,
+                tokens,
+                detailList
+        );
     }
 }

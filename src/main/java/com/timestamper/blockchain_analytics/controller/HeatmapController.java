@@ -35,14 +35,13 @@ public class HeatmapController {
         return heatmapService.getDailyInfoDetail(request.getFromAddress(), request.getDate());
     }
 
-    // 두 토큰의 value를 비교하는 API
     @PostMapping("/compare/monthly")
     public CompareMonthlyResponseDTO getCompareMonthlyInfo(@RequestBody CompareMonthlyRequestDTO request) {
         return heatmapService.getCompareMonthlyInfo(request.getTokens(), request.getDate());
     }
 
-//    @PostMapping("/compare/daily")
-//    public CompareDailyResponseDTO getCompareDailyInfo(@RequestBody CompareDailyRequestDTO request) {
-//        return heatmapService.getCompareDailyInfo();
-//    }
+    @PostMapping("/compare/daily")
+    public CompareDailyResponseDTO getCompareDailyInfo(@RequestBody CompareDailyRequestDTO request) {
+        return heatmapService.getCompareDailyInfo(request.getTokens(), request.getDate());
+    }
 }
