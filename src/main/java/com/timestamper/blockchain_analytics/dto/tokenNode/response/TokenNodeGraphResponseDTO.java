@@ -32,5 +32,6 @@ public class TokenNodeGraphResponseDTO {
         private int nodeSize;
         private String totalValue;
         private String transactionAmount;
+        private double price;
     }
 }
