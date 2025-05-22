@@ -4,6 +4,7 @@ import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountDTO;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredLatestDTO;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredVolumeDTO;
 import com.timestamper.blockchain_analytics.entity.Transaction;
+import com.timestamper.blockchain_analytics.repository.projection.transaction.MvTopAddressWithChildrenProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -45,5 +46,26 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<TransactionFilteredAmountDTO> findByTransactionFilteredAmount(@Param("token") String token);
 
     List<Transaction> findByDpdenomAndFromAddressOrderByTimestampDesc(String dpdenom, String fromAddress);
+
+    @Query(value = """
+    SELECT 
+        section_label,
+        toaddress,
+        token,
+        ecosystem,
+        nodesize,
+        value,
+        totalvalue,
+        transactionamount,
+        second_to_address AS secondToAddress,
+        second_token AS secondToken,
+        second_ecosystem AS secondEcosystem,
+        second_value AS secondValue,
+        second_totalvalue AS secondTotalValue,
+        second_nodesize AS secondNodeSize
+    FROM mv_token_top_addresses_with_children
+    ORDER BY section_label, totalvalue DESC
+""", nativeQuery = true)
+    List<MvTopAddressWithChildrenProjection> findAllTopAddressWithChildren();
 
 }

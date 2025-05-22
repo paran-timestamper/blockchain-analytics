@@ -3,6 +3,8 @@ package com.timestamper.blockchain_analytics.controller;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredAmountResponse;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredLatestDTO;
 import com.timestamper.blockchain_analytics.dto.TransactionFilteredVolumeDTO;
+import com.timestamper.blockchain_analytics.dto.transaction.reqeust.TransactionGraphRequestDTO;
+import com.timestamper.blockchain_analytics.dto.transaction.response.TransactionGraphResponseDTO;
 import com.timestamper.blockchain_analytics.entity.Transaction;
 import com.timestamper.blockchain_analytics.service.TransactionService;
 import lombok.RequiredArgsConstructor;
@@ -59,5 +61,10 @@ public class TransactionController {
     @GetMapping("infos/address")
     public List<Transaction> getTransactionsByAddress(@RequestParam String token, @RequestParam String fromAddress) {
         return transactionService.getTransactionByAddress(token, fromAddress);
+    }
+
+    @PostMapping("graph")
+    public TransactionGraphResponseDTO getGraph(@RequestBody TransactionGraphRequestDTO request) {
+        return transactionService.getGraph(request.getFromAddress());
     }
 }

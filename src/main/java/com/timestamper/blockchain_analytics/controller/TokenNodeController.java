@@ -46,6 +46,4 @@ public class TokenNodeController {
         return tokenNodeService.getChainInfo(requestDTO);
     }
 
-    // TODO Main > Transaction Node > Graph 그리기
-
 }
