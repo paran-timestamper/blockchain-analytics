@@ -34,7 +34,7 @@ const bChains = ref([])
 
 async function fetchChains() {
   try {
-    const res = await fetch('http://localhost:8080/api/tokenNode/chain', {
+    const res = await fetch('http://localhost:8080/api/tokenNode/chainInfo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -43,8 +43,8 @@ async function fetchChains() {
     })
 
     const result = await res.json()
-    aChains.value = result.tokenChains?.tokenA?.topChains || []
-    bChains.value = result.tokenChains?.tokenB?.topChains || []
+    aChains.value = result.tokenChains?.[props.aToken]?.topChains || []
+    bChains.value = result.tokenChains?.[props.bToken]?.topChains || []
 
   } catch (err) {
     console.error('🚨 체인 정보 불러오기 실패:', err)

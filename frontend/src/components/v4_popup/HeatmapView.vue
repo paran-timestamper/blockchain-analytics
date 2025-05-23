@@ -9,9 +9,7 @@
 
 <script setup>
 import * as d3 from 'd3'
-import { ref, onMounted } from 'vue'
-import { defineProps } from 'vue';
-import { defineEmits } from 'vue';
+import { ref, onMounted, defineEmits, defineProps } from 'vue'
 
 const props = defineProps({
   aToken: String,
@@ -22,18 +20,20 @@ const emit = defineEmits(['cell-click'])
 
 const selectedMonth = ref(new Date().toISOString().slice(0, 7))
 const heatmapData = ref([])
+const heatmapContainer = ref(null)
 
 async function fetchHeatmapData() {
-  const res = await fetch('http://localhost:8080/api/tokenNode/heatmap', {
+  const res = await fetch('http://localhost:8080/api/heatmap/compare/monthly', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      tokens: [props.aToken, props.bToken]
+      tokens: [props.aToken, props.bToken],
+      date: selectedMonth.value
     })
   })
 
   const result = await res.json()
-  heatmapData.value = result.time_blocks || []
+  heatmapData.value = result.compareMonthlyTimeBlocks || []
   drawHeatmap()
 }
 
@@ -41,27 +41,23 @@ function drawHeatmap() {
   const container = d3.select(heatmapContainer.value)
   container.select('svg').remove()
 
-  const margin = { top: 40, left: 40, right: 40, bottom: 40 }
-  const width = 600
-  const height = 300
+  const margin = { top: 50, left: 40, right: 40, bottom: 40 }
   const cellWidth = 80
   const cellHeight = 40
-
   const svg = container
       .append('svg')
-      .attr('width', width)
-      .attr('height', height)
+      .attr('width', cellWidth * 7 + margin.left + margin.right)
+      .attr('height', cellHeight * 6 + margin.top + margin.bottom)
 
   const colorA = d3.rgb(70, 130, 180) // blue
   const colorB = d3.rgb(50, 205, 50)  // green
 
-  svg
-      .selectAll('rect')
+  svg.selectAll('rect')
       .data(heatmapData.value)
       .enter()
       .append('rect')
-      .attr('x', (_, i) => margin.left + i % 5 * cellWidth)
-      .attr('y', (_, i) => margin.top + Math.floor(i / 5) * cellHeight)
+      .attr('x', (_, i) => margin.left + i % 7 * cellWidth)
+      .attr('y', (_, i) => margin.top + Math.floor(i / 7) * cellHeight)
       .attr('width', cellWidth)
       .attr('height', cellHeight)
       .attr('fill', d => {
@@ -73,35 +69,48 @@ function drawHeatmap() {
       })
       .attr('stroke', '#333')
       .on('click', (event, d) => {
-        const date = `2025-05-${d.time_range.replace('일', '').padStart(2, '0')}`
-        emit('cell-click', { date })
+        const emittedPayload = { date: d.timeRange, mode: 'monthly' }
+        console.log('[📤 HeatmapView emit]', emittedPayload)
+        emit('cell-click', emittedPayload)
       })
 
-  svg
-      .selectAll('text')
+  svg.selectAll('text')
       .data(heatmapData.value)
       .enter()
       .append('text')
-      .attr('x', (_, i) => margin.left + i % 5 * cellWidth + 6)
-      .attr('y', (_, i) => margin.top + Math.floor(i / 5) * cellHeight + 16)
+      .attr('x', (_, i) => margin.left + i % 7 * cellWidth + 6)
+      .attr('y', (_, i) => margin.top + Math.floor(i / 7) * cellHeight + 16)
       .attr('fill', 'white')
       .attr('font-size', '12px')
-      .text(d => d.time_range)
+      .text(d => {
+        const parts = d.timeRange.split('-')
+        return `${Number(parts[2])}일`
+      })
 }
 
-const heatmapContainer = ref(null)
+
 onMounted(fetchHeatmapData)
 </script>
 
 <style scoped>
 .heatmap-page {
+  padding: 24px;
   color: white;
 }
 .controls {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 .heatmap-container {
   background-color: #1e1e1e;
   border-radius: 8px;
+}
+svg {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+}
+.cell:hover {
+  stroke: yellow;
+  stroke-width: 2px;
+  cursor: pointer;
 }
 </style>

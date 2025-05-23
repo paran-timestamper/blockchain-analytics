@@ -17,12 +17,12 @@
 
     <!-- 🔁 AddressPopup 테스트용 -->
 
-    <!--
+<!--
     <AddressPopup
       :address="'axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k'"
       @close="() => {}"
     />
-    -->
+-->
 
 
   </div>

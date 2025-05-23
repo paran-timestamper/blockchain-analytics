@@ -4,7 +4,7 @@ import LineGraph from '@/components/v4_popup/LineGraph.vue'
 import HeatmapView from '@/components/v4_popup/HeatmapView.vue'
 import HeatmapTable from '@/components/v4_popup/HeatmapTable.vue'
 import Chain from '@/components/v4_popup/Chain.vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { defineProps } from 'vue';
 
 // ✅ props 선언
@@ -22,10 +22,16 @@ const props = defineProps({
 const selectedDate = ref('')
 const selectedMode = ref('')
 
-function handleHeatmapClick({ date, mode }) {
-  selectedDate.value = date
-  selectedMode.value = mode
+function handleHeatmapClick(payload) {
+  console.log('[📥 TokenPopup handleHeatmapClick]', payload)
+  selectedDate.value = payload.date
+  selectedMode.value = payload.mode   // ✅ 여기가 빠지면 mode가 undefined
 }
+
+const currentDate = computed(() => selectedDate.value)
+const currentMode = computed(() => selectedMode.value)
+
+
 </script>
 
 <template>
@@ -59,10 +65,11 @@ function handleHeatmapClick({ date, mode }) {
         <HeatmapTable
             :a-token="props.aToken"
             :b-token="props.bToken"
-            :date="selectedDate"
-            :mode="selectedMode"
-            :key="selectedDate + '-' + selectedMode"
+            :date="currentDate"
+            :mode="currentMode"
+            :key="currentDate + '-' + currentMode"
         />
+
       </div>
     </div>
   </div>

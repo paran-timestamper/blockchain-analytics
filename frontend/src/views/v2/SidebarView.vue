@@ -244,26 +244,33 @@ export default {
 .popup-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.15); /* ✅ 더 투명하게 */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
+
 .popup {
-  background: white;
+  background: rgba(255, 255, 255, 0.3); /* 🔹 거의 투명한 흰색 */
   border-radius: 16px;
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
+
+
+
 
 /* ✅ 팝업 고정 크기 설정 */
 .fixed-popup {
-  width: 1200px;
-  height: 800px;
+  width: 90vw;
+  height: 65vh;
   padding: 20px;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .close-btn {

@@ -37,32 +37,54 @@ import { defineProps } from 'vue';
 const props = defineProps({
   aToken: String,
   bToken: String,
-  date: String
+  date: String,
+  mode: String
 })
 
 const aData = ref(null)
 const bData = ref(null)
 
 async function fetchDetails() {
-  if (!props.date) return
+  if (!props.date) {
+    console.warn('[⛔️ fetchDetails] date is empty, skipping')
+    return
+  }
 
-  const res = await fetch('http://localhost:8080/api/tokenNode/heatmap/detail', {
+  const payload = {
+    date: props.date,
+    tokens: [props.aToken, props.bToken]
+  }
+
+  console.log('[📡 fetchDetails payload]', payload)
+
+  const res = await fetch('http://localhost:8080/api/heatmap/compare/daily', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      clickedHour: props.date,
-      tokens: [props.aToken, props.bToken]
-    })
+    body: JSON.stringify(payload)
   })
 
   const result = await res.json()
-  const details = result.details || []
+  console.log('[📨 fetchDetails result]', result)
 
-  aData.value = details.find(d => d.token === props.aToken)
-  bData.value = details.find(d => d.token === props.bToken)
+  // ✅ 실제로 데이터에 반영
+  aData.value = result.details.find(d => d.token === props.aToken)
+  bData.value = result.details.find(d => d.token === props.bToken)
+
+  console.log('[✅ 세팅 완료]', aData.value, bData.value)
 }
 
-watch(() => props.date, fetchDetails, { immediate: true })
+
+
+watch(
+    () => [props.date, props.mode],
+    ([newDate, newMode]) => {
+      console.log('[📩 HeatmapTable props changed]', newDate, newMode)
+      fetchDetails()
+    },
+    { immediate: true }
+)
+
+
 </script>
 
 <style scoped>

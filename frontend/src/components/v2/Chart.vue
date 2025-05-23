@@ -47,9 +47,24 @@
         </thead>
         <tbody>
         <tr v-for="tx in transactions" :key="tx.txHash">
-          <td>{{ tx.txHash }}</td>
-          <td>{{ tx.fromAddress }}</td>
-          <td>{{ tx.toAddress }}</td>
+          <td>
+            <div class="address-cell">
+              {{ tx.txHash.slice(0, 32) + '...' }}
+              <button class="copy-button" @click="copyToClipboard(tx.txHash)">📋</button>
+            </div>
+          </td>
+          <td>
+            <div class="address-cell">
+              {{ tx.fromAddress.slice(0, 32) + '...' }}
+              <button class="copy-button" @click="copyToClipboard(tx.fromAddress)">📋</button>
+            </div>
+          </td>
+          <td>
+            <div class="address-cell">
+              {{ tx.toAddress.slice(0, 32) + '...' }}
+              <button class="copy-button" @click="copyToClipboard(tx.toAddress)">📋</button>
+            </div>
+          </td>
           <td>{{ tx.value.toFixed(4) }}</td>
           <td>{{ tx.totalPrice.toFixed(2) }}</td>
           <td>{{ formatDate(tx.convertedDate) }}</td>
@@ -58,9 +73,16 @@
       </table>
 
       <div class="pagination">
-        <button :disabled="page === 1" @click="changePage(page - 1)">Prev</button>
-        <span>Page {{ page }} / {{ totalPages }}</span>
-        <button :disabled="page === totalPages" @click="changePage(page + 1)">Next</button>
+        <button :disabled="page === 1" @click="changePage(page - 1)">&lt;</button>
+        <button
+            v-for="n in 10"
+            :key="n"
+            :class="{ active: page === n }"
+            @click="changePage(n)"
+        >
+          {{ n }}
+        </button>
+        <button :disabled="page === 10" @click="changePage(page + 1)">&gt;</button>
       </div>
     </div>
   </div>
@@ -72,8 +94,8 @@ export default {
   data() {
     return {
       tokenList: [],
-      selectedToken: null,        // ✅ default = null
-      selectedFilter: 'LATEST',   // ✅ default = "Latest"
+      selectedToken: null,
+      selectedFilter: 'LATEST',
       fromAddress: '',
       showTokenDropdown: false,
       showFilterDropdown: false,
@@ -83,14 +105,9 @@ export default {
       totalCount: 0,
     };
   },
-  computed: {
-    totalPages() {
-      return Math.ceil(this.totalCount / this.size);
-    }
-  },
   mounted() {
     this.fetchTokenList();
-    this.fetchTransactions(); // ✅ 초기 요청
+    this.fetchTransactions();
   },
   methods: {
     toggleTokenDropdown() {
@@ -141,16 +158,12 @@ export default {
         filter: this.selectedFilter.toUpperCase(),
         fromAddress: this.fromAddress || null
       };
-      console.log("📦 요청 payload:", payload);
-
-
       try {
         const res = await fetch('http://localhost:8080/api/chart/data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-
         const data = await res.json();
         this.transactions = data.transactions || [];
         this.totalCount = data.totalCount || 0;
@@ -161,6 +174,11 @@ export default {
     formatDate(dateStr) {
       const d = new Date(dateStr);
       return d.toLocaleString();
+    },
+    copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('복사되었습니다: ' + text);
+      });
     }
   }
 };
@@ -168,10 +186,10 @@ export default {
 
 <style scoped>
 .chart-page {
-  padding: 20px;
+  padding: 12px;
   color: white;
   width: 100%;
-  height: 100%;
+  height: 100vh;
 }
 .controls {
   display: flex;
@@ -209,7 +227,7 @@ export default {
   gap: 6px;
   z-index: 100;
   max-height: 300px;
-  overflow-y: auto; /* ✅ 스크롤 가능 */
+  overflow-y: auto;
 }
 .dropdown-option {
   background-color: #1f2630;
@@ -233,91 +251,81 @@ export default {
   border: none;
 }
 .tx-table {
-  margin-top: 20px;
-  overflow-x: auto;
-}
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  background-color: #1a1a1a;
-}
-th, td {
-  padding: 12px 16px;
-  border: 1px solid #444;
-  text-align: left;
-}
-th {
-  background-color: #222;
-  color: #ddd;
-}
-tr:nth-child(even) {
-  background-color: #2a2a2a;
-}
-tr:hover {
-  background-color: #333;
-}
-.pagination {
   margin-top: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-button {
-  background: #2196f3;
-  color: white;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-button:disabled {
-  background: #555;
-  cursor: not-allowed;
+  width: 120%;
+  height: auto;
+  overflow: auto;
 }
 .styled-table {
-  width: 100%;
+  width: auto;
+  table-layout: fixed;
   border-collapse: collapse;
-  font-size: 12px; /* ✅ 폰트 크기 줄임 */
   background-color: #1a1a1a;
-  table-layout: fixed; /* ✅ 열 너비 고정 */
 }
 
 th, td {
-  padding: 6px 8px; /* ✅ 셀 여백 최소화 */
+  padding: 10px 12px;
   border: 1px solid #444;
   text-align: left;
-  white-space: nowrap; /* ✅ 한 줄에 표시 */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* 절대 너비 지정 - 비율 무시 */
+th:nth-child(1), td:nth-child(1) { min-width: 340px; max-width: 340px; width: 340px; }
+th:nth-child(2), td:nth-child(2) { min-width: 340px; max-width: 340px; width: 340px; }
+th:nth-child(3), td:nth-child(3) { min-width: 340px; max-width: 340px; width: 340px; }
+th:nth-child(4), td:nth-child(4) { min-width: 200px;  max-width: 200px;  width: 200px;  }
+th:nth-child(5), td:nth-child(5) { min-width: 180px; max-width: 180px; width: 180px; }
+th:nth-child(6), td:nth-child(6) { min-width: 220px; max-width: 220px; width: 220px; }
 th {
   background-color: #222;
   color: #ddd;
   font-weight: bold;
 }
-
 tr:nth-child(even) {
   background-color: #2a2a2a;
 }
-
 tr:hover {
   background-color: #333;
 }
-
-.tx-table {
+.address-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.copy-button {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+}
+.copy-button:hover {
+  color: #fff;
+}
+.pagination {
   margin-top: 16px;
-  width: 100%;
-  overflow: hidden; /* ✅ 스크롤 제거 */
-  height: auto;     /* ✅ 높이 제한 없음 */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
-
-.chart-page {
-  padding: 12px;
+.pagination button {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: none;
+  background: #2196f3;
   color: white;
-  width: 100%;
-  height: auto;     /* ✅ 전체 내용 높이에 맞춤 */
+  cursor: pointer;
 }
-
+.pagination button.active {
+  background: #ff9800;
+  color: black;
+  font-weight: bold;
+}
+.pagination button:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
 </style>
