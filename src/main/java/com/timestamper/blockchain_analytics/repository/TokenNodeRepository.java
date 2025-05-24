@@ -1,6 +1,5 @@
 package com.timestamper.blockchain_analytics.repository;
 
-import com.timestamper.blockchain_analytics.dto.tokenNode.response.TokenNodeGraphResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -17,7 +16,7 @@ public class TokenNodeRepository {
 
     public List<TokenData> findAllFromTable(String tableName) {
         String sql = "SELECT token, ecosystem, color_darkening, timestamp, generation_date, " +
-                "nodesize, total_value, transcationamount FROM " + tableName;
+                "nodesize, total_value, transcationamount, price FROM " + tableName;
 
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new TokenData(
@@ -28,7 +27,8 @@ public class TokenNodeRepository {
                         rs.getString("generation_date"),
                         rs.getInt("nodesize"),
                         rs.getString("total_value"),
-                        rs.getString("transcationamount")
+                        rs.getString("transcationamount"),
+                        rs.getDouble("price")
                 )
         );
     }

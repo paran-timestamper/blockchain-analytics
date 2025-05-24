@@ -46,7 +46,6 @@ public interface NodeRepository  extends JpaRepository<Transaction, Long> {
     """, nativeQuery = true)
     List<NodeInfoDTO> findNodeInfosByTransaction(String fromAddress, String token);
 
-    // TODO 쿼리 만들어야함 거래 대금 기준으로 select하는 쿼리
     @Query(value = """
         SELECT t.toaddress, t.dpdenom
         FROM Transaction t
@@ -78,7 +77,6 @@ public interface NodeRepository  extends JpaRepository<Transaction, Long> {
     """, nativeQuery = true)
     List<NodeInfoDTO> findNodeInfosByTransactionLimit10(String fromAddress, String token);
 
-    // TODO 쿼리 만들어야함 거래 대금 기준으로 select하는 쿼리
     @Query(value = """
         SELECT t.toaddress, t.dpdenom
         FROM Transaction t

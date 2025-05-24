@@ -45,7 +45,6 @@ public class NodeService {
         return new TOP1AddressResponseDTO(TOP1_ADDRESS, toAddressesDTO);
     }
 
-    // TODO riskLevel 구하는 로직 필요
     public NodeInfosResponseDTO getNodeInfos(NodeInfosRequestDTO request) {
         List<NodeInfoDTO> result;
 
