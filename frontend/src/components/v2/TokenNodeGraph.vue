@@ -1,12 +1,18 @@
 <template>
-  <div class="graph-wrapper">
-    <svg class="graph-svg" viewBox="0 0 600 600">
-      <!-- 중심 이동 그룹 -->
-      <g :transform="`translate(${center}, ${center})`">
-        <!-- 1. 월별 라인 (3개의 원) -->
+  <div class="graph-wrapper" ref="wrapperRef">
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">⏳ Loading tokens...</div>
+    </div>
+    <svg
+        class="graph-svg"
+        :width="svgWidth"
+        :height="svgHeight"
+    >
+      <g :transform="`translate(${centerX}, ${centerY})`">
         <circle
             v-for="(radius, idx) in monthRadii"
-            :key="idx"
+            :key="'ring-' + idx"
             :r="radius"
             cx="0"
             cy="0"
@@ -14,15 +20,13 @@
             stroke="#ddd"
             stroke-width="1"
         />
-
-        <!-- 2. 더미 노드 -->
         <circle
-            v-for="(node, idx) in dummyNodes"
-            :key="idx"
+            v-for="(node, idx) in computedNodes"
+            :key="'node-' + idx"
             :cx="node.xOffset"
             :cy="node.yOffset"
             :r="node.radius"
-            :fill="node.color"
+            :fill="node.fill"
             @click="handleClick(node)"
         />
       </g>
@@ -31,57 +35,122 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
 
-//eslint-disable-next-line no-unused-vars
-const svgRef = ref(null)
-const center = 250 // 중심 좌표 (viewBox 기준)
-const monthRadii = [90, 180, 270] // 원 반지름 (최근 → 과거)
+const props = defineProps({
+  currentSection: String
+})
 
-// eslint-disable-next-line no-unused-vars
-const daysInMonth = 30
-const tokens = [
-  { name: 'Token A', year: 2009, month: 2, day: 15, color: 'red' },
-  { name: 'Token B', year: 2015, month: 3, day: 8, color: 'green' },
-  { name: 'Token C', year: 2021, month: 4, day: 22, color: 'blue' }
-]
+const wrapperRef = ref(null)
+const svgWidth = ref(600)
+const svgHeight = ref(600)
+const margin = 40
 
-// 생성일 기준 각도 계산 (12시 방향 시작)
-const getAngleFromYearMonth = (year, month) => {
-  const startYear = 2009
-  const totalMonths = (year - startYear) * 12 + (month - 1)
-  return (totalMonths * (360 / 168)) % 360
+const centerX = computed(() => svgWidth.value / 2)
+const centerY = computed(() => svgHeight.value / 2)
+
+const fullTokenData = ref({})
+const isLoading = ref(true)
+
+const monthRadii = computed(() => {
+  const maxR = Math.min(svgWidth.value, svgHeight.value) / 2 - margin
+  return [maxR * 0.3, maxR * 0.7, maxR * 1.2]
+})
+
+const ecosystemColor = {
+  cosmos: '#a855f7',
+  evm: '#7c3aed',
+  terra: '#3b82f6',
+  binance: '#facc15',
+  unknown: '#9ca3af'
+}
+const brightnessMap = [1, 0.85, 0.7, 0.55, 0.4, 0.25, 0.1]
+
+function getColorWithDarkening(hex, level) {
+  const percent = brightnessMap[(+level || 1) - 1] || 1
+  const rgb = hex.match(/\w\w/g).map(c => parseInt(c, 16))
+  return `rgb(${rgb.map(c => Math.round(c * percent)).join(',')})`
 }
 
-// 최신 → 과거 순서로 매핑
-const monthToIndex = { 2: 2, 3: 1, 4: 0 }
+function parseTimestampToRadius(timestamp) {
+  const date = new Date(timestamp)
+  const monthIdx = date.getMonth() % 3
+  const baseRadius = monthRadii.value[monthIdx] || 180
+  const day = date.getDate()
+  return baseRadius + (day - 1) * (30 / 30) // 균일 반영
+}
 
-const dummyNodes = tokens.map((token) => {
-  const baseRadius = monthRadii[monthToIndex[token.month]]
-  const nextRadius = monthRadii[monthToIndex[token.month] - 1] || baseRadius + 100 // fallback
+const computedNodes = computed(() => {
+  const section = fullTokenData.value[props.currentSection]
+  if (!section) return []
 
-  const radiusStep = (nextRadius - baseRadius) / daysInMonth
-  const radius = baseRadius + radiusStep * (token.day - 1)
+  const entries = Object.entries(section)
+  const prices = entries.map(([_, t]) => Math.log10(parseFloat(t.price) + 1)).sort((a, b) => a - b)
+  const thresholds = [
+    prices[Math.floor(prices.length * 0.2)],
+    prices[Math.floor(prices.length * 0.4)],
+    prices[Math.floor(prices.length * 0.6)],
+    prices[Math.floor(prices.length * 0.8)]
+  ]
 
-  const angle = getAngleFromYearMonth(token.year, token.month) // 여전히 month 기준 각도
-  const rad = (angle * Math.PI) / 180
-  const xOffset = radius * Math.cos(rad)
-  const yOffset = radius * Math.sin(rad)
-  return {
-    xOffset,
-    yOffset,
-    color: token.color,
-    radius: 10,
-    name: token.name
-  }
+  return entries.map(([token, tokenData]) => {
+    const price = Math.log10(parseFloat(tokenData.price) + 1)
+    let priceGroup = 0
+    while (priceGroup < thresholds.length && price > thresholds[priceGroup]) priceGroup++
+    const angle = (priceGroup / 5) * 2 * Math.PI + Math.random() * (Math.PI / 20)
+    const radius = parseTimestampToRadius(tokenData.timestamp)
+    const x = radius * Math.cos(angle)
+    const y = radius * Math.sin(angle)
+    const baseColor = ecosystemColor[tokenData.ecosystem] || '#aaa'
+    const fill = getColorWithDarkening(baseColor, tokenData.color_darkening)
+    const size = 5 + 3 * ((+tokenData.Nodesize || 1) - 1)
+    return { name: token, xOffset: x, yOffset: y, radius: size, fill }
+  })
 })
 
 function handleClick(node) {
-  alert(`클릭한 노드: ${node.name}`)
+  alert(`클릭한 토큰: ${node.name}`)
 }
 
+async function fetchTokenData() {
+  try {
+    isLoading.value = true
+    const res = await fetch('/api/tokenNode/graph', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    const raw = await res.json()
+
+    if (Array.isArray(raw.sections)) {
+      fullTokenData.value = Object.fromEntries(
+          raw.sections.map(entry => [entry.sectionDate, entry.tokens])
+      )
+      console.log("fullTokenData :", raw)
+    } else {
+      console.error('⚠️ 예상한 구조가 아님:', raw)
+    }
+    await nextTick()
+  } catch (err) {
+    console.error('API 오류:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+fetchTokenData()
+
+watch(() => props.currentSection, async (val) => {
+  isLoading.value = true
+  await nextTick()
+  isLoading.value = false
+})
+
 onMounted(() => {
-  console.log('TokenNodeGraph mounted')
+  nextTick(() => {
+    const rect = wrapperRef.value?.getBoundingClientRect()
+    svgWidth.value = rect?.width || 600
+    svgHeight.value = rect?.height || 600
+  })
 })
 </script>
 
@@ -89,21 +158,36 @@ onMounted(() => {
 .graph-wrapper {
   width: 100%;
   height: 100%;
-  background: none;/*repeating-radial-gradient(
-      circle at center,
-      #f9f9f9,
-      #f9f9f9 10px,
-      #f0f0f0 10px,
-      #f0f0f0 20px
-  );*/
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
 }
-
 .graph-svg {
-  width: 100%;
-  height: 100%;
-
+  display: block;
+}
+.loading-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255,255,255,0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.loading-spinner {
+  border: 4px solid #ccc;
+  border-top: 4px solid #6366f1;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+}
+.loading-text {
+  margin-top: 8px;
+  color: #4b5563;
+  font-size: 14px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
