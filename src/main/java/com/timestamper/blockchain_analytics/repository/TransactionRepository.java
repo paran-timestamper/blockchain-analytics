@@ -48,24 +48,44 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByDpdenomAndFromAddressOrderByTimestampDesc(String dpdenom, String fromAddress);
 
     @Query(value = """
-    SELECT 
-        section_label,
-        toaddress,
-        token,
-        ecosystem,
-        nodesize,
-        value,
-        totalvalue,
-        transactionamount,
-        second_to_address AS secondToAddress,
-        second_token AS secondToken,
-        second_ecosystem AS secondEcosystem,
-        second_value AS secondValue,
-        second_totalvalue AS secondTotalValue,
-        second_nodesize AS secondNodeSize
-    FROM mv_token_top_addresses_with_children
-    ORDER BY section_label, totalvalue DESC
-""", nativeQuery = true)
+        SELECT 
+            section_label,
+            toaddress,
+            token,
+            ecosystem,
+            nodesize,
+            value,
+            totalvalue,
+            transactionamount,
+            second_to_address AS secondToAddress,
+            second_token AS secondToken,
+            second_ecosystem AS secondEcosystem,
+            second_value AS secondValue,
+            second_totalvalue AS secondTotalValue,
+            second_nodesize AS secondNodeSize
+        FROM mv_token_top_addresses_with_children
+        ORDER BY section_label, totalvalue DESC
+    """, nativeQuery = true)
     List<MvTopAddressWithChildrenProjection> findAllTopAddressWithChildren();
 
+    @Query(value = """
+        SELECT 
+            section_label,
+            toaddress,
+            token,
+            ecosystem,
+            nodesize,
+            value,
+            totalvalue,
+            transactionamount,
+            second_to_address AS secondToAddress,
+            second_token AS secondToken,
+            second_ecosystem AS secondEcosystem,
+            second_value AS secondValue,
+            second_totalvalue AS secondTotalValue,
+            second_nodesize AS secondNodeSize
+        FROM mv_top100_with_children_address
+        ORDER BY section_label, totalvalue DESC
+    """, nativeQuery = true)
+    List<MvTopAddressWithChildrenProjection> findAllTopAddressWithChildrenForAddress(String fromAddress);
 }
