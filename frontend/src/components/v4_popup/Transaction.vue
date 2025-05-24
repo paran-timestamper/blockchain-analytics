@@ -30,17 +30,27 @@
       </table>
     </div>
 
+    <!-- ✅ 새 페이지네이션 -->
     <div class="pagination-controls">
-      <button @click="prevPage" :disabled="currentPage === 1">‹ Prev</button>
-      <span>{{ currentPage }}</span>
-      <button @click="nextPage">Next ›</button>
+      <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">‹</button>
+
+      <button
+          v-for="n in 10"
+          :key="n"
+          @click="changePage(n)"
+          :class="{ active: currentPage === n }"
+      >
+        {{ n }}
+      </button>
+
+      <button @click="changePage(currentPage + 1)" :disabled="currentPage === 10">›</button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
-import { defineProps } from 'vue';
+import { defineProps } from 'vue'
 
 const props = defineProps({
   token: {
@@ -54,12 +64,11 @@ const currentPage = ref(1)
 const rowsPerPage = ref(10)
 
 async function fetchTransactions() {
-
   console.log("📡 API 호출 준비 중:", {
     token: props.token,
     page: currentPage.value,
     size: rowsPerPage.value
-  });
+  })
 
   try {
     const res = await fetch("http://localhost:8080/api/tokenNode/transaction", {
@@ -80,16 +89,10 @@ async function fetchTransactions() {
   }
 }
 
-function nextPage() {
-  currentPage.value++
+function changePage(n) {
+  if (n < 1 || n > 10) return
+  currentPage.value = n
   fetchTransactions()
-}
-
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--
-    fetchTransactions()
-  }
 }
 
 function copyToClipboard(value) {
@@ -112,9 +115,30 @@ onMounted(() => {
   color: white;
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid #444;
   height: 100%;
   box-sizing: border-box;
+}
+
+.tx-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.tx-table th,
+.tx-table td {
+  padding: 8px 6px;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.tx-table th {
+  background: #333;
+  color: #ddd;
+}
+
+.table-wrapper {
+  overflow-x: auto;
 }
 
 .table-title {
@@ -123,30 +147,11 @@ onMounted(() => {
   font-weight: bold;
 }
 
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.tx-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tx-table th, .tx-table td {
-  padding: 8px 6px;
-  border: 1px solid #333;
-  text-align: center;
-}
-
-.tx-table th {
-  background: #333;
-}
-
 .cell-with-copy-row {
   display: flex;
   align-items: center;
-  gap: 4px;
   justify-content: center;
+  gap: 4px;
 }
 
 .copy-btn {
@@ -165,7 +170,7 @@ onMounted(() => {
 }
 
 .pagination-controls button {
-  background: #444;
+  background: #111;
   color: white;
   border: none;
   padding: 4px 8px;
@@ -176,5 +181,11 @@ onMounted(() => {
 .pagination-controls button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.pagination-controls button.active {
+  background: #ff9800;
+  color: black;
+  font-weight: bold;
 }
 </style>

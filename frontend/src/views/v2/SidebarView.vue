@@ -264,14 +264,18 @@ export default {
 
 
 
-/* ✅ 팝업 고정 크기 설정 */
-.fixed-popup {
-  width: 90vw;
+.popup.fixed-popup {
+  position: relative;
+  width: 78vw;            /* 기본 너비 */
   height: 65vh;
   padding: 20px;
-  max-width: 100%;
-  max-height: 100%;
+  margin-left: 5vw;      /* ✅ 왼쪽을 약간 앞으로 당김 = 오른쪽 확장 */
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
+
 
 .close-btn {
   position: absolute;

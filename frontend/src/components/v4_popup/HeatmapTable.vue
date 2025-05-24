@@ -97,7 +97,7 @@ table {
   border-collapse: collapse;
 }
 th, td {
-  border: 1px solid #444;
+  border: none;
   padding: 8px;
   text-align: center;
 }

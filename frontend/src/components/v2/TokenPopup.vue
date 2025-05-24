@@ -5,18 +5,11 @@ import HeatmapView from '@/components/v4_popup/HeatmapView.vue'
 import HeatmapTable from '@/components/v4_popup/HeatmapTable.vue'
 import Chain from '@/components/v4_popup/Chain.vue'
 import { ref, computed } from 'vue'
-import { defineProps } from 'vue';
+import { defineProps } from 'vue'
 
-// ✅ props 선언
 const props = defineProps({
-  aToken: {
-    type: String,
-    required: true
-  },
-  bToken: {
-    type: String,
-    required: true
-  }
+  aToken: { type: String, required: true },
+  bToken: { type: String, required: true }
 })
 
 const selectedDate = ref('')
@@ -25,13 +18,11 @@ const selectedMode = ref('')
 function handleHeatmapClick(payload) {
   console.log('[📥 TokenPopup handleHeatmapClick]', payload)
   selectedDate.value = payload.date
-  selectedMode.value = payload.mode   // ✅ 여기가 빠지면 mode가 undefined
+  selectedMode.value = payload.mode
 }
 
 const currentDate = computed(() => selectedDate.value)
 const currentMode = computed(() => selectedMode.value)
-
-
 </script>
 
 <template>
@@ -42,26 +33,26 @@ const currentMode = computed(() => selectedMode.value)
     </div>
 
     <div class="popup-grid">
-      <div class="left top">
+      <div class="left top white-box">
         <Transaction :token="props.aToken" label="A Token" />
       </div>
-      <div class="left bottom">
+      <div class="left bottom white-box">
         <Transaction :token="props.bToken" label="B Token" />
       </div>
-      <div class="center top">
+      <div class="center top white-box">
         <LineGraph :a-token="props.aToken" :b-token="props.bToken" />
       </div>
-      <div class="center bottom">
+      <div class="center bottom white-box">
         <HeatmapView
             :a-token="props.aToken"
             :b-token="props.bToken"
             @cell-click="handleHeatmapClick"
         />
       </div>
-      <div class="right top">
+      <div class="right top white-box">
         <Chain :a-token="props.aToken" :b-token="props.bToken" />
       </div>
-      <div class="right bottom">
+      <div class="right bottom white-box">
         <HeatmapTable
             :a-token="props.aToken"
             :b-token="props.bToken"
@@ -69,7 +60,6 @@ const currentMode = computed(() => selectedMode.value)
             :mode="currentMode"
             :key="currentDate + '-' + currentMode"
         />
-
       </div>
     </div>
   </div>
@@ -82,15 +72,13 @@ const currentMode = computed(() => selectedMode.value)
   left: 60px;
   width: 90vw;
   height: 85vh;
-  background: #1e1e1e;
+  background: rgba(30, 30, 30, 0.85);
   border: 1px solid #444;
   padding: 12px;
   color: white;
   z-index: 1000;
-
   display: flex;
   flex-direction: column;
-
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -125,4 +113,12 @@ const currentMode = computed(() => selectedMode.value)
 .center.bottom{ grid-column: 2 / 3; grid-row: 2 / 3; }
 .right.top    { grid-column: 3 / 4; grid-row: 1 / 2; }
 .right.bottom { grid-column: 3 / 4; grid-row: 2 / 3; }
+
+.white-box {
+  border: 1px solid #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  background-color: #1e1e1e;
+  box-sizing: border-box;
+}
 </style>

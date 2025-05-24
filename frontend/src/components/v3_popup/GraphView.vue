@@ -1,36 +1,39 @@
-//오른쪽 상단 토글같은거 여기에서 구현해놨음
-
 <template>
   <div class="graph-wrapper">
-    <div class="top-controls">
+    <!-- 📅 날짜 선택 -->
+    <div class="calendar-controls">
       <input type="date" v-model="selectedDate" class="calendar-input" />
-      <button @click="graphType = 'line'">📈 Line Graph</button>
-      <button @click="graphType = 'treemap'">🗺️ Treemap</button>
     </div>
 
-    <!-- 조건부 하위 컨트롤 -->
-    <div v-if="graphType === 'line'" class="line-controls">
-      <button @click="metric = 'txCount'">🧮 트랜잭션 수</button>
-      <button @click="metric = 'value'">💰 거래 대금</button>
+    <!-- 🧮 metric 선택 -->
+    <div class="metric-controls">
+      <button @click="metric = 'txCount'" :class="{ active: metric === 'txCount' }">TransactionCount</button>
+      <button @click="metric = 'value'" :class="{ active: metric === 'value' }">TotalPrice</button>
     </div>
 
-    <!-- 시각화 영역 -->
+    <!-- 📈 Line Graph -->
     <LineGraph
-        v-if="graphType === 'line' && selectedDate"
+        v-if="selectedDate"
         :address="address"
-        :metric="metric"
         :date="selectedDate"
+        :metric="metric"
     />
+
+    <!-- 🏷️ Treemap 타이틀 -->
+    <div class="treemap-title">『Treemap』</div>
+
+    <!-- 🗺️ Treemap -->
     <Treemap
-        v-if="graphType === 'treemap' && selectedDate"
+        v-if="selectedDate"
         :address="address"
         :date="selectedDate"
     />
   </div>
 </template>
 
+
 <script>
-import LineGraph from "@/components/v1/BrokenLineGraph.vue"; // ✅ 실제 파일명 기준
+import LineGraph from "@/components/v1/BrokenLineGraph.vue";
 import Treemap from "@/components/v1/Treemap.vue";
 
 export default {
@@ -47,9 +50,8 @@ export default {
   },
   data() {
     return {
-      selectedDate: '',      // 📆 캘린더에서 선택된 날짜
-      graphType: 'line',     // 📈 or 🗺️
-      metric: 'txCount'      // 트랜잭션 수 or 거래 대금
+      selectedDate: '',
+      metric: 'txCount'
     };
   }
 };
@@ -57,13 +59,14 @@ export default {
 
 <style scoped>
 .graph-wrapper {
-  padding: 20px;
+  padding: 12px;
 }
-.top-controls,
-.line-controls {
+
+.calendar-controls,
+.metric-controls {
+  margin-bottom: 12px;
   display: flex;
   gap: 10px;
-  margin-bottom: 12px;
 }
 
 .calendar-input {
@@ -72,5 +75,20 @@ export default {
   background: #1e1e1e;
   border: 1px solid #444;
   color: white;
+  width: fit-content;
+}
+
+button {
+  padding: 6px 12px;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button.active {
+  background: #4CAF50;
+  font-weight: bold;
 }
 </style>

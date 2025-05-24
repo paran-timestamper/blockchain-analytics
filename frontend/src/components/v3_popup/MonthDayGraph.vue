@@ -154,9 +154,22 @@ export default {
             }
           },
           scales: {
-            x: { ticks: { color: "#fff" } },
-            y: { ticks: { color: "#fff" }, beginAtZero: true }
+            x: {
+              ticks: { color: "#fff" }
+            },
+            y: {
+              ticks: {
+                color: "#fff",
+                beginAtZero: true,
+                stepSize: 1,
+                precision: 0,
+                callback: function(value) {
+                  return Number.isInteger(value) ? value : '';
+                }
+              }
+            }
           }
+
         }
       });
     }
@@ -168,6 +181,7 @@ export default {
 .month-day-graph {
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
 }
 canvas {
   background: #222;
@@ -202,4 +216,5 @@ input[type="date"], input[type="month"] {
   border: 1px solid #555;
   border-radius: 4px;
 }
+
 </style>

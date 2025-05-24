@@ -145,10 +145,7 @@ export default {
               beginAtZero: true,
               ticks: {
                 color: "#fff",
-                callback: (val) =>
-                    this.metric === 'txCount'
-                        ? parseInt(val)
-                        : parseFloat(val).toFixed(2)
+                callback: (val) => parseInt(val)
               }
             }
           }

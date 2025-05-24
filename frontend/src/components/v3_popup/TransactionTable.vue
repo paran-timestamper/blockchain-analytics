@@ -1,6 +1,6 @@
 <template>
   <div class="transaction-table-wrapper">
-    <h3 class="table-title">노드 트랜잭션 내역 ({{ truncatedAddress }})</h3>
+    <h3 class="table-title">노드 트랜잭션 내역</h3>
 
     <div class="table-wrapper">
       <table class="tx-table">
@@ -14,14 +14,26 @@
         </thead>
         <tbody>
         <tr v-for="(tx, i) in transactions" :key="i">
+          <!-- ✅ TxHash -->
           <td>
             <div class="cell-with-copy-row">
               <span>{{ tx.txHash.slice(0, 10) + '...' }}</span>
               <button class="copy-btn" @click="copyToClipboard(tx.txHash)">📋</button>
             </div>
           </td>
+
+          <!-- Direction -->
           <td>{{ tx.direction }}</td>
-          <td>{{ tx.toAddress.slice(0, 10) + '...' }}</td>
+
+          <!-- ✅ To Address -->
+          <td>
+            <div class="cell-with-copy-row">
+              <span>{{ tx.toAddress.slice(0, 10) + '...' }}</span>
+              <button class="copy-btn" @click="copyToClipboard(tx.toAddress)">📋</button>
+            </div>
+          </td>
+
+          <!-- Value -->
           <td>{{ tx.totalValue.toFixed(2) }}</td>
         </tr>
         </tbody>
@@ -29,9 +41,16 @@
     </div>
 
     <div class="pagination-controls">
-      <button @click="prevPage" :disabled="currentPage === 1">‹ Prev</button>
-      <span>{{ currentPage }}</span>
-      <button @click="nextPage">Next ›</button>
+      <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">‹</button>
+      <button
+        v-for="n in 10"
+        :key="n"
+        @click="changePage(n)"
+        :class="{ active: currentPage === n }"
+      >
+        {{ n }}
+      </button>
+      <button @click="changePage(currentPage + 1)" :disabled="currentPage === 10">›</button>
     </div>
   </div>
 </template>
@@ -90,17 +109,11 @@ export default {
       }
     },
 
-    nextPage() {
-      this.currentPage++;
+    changePage(n) {
+      if (n < 1 || n > 10) return;
+      this.currentPage = n;
       this.fetchTransactions();
-    },
-
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-        this.fetchTransactions();
-      }
-    },
+      },
 
     copyToClipboard(value) {
       navigator.clipboard.writeText(value);
@@ -113,45 +126,55 @@ export default {
 .transaction-table-wrapper {
   background: #1e1e1e;
   color: white;
-  padding: 10px;
+  padding: 16px;
   border-radius: 8px;
-  border: 1px solid #444;
-  height: 100%;
+  /* ✅ 이중 테두리 제거 */
+  /* border: 1px solid #444; */
+  height: auto;
+  min-height: 420px; /* ✅ 최소 높이 확보하여 여백 문제 방지 */
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* 테이블 + 페이지네이션 간 여백 최소화 */
 }
 
 .table-title {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 16px;
   font-weight: bold;
 }
 
 .table-wrapper {
   overflow-x: auto;
+  flex-grow: 1; /* ✅ 표가 공간 채우도록 */
 }
 
 .tx-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 14px;
+  table-layout: fixed;
 }
 
 .tx-table th, .tx-table td {
-  padding: 8px 6px;
+  padding: 10px;
   border: 1px solid #333;
   text-align: center;
+  word-break: break-word;
 }
 
 .tx-table th {
   background: #333;
   color: #ddd;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .cell-with-copy-row {
   display: flex;
   align-items: center;
-  gap: 4px;
   justify-content: center;
+  gap: 4px;
 }
 
 .copy-btn {
@@ -159,21 +182,22 @@ export default {
   border: none;
   color: white;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .pagination-controls {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .pagination-controls button {
-  background: #444;
+  background: #111;
   color: white;
   border: none;
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
 }
@@ -182,4 +206,10 @@ export default {
   opacity: 0.5;
   cursor: not-allowed;
 }
+.pagination-controls button.active {
+  background: #ff9800;
+  color: black;
+  font-weight: bold;
+}
+
 </style>

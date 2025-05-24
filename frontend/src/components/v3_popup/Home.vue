@@ -84,8 +84,7 @@ export default {
 
 <style scoped>
 .home-layout {
-  display: flex;
-  gap: 24px;
+  display: block;
   color: white;
   padding: 24px;
   background: #0d1117;
@@ -93,13 +92,17 @@ export default {
 
 .home-page {
   width: 100%;
+  max-width: 100%;
 }
 
 .news-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 반응형 */
   gap: 16px;
+  margin-top: 32px;  /* 위 요소와 간격 */
+  width: 100%;
 }
+
 .news-card {
   background: #1f2630;
   padding: 16px;

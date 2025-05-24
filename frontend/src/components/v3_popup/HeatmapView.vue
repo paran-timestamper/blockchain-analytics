@@ -3,12 +3,22 @@
     <div class="controls">
       <input type="date" v-model="selectedDate" @change="fetchHeatmapData" />
     </div>
+
     <div class="heatmap-container">
-      <div ref="dailyHeatmapContainer"></div>
-      <div ref="monthlyHeatmapContainer"></div>
+      <div class="section-wrapper">
+        <div class="section-title">Daily Heatmap</div>
+        <div ref="dailyHeatmapContainer" class="heatmap-box"></div>
+      </div>
+
+      <div class="section-wrapper">
+        <div class="section-title">Monthly Heatmap</div>
+        <div ref="monthlyHeatmapContainer" class="heatmap-box"></div>
+      </div>
     </div>
+
   </div>
 </template>
+
 
 <script>
 import * as d3 from "d3";
@@ -92,7 +102,7 @@ export default {
       const container = this.$refs.dailyHeatmapContainer;
       d3.select(container).select("svg").remove();
 
-      const margin = { top: 50, right: 20, bottom: 30, left: 40 };
+      const margin = { top: 40, right: 40, bottom: 30, left: 60 };  // ⬅ top 줄임
       const cellWidth = 80;
       const cellHeight = 40;
       const svg = d3.select(container)
@@ -224,6 +234,15 @@ export default {
 </script>
 
 <style scoped>
+
+input[type="date"] {
+  background-color: #1e1e1e;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
 .heatmap-page {
   padding: 24px;
   color: white;
@@ -237,7 +256,7 @@ export default {
 .heatmap-container {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  //gap: 10px;
 }
 svg {
   background-color: #1e1e1e;
@@ -248,4 +267,29 @@ svg {
   stroke-width: 2px;
   cursor: pointer;
 }
+.section-title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.heatmap-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  //border: 1px solid #444;       /* ✅ 테두리 추가 */
+  border-radius: 8px;
+  padding: 12px;                /* 여백도 약간 */
+}
+
+.section-wrapper {
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: #1e1e1e;
+}
+
+
 </style>

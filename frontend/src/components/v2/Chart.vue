@@ -252,7 +252,7 @@ export default {
 }
 .tx-table {
   margin-top: 16px;
-  width: 120%;
+  width: 100%;
   height: auto;
   overflow: auto;
 }
@@ -315,7 +315,7 @@ tr:hover {
   padding: 6px 10px;
   border-radius: 4px;
   border: none;
-  background: #2196f3;
+  background: #111;
   color: white;
   cursor: pointer;
 }
