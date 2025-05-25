@@ -54,6 +54,7 @@
       <div class="header-info">
         <button class="copy-btn" @click="copyToClipboard(clickedNodeId)">📋</button>
       </div>
+
       <!-- 테이블 -->
       <div class="table-wrapper">
         <table class="tx-table wide-table">
@@ -85,13 +86,14 @@
           </tbody>
         </table>
       </div>
-      <!-- 페이지네이션 (10개만) -->
+      <!-- 페이지네이션 -->
       <div class="pagination-controls">
         <button @click="prevPage" :disabled="currentPage===1">‹ Prev</button>
         <span>{{ currentPage }} / {{ totalPages }}</span>
         <button @click="nextPage" :disabled="currentPage===totalPages">Next ›</button>
       </div>
-      <!-- 차트 탭 -->
+
+      <!-- 차트 -->
       <div class="chart-buttons">
         <button :class="{ active: currentTab==='daily' }" @click="switchTab('daily')">일간 거래량</button>
         <button :class="{ active: currentTab==='monthly' }" @click="switchTab('monthly')">월간 거래량</button>
@@ -105,21 +107,23 @@
         </select>월
       </div>
       <canvas ref="detailChartCanvas" width="400" height="200"></canvas>
+
+      <!-- ✅ 추가: 날짜별 그래프 및 트리맵 -->
+      <DateGraphToggle v-if="clickedNodeId" :address="clickedNodeId" />
     </div>
   </div>
 </template>
 
 <script>
 import * as d3 from "d3";
-import {
-  Chart, BarController, BarElement, CategoryScale,
-  LinearScale, Tooltip, Title
-} from "chart.js";
+import { Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip, Title } from "chart.js";
+import GraphView from './GraphView.vue';
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip, Title);
 
 export default {
   name: "VisualView",
+  components: { DateGraphToggle: GraphView },
   data() {
     return {
       // UI state

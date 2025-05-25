@@ -3,11 +3,14 @@ package com.timestamper.blockchain_analytics.dto;
 import com.timestamper.blockchain_analytics.utils.converter.TimestampConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
+
 public class TransactionFilteredLatestDTO {
 
     public TransactionFilteredLatestDTO(String txhash, String fromAddress, String toAddress, Double amount, String dpdenom, Long timestamp) {

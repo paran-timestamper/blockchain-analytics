@@ -1,50 +1,53 @@
 <template>
   <div class="chart-page">
-    <!-- 필터 UI -->
     <div class="controls">
       <div class="dropdown">
         <button class="token-button" @click="toggleTokenCategory">{{ selectedToken || 'TOKEN' }}</button>
-        <div v-if="showTokenCategory" class="dropdown-content">
-          <button class="dropdown-option" @click="selectToken(t)" v-for="t in tokenList" :key="t">{{ t }}</button>
+        <div v-if="showTokenCategory" class="dropdown-content scrollable-dropdown">
+          <button class="dropdown-option" v-for="token in tokenList" :key="token" @click="selectToken(token)">{{ token }}</button>
         </div>
       </div>
 
       <div class="dropdown">
         <button class="token-button" @click="toggleFilterCategory">{{ selectedFilter || 'FILTER' }}</button>
         <div v-if="showFilterCategory" class="dropdown-content">
-          <button class="dropdown-option" @click="selectFilter(f)" v-for="f in filterList" :key="f">{{ f }}</button>
+          <button class="dropdown-option" @click="selectFilter('거래 대금')">거래 대금</button>
+          <button class="dropdown-option" @click="selectFilter('최신순')">최신순</button>
         </div>
+      </div>
+
+      <div v-if="selectedToken && selectedFilter" class="date-filter">
+        <input type="date" v-model="filterStart" /> ~
+        <input type="date" v-model="filterEnd" />
+        <button @click="applyDateFilter">Filter</button>
+        <button @click="resetDateFilter">Reset</button>
       </div>
     </div>
 
-    <!-- 트랜잭션 테이블 -->
-    <div v-if="paginatedTxs.length" class="tx-table">
-      <table>
+    <div v-if="transactions.length" class="tx-table">
+      <table class="styled-table">
         <thead>
         <tr>
           <th>Tx Hash</th>
           <th>From</th>
           <th>To</th>
-          <th>Value</th>
-          <th></th>
+          <th>Value(USDT)</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="tx in paginatedTxs" :key="tx.hash">
-          <td><span class="clip">{{ truncate(tx.hash) }}</span></td>
-          <td><span class="clip">{{ truncate(tx.from) }}</span></td>
-          <td><span class="clip">{{ truncate(tx.to) }}</span></td>
-          <td>{{ tx.value }}</td>
-          <td><button class="copy-btn" @click="copy(tx)">📋</button></td>
+        <tr v-for="tx in transactions" :key="tx.txHash">
+          <td>{{ tx.txHash }}</td>
+          <td>{{ tx.fromAddress }}</td>
+          <td>{{ tx.toAddress }}</td>
+          <td>{{ tx.totalPrice.toFixed(2) }}</td>
         </tr>
         </tbody>
       </table>
 
-      <!-- 페이지네이션 -->
       <div class="pagination">
-        <button :disabled="currentPage === 1" @click="currentPage--">Prev</button>
-        <span>Page {{ currentPage }} / {{ totalPages }}</span>
-        <button :disabled="currentPage === totalPages" @click="currentPage++">Next</button>
+        <button :disabled="page === 1" @click="changePage(page - 1)">Prev</button>
+        <span>Page {{ page }} / {{ totalPages }}</span>
+        <button :disabled="page === totalPages" @click="changePage(page + 1)">Next</button>
       </div>
     </div>
   </div>
@@ -54,24 +57,26 @@
 export default {
   data() {
     return {
+      tokenList: [],
       selectedToken: '',
       selectedFilter: '',
       showTokenCategory: false,
       showFilterCategory: false,
-      currentPage: 1,
-      txs: [],
-      tokenList: ['ETH', 'BTC', 'USDT'],
-      filterList: ['거래 대금', '트랜잭션량', '최신순']
+      filterStart: '',
+      filterEnd: '',
+      transactions: [],
+      page: 1,
+      size: 10,
+      totalCount: 0,
     };
   },
   computed: {
-    paginatedTxs() {
-      const start = (this.currentPage - 1) * 10;
-      return this.txs.slice(start, start + 10);
-    },
     totalPages() {
-      return Math.ceil(this.txs.length / 10);
+      return Math.ceil(this.totalCount / this.size);
     }
+  },
+  mounted() {
+    this.fetchTokens();
   },
   methods: {
     toggleTokenCategory() {
@@ -83,30 +88,71 @@ export default {
     selectToken(token) {
       this.selectedToken = token;
       this.showTokenCategory = false;
-      this.generateMockTxs();
+      this.page = 1;
+      this.fetchTransactions();
     },
     selectFilter(filter) {
       this.selectedFilter = filter;
       this.showFilterCategory = false;
-      this.generateMockTxs();
+      this.page = 1;
+      this.fetchTransactions();
     },
-    generateMockTxs() {
+    applyDateFilter() {
+      this.page = 1;
+      this.fetchTransactions();
+    },
+    resetDateFilter() {
+      this.filterStart = '';
+      this.filterEnd = '';
+      this.page = 1;
+      this.fetchTransactions();
+    },
+    changePage(newPage) {
+      this.page = newPage;
+      this.fetchTransactions();
+    },
+    async fetchTokens() {
+      try {
+        const res = await fetch('http://localhost:8080/api/common/tokens', { method: 'POST' });
+        const data = await res.json();
+        this.tokenList = data || [];
+      } catch (err) {
+        console.error('토큰 목록 로드 실패:', err);
+      }
+    },
+    async fetchTransactions() {
       if (!this.selectedToken || !this.selectedFilter) return;
-      this.txs = Array.from({ length: 100 }, () => ({
-        hash: `0x${Math.random().toString(16).slice(2, 10).padEnd(64, '0')}`,
-        from: `0x${Math.random().toString(16).slice(2, 12).padEnd(40, '0')}`,
-        to: `0x${Math.random().toString(16).slice(2, 12).padEnd(40, '1')}`,
-        value: (Math.random() * 100).toFixed(3)
-      }));
-      this.currentPage = 1;
-    },
-    truncate(val) {
-      return val.length > 10 ? val.slice(0, 10) + '...' : val;
-    },
-    copy(tx) {
-      const content = `TxHash: ${tx.hash}\nFrom: ${tx.from}\nTo: ${tx.to}\nValue: ${tx.value}`;
-      navigator.clipboard.writeText(content);
-      alert('Copied to clipboard!');
+
+      const payload = {
+        token: this.selectedToken,
+        page: this.page,
+        size: this.size,
+        startDate: this.filterStart ? this.filterStart + 'T00:00:00' : null,
+        endDate: this.filterEnd ? this.filterEnd + 'T00:00:00' : null
+      };
+
+      let endpoint = '';
+      if (this.selectedFilter === '최신순') {
+        endpoint = 'latest';
+      } else if (this.selectedFilter === '거래 대금') {
+        endpoint = 'transactionPrice';
+      } else {
+        endpoint = 'latest'; // 기본값 fallback
+      }
+
+      try {
+        const res = await fetch(`http://localhost:8080/api/charts/infos/${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        this.transactions = data.transactions || [];
+        this.totalCount = data.totalCount || 0;
+      } catch (err) {
+        console.error('트랜잭션 로드 실패:', err);
+      }
     }
   }
 };
@@ -122,6 +168,7 @@ export default {
   gap: 10px;
   align-items: center;
   margin-bottom: 16px;
+  font-size: 14px;
 }
 .dropdown {
   position: relative;
@@ -133,56 +180,86 @@ export default {
   border-radius: 8px;
   border: none;
   cursor: pointer;
+  font-weight: 500;
+  font-size: 16px;
+  transition: 0.2s;
+}
+.token-button:hover {
+  background: #2196f3;
+  color: white;
 }
 .dropdown-content {
   position: absolute;
   top: 110%;
   left: 0;
   background: rgba(50, 50, 50, 0.85);
+  backdrop-filter: blur(8px);
   border-radius: 8px;
   padding: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
 }
 .dropdown-option {
   background-color: #1f2630;
   color: #93c5fd;
+  border: none;
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
+  font-size: 15px;
 }
-.tx-table table {
+.dropdown-option:hover {
+  background-color: #2196f3;
+  color: white;
+}
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tx-table {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+.styled-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  background-color: #1a1a1a;
 }
 th, td {
-  padding: 8px;
-  border: 1px solid #555;
+  padding: 12px 16px;
+  border: 1px solid #444;
   text-align: left;
 }
-.clip {
-  display: inline-block;
-  max-width: 140px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+th {
+  background-color: #222;
+  color: #ddd;
 }
-.copy-btn {
-  background: #2196f3;
-  color: white;
-  padding: 4px 8px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
+tr:hover {
+  background-color: #333;
 }
 .pagination {
-  margin-top: 12px;
+  margin-top: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
+}
+button {
+  background: #2196f3;
+  color: white;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 button:disabled {
   background: #555;
