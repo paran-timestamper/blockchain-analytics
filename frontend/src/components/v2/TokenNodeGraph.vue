@@ -1,193 +1,285 @@
+<!-- src/components/v2/TokenNodeGraph.vue -->
 <template>
   <div class="graph-wrapper" ref="wrapperRef">
+    <!-- Loading overlay -->
     <div v-if="isLoading" class="loading-overlay">
       <div class="loading-spinner"></div>
       <div class="loading-text">⏳ Loading tokens...</div>
     </div>
-    <svg
-        class="graph-svg"
-        :width="svgWidth"
-        :height="svgHeight"
-    >
-      <g :transform="`translate(${centerX}, ${centerY})`">
-        <circle
-            v-for="(radius, idx) in monthRadii"
-            :key="'ring-' + idx"
-            :r="radius"
-            cx="0"
-            cy="0"
-            fill="none"
-            stroke="#ddd"
-            stroke-width="1"
+
+    <!-- SVG canvas -->
+    <svg class="graph-svg" :width="svgWidth" :height="svgHeight">
+      <!-- Left: radial layout group -->
+      <g :transform="`translate(${centerX - 150}, ${centerY})`">
+        <!-- Radial guide lines and labels -->
+        <line
+            v-for="i in 5" :key="'angle-line-' + i"
+            x1="0" y1="0"
+            :x2="Math.cos((i - 1) * 2 * Math.PI / 5) * maxRadius"
+            :y2="Math.sin((i - 1) * 2 * Math.PI / 5) * maxRadius"
+            stroke="#6b7280" stroke-dasharray="4 2" stroke-width="2"
         />
+        <text
+            v-for="i in 5" :key="'angle-label-' + i"
+            :x="Math.cos((i - 1 + 0.5) * 2 * Math.PI / 5) * (maxRadius - 10)"
+            :y="Math.sin((i - 1 + 0.5) * 2 * Math.PI / 5) * (maxRadius - 10)"
+            font-size="10" text-anchor="middle" fill="#6b7280"
+        >
+          Section {{ i }}
+        </text>
+
+        <!-- Concentric rings and labels -->
         <circle
-            v-for="(node, idx) in computedNodes"
-            :key="'node-' + idx"
-            :cx="node.xOffset"
-            :cy="node.yOffset"
-            :r="node.radius"
-            :fill="node.fill"
-            @click="handleClick(node)"
+            v-for="i in 3" :key="'ring-' + i"
+            :r="i * monthRadiusStep"
+            fill="none" stroke="#ddd" stroke-width="1"
         />
+        <text
+            v-for="i in 3" :key="'ring-label-' + i"
+            x="0" :y="-i * monthRadiusStep + 14"
+            font-size="10" text-anchor="middle" fill="#6b7280"
+        >
+          {{ monthLabels[i - 1] }}
+        </text>
+
+        <!-- Token nodes -->
+        <template v-for="node in animatedNodes" :key="node.name">
+          <circle
+              :cx="node.x"
+              :cy="node.y"
+              :r="node.r"
+              :fill="node.fill"
+              :class="{ 'active-node': selectedTokens.has(node.name) }"
+              @contextmenu.prevent="toggleSelect(node)"
+          />
+          <text
+              v-if="node.r > 10"
+              :x="node.x"
+              :y="node.y + 4"
+              font-size="10"
+              text-anchor="middle"
+              fill="white"
+              style="pointer-events: none"
+          >
+            {{ node.name }}
+          </text>
+        </template>
+      </g>
+
+      <!-- Right: legend -->
+      <g :transform="`translate(${svgWidth - 300}, 40)`">
+        <text x="0" y="0" font-size="14" font-weight="bold" fill="#374151">📘 설명</text>
+        <text x="0" y="28" font-size="12" fill="#6b7280">🔷 체인별 색상</text>
+        <text x="10" y="48" font-size="12" fill="#a855f7">cosmos</text>
+        <text x="10" y="66" font-size="12" fill="#7c3aed">evm</text>
+        <text x="10" y="84" font-size="12" fill="#3b82f6">terra</text>
+        <text x="10" y="102" font-size="12" fill="#facc15">binance</text>
+        <text x="10" y="120" font-size="12" fill="#9ca3af">unknown</text>
+        <text x="0" y="150" font-size="12" fill="#6b7280">🔵 노드 크기 = 중요도</text>
+        <text x="10" y="170" font-size="12" fill="#6b7280">nodeSize 1 → 작음</text>
+        <text x="10" y="188" font-size="12" fill="#6b7280">nodeSize 7 → 큼</text>
+        <text x="0" y="220" font-size="12" fill="#6b7280">📈 Section 기준</text>
+        <text x="10" y="240" font-size="12" fill="#6b7280">Section 1: 현재가 하위 20%</text>
+        <text x="10" y="258" font-size="12" fill="#6b7280">Section 5: 현재가 상위 20%</text>
       </g>
     </svg>
+
+    <!-- Compare popup -->
+    <TokenPopup
+        v-if="showComparePopup"
+        :tokenA="comparePair[0]"
+        :tokenB="comparePair[1]"
+        @close="resetSelection"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { ref, reactive, computed, watch, nextTick, onMounted, inject, reactive as toReactive } from 'vue'
+import gsap from 'gsap'
+import TokenPopup from '@/components/v2/TokenPopup.vue'
 
-const props = defineProps({
-  currentSection: String
-})
+/** props & injections **/
+const props = defineProps({ currentSection: String })
+const visibleTokens = inject('visibleTokens', ref([]))
 
-const wrapperRef = ref(null)
-const svgWidth = ref(600)
-const svgHeight = ref(600)
-const margin = 40
+/** state **/
+const wrapperRef      = ref(null)
+const svgWidth        = ref(600)
+const svgHeight       = ref(680)
+const isLoading       = ref(true)
+const fullTokenData   = ref({})
+const animatedNodes   = ref([])
+// currently-selected token names
+const selectedTokens  = toReactive(new Set())
+// compare popup
+const showComparePopup = ref(false)
+const comparePair      = ref(['',''])
 
-const centerX = computed(() => svgWidth.value / 2)
-const centerY = computed(() => svgHeight.value / 2)
-
-const fullTokenData = ref({})
-const isLoading = ref(true)
-
-const monthRadii = computed(() => {
-  const maxR = Math.min(svgWidth.value, svgHeight.value) / 2 - margin
-  return [maxR * 0.3, maxR * 0.7, maxR * 1.2]
-})
-
-const ecosystemColor = {
-  cosmos: '#a855f7',
-  evm: '#7c3aed',
-  terra: '#3b82f6',
-  binance: '#facc15',
-  unknown: '#9ca3af'
-}
-const brightnessMap = [1, 0.85, 0.7, 0.55, 0.4, 0.25, 0.1]
-
-function getColorWithDarkening(hex, level) {
-  const percent = brightnessMap[(+level || 1) - 1] || 1
-  const rgb = hex.match(/\w\w/g).map(c => parseInt(c, 16))
-  return `rgb(${rgb.map(c => Math.round(c * percent)).join(',')})`
-}
-
-function parseTimestampToRadius(timestamp) {
-  const date = new Date(timestamp)
-  const monthIdx = date.getMonth() % 3
-  const baseRadius = monthRadii.value[monthIdx] || 180
-  const day = date.getDate()
-  return baseRadius + (day - 1) * (30 / 30) // 균일 반영
-}
-
-const computedNodes = computed(() => {
-  const section = fullTokenData.value[props.currentSection]
-  if (!section) return []
-
-  const entries = Object.entries(section)
-  const prices = entries.map(([_, t]) => Math.log10(parseFloat(t.price) + 1)).sort((a, b) => a - b)
-  const thresholds = [
-    prices[Math.floor(prices.length * 0.2)],
-    prices[Math.floor(prices.length * 0.4)],
-    prices[Math.floor(prices.length * 0.6)],
-    prices[Math.floor(prices.length * 0.8)]
-  ]
-
-  return entries.map(([token, tokenData]) => {
-    const price = Math.log10(parseFloat(tokenData.price) + 1)
-    let priceGroup = 0
-    while (priceGroup < thresholds.length && price > thresholds[priceGroup]) priceGroup++
-    const angle = (priceGroup / 5) * 2 * Math.PI + Math.random() * (Math.PI / 20)
-    const radius = parseTimestampToRadius(tokenData.timestamp)
-    const x = radius * Math.cos(angle)
-    const y = radius * Math.sin(angle)
-    const baseColor = ecosystemColor[tokenData.ecosystem] || '#aaa'
-    const fill = getColorWithDarkening(baseColor, tokenData.color_darkening)
-    const size = 5 + 3 * ((+tokenData.Nodesize || 1) - 1)
-    return { name: token, xOffset: x, yOffset: y, radius: size, fill }
+/** layout computations **/
+const centerX        = computed(() => svgWidth.value / 2)
+const centerY        = computed(() => svgHeight.value / 2)
+const maxRadius      = computed(() => svgHeight.value / 2 - 10)
+const monthRadiusStep = computed(() => maxRadius.value / 3)
+const monthLabels    = computed(() => {
+  if (!props.currentSection) return []
+  const [y,m] = props.currentSection.split('-').map(Number)
+  return [2,1,0].map(i => {
+    const d = new Date(y, m -1 + i, 1)
+    const start = `${d.getFullYear()}년 ${d.getMonth()+1}월 1일`
+    const end   = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${new Date(d.getFullYear(), d.getMonth()+1,0).getDate()}일`
+    return `${start} ~ ${end}`
   })
 })
 
-function handleClick(node) {
-  alert(`클릭한 토큰: ${node.name}`)
+/** helper: map ecosystem → color **/
+const ecosystemColor = {
+  cosmos: '#a855f7',
+  evm:    '#7c3aed',
+  terra:  '#3b82f6',
+  binance:'#facc15',
+  unknown:'#9ca3af'
 }
 
-async function fetchTokenData() {
-  try {
-    isLoading.value = true
-    const res = await fetch('/api/tokenNode/graph', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    const raw = await res.json()
+/** hash/token layout math **/
+function hashToAngle(name) {
+  return ([...name].reduce((a,c)=>a+c.charCodeAt(0),0) % 1000) / 1000
+}
+function daysDiff(a,b) {
+  return Math.floor((b - a)/(1000*60*60*24))
+}
+function getRefDate(tokens) {
+  return new Date(Math.max(...Object.values(tokens).map(t=>new Date(t.timestamp).getTime())))
+}
 
-    if (Array.isArray(raw.sections)) {
-      fullTokenData.value = Object.fromEntries(
-          raw.sections.map(entry => [entry.sectionDate, entry.tokens])
-      )
-      console.log("fullTokenData :", raw)
-    } else {
-      console.error('⚠️ 예상한 구조가 아님:', raw)
+function computeTargetNodes(tokens) {
+  const refD = getRefDate(tokens)
+  const entries = Object.entries(tokens)
+  const prices = entries.map(([_,t])=>Math.log10(+t.price+1)).sort((a,b)=>a-b)
+  const thr = [0.2,0.4,0.6,0.8].map(f=>prices[Math.floor(prices.length*f)])
+  return entries.map(([tk,d]) => {
+    const lp = Math.log10(+d.price+1)
+    let grp = thr.findIndex(t=>lp<=t)
+    if (grp<0) grp = thr.length
+    const ang = ((grp + hashToAngle(tk)) / 5)*2*Math.PI
+    const rad = daysDiff(new Date(d.timestamp), refD)*(monthRadiusStep.value/30)
+    return {
+      name: tk,
+      x: rad * Math.cos(ang),
+      y: rad * Math.sin(ang),
+      r: 6 + (Math.max(1, Math.min(+d.nodeSize||1,7)) - 1)*6,
+      fill: ecosystemColor[d.ecosystem] || ecosystemColor.unknown
     }
-    await nextTick()
-  } catch (err) {
-    console.error('API 오류:', err)
+  })
+}
+
+function animateTo(tokens) {
+  const all = computeTargetNodes(tokens).filter(n => visibleTokens.value.includes(n.name))
+  all.forEach(t => {
+    let ex = animatedNodes.value.find(n=>n.name===t.name)
+    if (!ex) {
+      animatedNodes.value.push(toReactive(t))
+    } else {
+      gsap.to(ex, { x: t.x, y: t.y, r: t.r, duration: 1, ease: 'power2.out' })
+    }
+  })
+  const keep = new Set(all.map(n=>n.name))
+  animatedNodes.value = animatedNodes.value.filter(n=>keep.has(n.name))
+}
+
+/** initial fetch & animation **/
+onMounted(async () => {
+  await nextTick()
+  const r = wrapperRef.value.getBoundingClientRect()
+  svgWidth.value = r.width
+  svgHeight.value = r.height
+
+  try {
+    const res = await fetch('/api/tokenNode/graph', { method: 'POST' })
+    const raw = await res.json()
+    fullTokenData.value = Object.fromEntries(
+        raw.sections.map(({ sectionDate, tokens }) =>
+            [ sectionDate, Object.fromEntries(tokens.map(t=>[t.token,t])) ]
+        )
+    )
+    const toks = fullTokenData.value[props.currentSection]
+    if (toks) animateTo(toks)
+  } catch(e) {
+    console.error(e)
   } finally {
     isLoading.value = false
   }
-}
+})
 
-fetchTokenData()
-
-watch(() => props.currentSection, async (val) => {
+/** watch section or visibility **/
+watch(() => props.currentSection, async sec => {
   isLoading.value = true
   await nextTick()
+  const toks = fullTokenData.value[sec]
+  if (toks) animateTo(toks)
   isLoading.value = false
 })
-
-onMounted(() => {
-  nextTick(() => {
-    const rect = wrapperRef.value?.getBoundingClientRect()
-    svgWidth.value = rect?.width || 600
-    svgHeight.value = rect?.height || 600
-  })
+watch(visibleTokens, () => {
+  const toks = fullTokenData.value[props.currentSection]
+  if (toks) animateTo(toks)
 })
+
+/** right-click selection toggle **/
+function toggleSelect(node) {
+  const name = node.name
+  if (selectedTokens.has(name)) {
+    selectedTokens.delete(name)
+  } else {
+    selectedTokens.add(name)
+  }
+  // exactly two → show popup
+  if (selectedTokens.size === 2) {
+    comparePair.value = Array.from(selectedTokens)
+    showComparePopup.value = true
+  }
+}
+
+/** reset on popup close **/
+function resetSelection() {
+  selectedTokens.clear()
+  showComparePopup.value = false
+}
 </script>
 
 <style scoped>
 .graph-wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
+  width: 100%; height: 100%; position: relative;
 }
 .graph-svg {
   display: block;
 }
+/* blink animation on active nodes */
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50%     { opacity: 0.3; }
+}
+.active-node {
+  animation: blink 1s infinite;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+/* loading overlay */
 .loading-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(255,255,255,0.7);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.7);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
 }
 .loading-spinner {
   border: 4px solid #ccc;
   border-top: 4px solid #6366f1;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 32px; height: 32px;
   animation: spin 1s linear infinite;
 }
 .loading-text {
-  margin-top: 8px;
-  color: #4b5563;
-  font-size: 14px;
+  margin-top: 8px; color: #4b5563; font-size: 14px;
 }
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>

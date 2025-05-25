@@ -5,22 +5,43 @@ import NodeGraphView from './views/v2/NodeGraphView.vue'
 import LineChartView from './views/v2/LineChartView.vue'
 import TimelineControl from './views/v2/TimelineControl.vue'
 
-// ✅ 중앙 상태관리
 const selectedNodeType = ref('tx')
 const currentSection = ref('2021-02')
+    // 클릭된 주소 토글용 Set
+const visibleAddresses = ref(new Set())
+    // depth 필터
+const showDepth1       = ref(true)
+const showDepth2       = ref(true)
+const visibleTokens = ref([]) // ✅ 여기 추가
+
+provide('showDepth1', showDepth1)
+provide('showDepth2', showDepth2)
 
 provide('selectedNodeType', selectedNodeType)
 provide('currentSection', currentSection)
+// 새로 provide
+provide('visibleAddresses', visibleAddresses)
 
-function handleSectionChange(newVal) {
-  currentSection.value = newVal  // ✅ .value로 설정
-}
+provide('visibleTokens', visibleTokens) // ✅ 여기서 전역처럼 공유
 
 const sectionDates = [
   '2021-02', '2021-05', '2021-08',
   '2021-11', '2022-02', '2022-05', '2022-08'
 ]
+
+function handleSectionChange(val) {
+  currentSection.value = val
+}
+// NodeGraphView로부터 받은 토글 이벤트 처리
+function handleToggle(address) {
+  if (visibleAddresses.value.has(address)) {
+    visibleAddresses.value.delete(address)
+  } else {
+    visibleAddresses.value.add(address)
+  }
+}
 </script>
+
 
 <template>
   <div class="app-container">
@@ -29,7 +50,8 @@ const sectionDates = [
     </div>
     <div class="main-content">
       <div class="node-graph box">
-        <NodeGraphView />
+        <!-- 클릭된 노드 주소를 토글하도록 handleToggle 바인딩 -->
+        <NodeGraphView @toggleChart="handleToggle" />
       </div>
       <div class="line-chart box">
         <LineChartView :sectionDates="sectionDates" />
@@ -62,10 +84,10 @@ const sectionDates = [
   gap: 8px;
 }
 .node-graph {
-  height: 470px;
+  height: 520px;
 }
 .line-chart {
-  height: 260px;
+  height: 210px;
 }
 .timeline-control {
   height: 40px;
