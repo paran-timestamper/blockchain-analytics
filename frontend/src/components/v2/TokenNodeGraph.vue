@@ -1,4 +1,3 @@
-<!-- src/components/v2/TokenNodeGraph.vue -->
 <template>
   <div class="graph-wrapper" ref="wrapperRef">
     <!-- Loading overlay -->
@@ -49,6 +48,7 @@
               :cy="node.y"
               :r="node.r"
               :fill="node.fill"
+              :opacity="node.alpha"
               :class="{ 'active-node': selectedTokens.has(node.name) }"
               @contextmenu.prevent="toggleSelect(node)"
           />
@@ -68,19 +68,24 @@
 
       <!-- Right: legend -->
       <g :transform="`translate(${svgWidth - 300}, 40)`">
-        <text x="0" y="0" font-size="14" font-weight="bold" fill="#374151">📘 설명</text>
-        <text x="0" y="28" font-size="12" fill="#6b7280">🔷 체인별 색상</text>
+        <text x="-10" y="0" font-size="14" font-weight="bold" fill="#374151">📘 설명</text>
+        <text x="-10" y="28" font-size="12" fill="#6b7280">🔷 체인별 색상(트랜잭션 발생 시 어떤 블록체인을 이용했나)</text>
         <text x="10" y="48" font-size="12" fill="#a855f7">cosmos</text>
         <text x="10" y="66" font-size="12" fill="#7c3aed">evm</text>
         <text x="10" y="84" font-size="12" fill="#3b82f6">terra</text>
         <text x="10" y="102" font-size="12" fill="#facc15">binance</text>
         <text x="10" y="120" font-size="12" fill="#9ca3af">unknown</text>
-        <text x="0" y="150" font-size="12" fill="#6b7280">🔵 노드 크기 = 중요도</text>
+
+        <text x="-10" y="150" font-size="12" fill="#6b7280">🔵 노드 크기 = 거래 대금(3개월동안 토큰 거래량)</text>
         <text x="10" y="170" font-size="12" fill="#6b7280">nodeSize 1 → 작음</text>
         <text x="10" y="188" font-size="12" fill="#6b7280">nodeSize 7 → 큼</text>
-        <text x="0" y="220" font-size="12" fill="#6b7280">📈 Section 기준</text>
-        <text x="10" y="240" font-size="12" fill="#6b7280">Section 1: 현재가 하위 20%</text>
-        <text x="10" y="258" font-size="12" fill="#6b7280">Section 5: 현재가 상위 20%</text>
+
+        <text x="0" y="218" font-size="12" fill="#6b7280">📈 Section 기준(현재 토큰 가격 기준)</text>
+        <text x="10" y="238" font-size="12" fill="#6b7280">Section 1: 하위 20%</text>
+        <text x="10" y="256" font-size="12" fill="#6b7280">Section 5: 상위 20%</text>
+
+        <text x="0" y="284" font-size="12" fill="#6b7280">🌑 색상 진하기(트랜잭션량이 얼마나 많은지)</text>
+        <text x="10" y="304" font-size="12" fill="#6b7280">1단계: 연함 … 7단계: 진함</text>
       </g>
     </svg>
 
@@ -99,29 +104,29 @@ import { ref, reactive, computed, watch, nextTick, onMounted, inject, reactive a
 import gsap from 'gsap'
 import TokenPopup from '@/components/v2/TokenPopup.vue'
 
-/** props & injections **/
+// props & visible list
 const props = defineProps({ currentSection: String })
 const visibleTokens = inject('visibleTokens', ref([]))
 
-/** state **/
-const wrapperRef      = ref(null)
-const svgWidth        = ref(600)
-const svgHeight       = ref(680)
-const isLoading       = ref(true)
-const fullTokenData   = ref({})
-const animatedNodes   = ref([])
-// currently-selected token names
-const selectedTokens  = toReactive(new Set())
-// compare popup
+// layout & loading state
+const wrapperRef       = ref(null)
+const svgWidth         = ref(600)
+const svgHeight        = ref(680)
+const isLoading        = ref(true)
+const fullTokenData    = ref({})
+const animatedNodes    = ref([])
+
+// selected tokens for compare
+const selectedTokens   = toReactive(new Set())
 const showComparePopup = ref(false)
 const comparePair      = ref(['',''])
 
-/** layout computations **/
-const centerX        = computed(() => svgWidth.value / 2)
-const centerY        = computed(() => svgHeight.value / 2)
-const maxRadius      = computed(() => svgHeight.value / 2 - 10)
+// compute centers & radii
+const centerX         = computed(() => svgWidth.value / 2)
+const centerY         = computed(() => svgHeight.value / 2)
+const maxRadius       = computed(() => svgHeight.value / 2 - 10)
 const monthRadiusStep = computed(() => maxRadius.value / 3)
-const monthLabels    = computed(() => {
+const monthLabels     = computed(() => {
   if (!props.currentSection) return []
   const [y,m] = props.currentSection.split('-').map(Number)
   return [2,1,0].map(i => {
@@ -132,7 +137,7 @@ const monthLabels    = computed(() => {
   })
 })
 
-/** helper: map ecosystem → color **/
+// base colors
 const ecosystemColor = {
   cosmos: '#a855f7',
   evm:    '#7c3aed',
@@ -141,7 +146,7 @@ const ecosystemColor = {
   unknown:'#9ca3af'
 }
 
-/** hash/token layout math **/
+// helper math
 function hashToAngle(name) {
   return ([...name].reduce((a,c)=>a+c.charCodeAt(0),0) % 1000) / 1000
 }
@@ -152,46 +157,55 @@ function getRefDate(tokens) {
   return new Date(Math.max(...Object.values(tokens).map(t=>new Date(t.timestamp).getTime())))
 }
 
+// build target node array
 function computeTargetNodes(tokens) {
-  const refD = getRefDate(tokens)
+  const refD    = getRefDate(tokens)
   const entries = Object.entries(tokens)
-  const prices = entries.map(([_,t])=>Math.log10(+t.price+1)).sort((a,b)=>a-b)
-  const thr = [0.2,0.4,0.6,0.8].map(f=>prices[Math.floor(prices.length*f)])
+  const prices  = entries.map(([_,t])=>Math.log10(+t.price+1)).sort((a,b)=>a-b)
+  const thr     = [0.2,0.4,0.6,0.8].map(f=>prices[Math.floor(prices.length*f)])
   return entries.map(([tk,d]) => {
-    const lp = Math.log10(+d.price+1)
-    let grp = thr.findIndex(t=>lp<=t)
+    const lp    = Math.log10(+d.price+1)
+    let grp     = thr.findIndex(t=>lp<=t)
     if (grp<0) grp = thr.length
-    const ang = ((grp + hashToAngle(tk)) / 5)*2*Math.PI
-    const rad = daysDiff(new Date(d.timestamp), refD)*(monthRadiusStep.value/30)
+    const ang   = ((grp + hashToAngle(tk)) / 5)*2*Math.PI
+    const rad   = daysDiff(new Date(d.timestamp), refD)*(monthRadiusStep.value/30)
+    // alpha ∈ [1/7 .. 7/7]
+    const dark  = +d.colorDarkening || 7
+    const alpha = Math.max(1, Math.min(dark,7)) / 7
+
+    console.log(`computeTargetNodes →`, tk, 'colorDarkening:', d.colorDarkening, 'dark:', dark, 'alpha:', alpha)
     return {
       name: tk,
-      x: rad * Math.cos(ang),
-      y: rad * Math.sin(ang),
-      r: 6 + (Math.max(1, Math.min(+d.nodeSize||1,7)) - 1)*6,
-      fill: ecosystemColor[d.ecosystem] || ecosystemColor.unknown
+      x:    rad * Math.cos(ang),
+      y:    rad * Math.sin(ang),
+      r:    6 + (Math.max(1, Math.min(+d.nodeSize||1,7)) - 1)*6,
+      fill: ecosystemColor[d.ecosystem] || ecosystemColor.unknown,
+      alpha
     }
   })
 }
 
+// animate nodes in/out
 function animateTo(tokens) {
-  const all = computeTargetNodes(tokens).filter(n => visibleTokens.value.includes(n.name))
+  const all = computeTargetNodes(tokens)
+      .filter(n => visibleTokens.value.includes(n.name))
   all.forEach(t => {
     let ex = animatedNodes.value.find(n=>n.name===t.name)
     if (!ex) {
       animatedNodes.value.push(toReactive(t))
     } else {
-      gsap.to(ex, { x: t.x, y: t.y, r: t.r, duration: 1, ease: 'power2.out' })
+      gsap.to(ex, { x: t.x, y: t.y, r: t.r, opacity: t.alpha, duration: 1, ease: 'power2.out' })
     }
   })
   const keep = new Set(all.map(n=>n.name))
   animatedNodes.value = animatedNodes.value.filter(n=>keep.has(n.name))
 }
 
-/** initial fetch & animation **/
+// initial load
 onMounted(async () => {
   await nextTick()
   const r = wrapperRef.value.getBoundingClientRect()
-  svgWidth.value = r.width
+  svgWidth.value  = r.width
   svgHeight.value = r.height
 
   try {
@@ -203,6 +217,7 @@ onMounted(async () => {
         )
     )
     const toks = fullTokenData.value[props.currentSection]
+    console.log("Data : ", toks)
     if (toks) animateTo(toks)
   } catch(e) {
     console.error(e)
@@ -211,7 +226,7 @@ onMounted(async () => {
   }
 })
 
-/** watch section or visibility **/
+// watch for section or visibility changes
 watch(() => props.currentSection, async sec => {
   isLoading.value = true
   await nextTick()
@@ -224,7 +239,7 @@ watch(visibleTokens, () => {
   if (toks) animateTo(toks)
 })
 
-/** right-click selection toggle **/
+// right-click selection toggle
 function toggleSelect(node) {
   const name = node.name
   if (selectedTokens.has(name)) {
@@ -232,14 +247,13 @@ function toggleSelect(node) {
   } else {
     selectedTokens.add(name)
   }
-  // exactly two → show popup
   if (selectedTokens.size === 2) {
-    comparePair.value = Array.from(selectedTokens)
+    comparePair.value      = Array.from(selectedTokens)
     showComparePopup.value = true
   }
 }
 
-/** reset on popup close **/
+// reset selection on popup close
 function resetSelection() {
   selectedTokens.clear()
   showComparePopup.value = false

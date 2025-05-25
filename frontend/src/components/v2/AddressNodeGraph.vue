@@ -1,4 +1,3 @@
-<!-- src/components/v2/AddressNodeGraph.vue -->
 <template>
   <div class="address-node-graph">
     <div ref="graphContainer" class="graph-content">
@@ -53,6 +52,28 @@
             {{ node.id.slice(0, 6) }}
           </text>
         </g>
+
+        <!-- ► 설명란 (오른쪽 공백) -->
+        <g :transform="`translate(${svgWidth - 250}, 40)`">
+          <text x="0" y="0" font-size="14" font-weight="bold" fill="#374151">📘 설명</text>
+          <!-- 1. 체인별 색상 -->
+          <text x="0" y="28" font-size="12" fill="#6b7280">🔷 체인별 색상(트랜잭션에서 사용한 블록체인)</text>
+          <text x="10" y="48" font-size="12" fill="#a855f7">cosmos</text>
+          <text x="10" y="66" font-size="12" fill="#a8329e">evm</text>
+          <text x="10" y="84" font-size="12" fill="#3b82f6">terra</text>
+          <text x="10" y="102" font-size="12" fill="#facc15">binance</text>
+          <text x="10" y="120" font-size="12" fill="#9ca3af">unknown</text>
+
+          <!-- 2. 노드 크기 1~3단계 -->
+          <text x="0" y="150" font-size="12" fill="#6b7280">🔵 노드 크기(거래대금에 따른 분류)</text>
+          <text x="10" y="170" font-size="12" fill="#6b7280">1단계 (작음)</text>
+          <text x="10" y="188" font-size="12" fill="#6b7280">... 중간 ...</text>
+          <text x="10" y="206" font-size="12" fill="#6b7280">3단계 (큼)</text>
+
+          <!-- 3. depth-2 기준 -->
+          <text x="0" y="236" font-size="12" fill="#6b7280">📈 depth2 기준(거래대금에 따른 추가 노드)</text>
+          <text x="10" y="256" font-size="12" fill="#6b7280">거래대금 상위 5개 계정</text>
+        </g>
       </svg>
 
       <div v-else class="loading-indicator">Loading...</div>
@@ -78,6 +99,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, watch, computed, nextTick, inject } from 'vue'
@@ -155,14 +177,14 @@ function updateTooltip(node, event) {
 // 색상 매핑
 const ecosystemColor = {
   cosmos: '#a855f7',
-  evm:    '#3b82aed',
+  evm:    '#a8329e',
   terra:  '#3b82f6',
   binance:'#facc15',
   unknown:'#9ca3af'
 }
 
 // 중앙 좌표 계산
-const centerX = computed(() => svgWidth.value * 0.5)
+const centerX = computed( () => svgWidth.value * 0.4)
 const centerY = computed(() => svgHeight.value * 0.5)
 const sectionKey = computed(() =>
     props.currentSection.replace(/-/g, '_')
@@ -285,6 +307,7 @@ function startSimulation() {
               .distance(l =>
                   l.source.id === nodes.value[0].id ? 60 : 5
               )
+              .strength(0.5)
       )
       .force('charge', d3.forceManyBody().strength(-150))
       .force('center', d3.forceCenter(centerX.value, centerY.value))
