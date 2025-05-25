@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/heatmap")
+
 public class HeatmapController {
 
     private final HeatmapService heatmapService;

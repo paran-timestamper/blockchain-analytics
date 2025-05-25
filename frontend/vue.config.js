@@ -1,13 +1,14 @@
-const { defineConfig } = require('@vue/cli-service')
 module.exports = {
-  outputDir: "../src/main/resources/static",
+  transpileDependencies: [
+    "chart.js"
+  ],
   devServer: {
-    port: 8082,
+    port: 8082, // 프론트 포트
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true //cross origin 허용
-      }
-    }
-  }
+        target: 'http://localhost:8083', // 백엔드 포트
+        changeOrigin: true,
+      },
+    },
+  },
 };
