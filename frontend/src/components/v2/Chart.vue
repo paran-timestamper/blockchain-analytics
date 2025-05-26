@@ -7,7 +7,12 @@
           {{ selectedToken || 'TOKEN' }}
         </button>
         <div v-if="showTokenDropdown" class="dropdown-content scrollable-dropdown">
-          <button class="dropdown-option" v-for="token in tokenList" :key="token" @click="selectToken(token)">
+          <button
+              class="dropdown-option"
+              v-for="token in tokenList"
+              :key="token"
+              @click="selectToken(token)"
+          >
             {{ token }}
           </button>
         </div>
@@ -19,8 +24,12 @@
           {{ selectedFilter || 'FILTER' }}
         </button>
         <div v-if="showFilterDropdown" class="dropdown-content">
-          <button class="dropdown-option" @click="selectFilter('LATEST')">최신순</button>
-          <button class="dropdown-option" @click="selectFilter('VALUE')">거래 대금</button>
+          <button class="dropdown-option" @click="selectFilter('LATEST')">
+            최신순
+          </button>
+          <button class="dropdown-option" @click="selectFilter('VALUE')">
+            거래 대금
+          </button>
         </div>
       </div>
 
@@ -73,16 +82,20 @@
       </table>
 
       <div class="pagination">
-        <button :disabled="page === 1" @click="changePage(page - 1)">&lt;</button>
+        <button :disabled="page === 1" @click="changePage(page - 1)">
+          &lt;
+        </button>
         <button
-            v-for="n in 10"
+            v-for="n in totalPages"
             :key="n"
             :class="{ active: page === n }"
             @click="changePage(n)"
         >
           {{ n }}
         </button>
-        <button :disabled="page === 10" @click="changePage(page + 1)">&gt;</button>
+        <button :disabled="page === totalPages" @click="changePage(page + 1)">
+          &gt;
+        </button>
       </div>
     </div>
   </div>
@@ -102,8 +115,13 @@ export default {
       transactions: [],
       page: 1,
       size: 10,
-      totalCount: 0,
+      totalCount: 0
     };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.totalCount / this.size) || 1;
+    }
   },
   mounted() {
     this.fetchTokenList();
@@ -144,8 +162,7 @@ export default {
     async fetchTokenList() {
       try {
         const res = await fetch('http://localhost:8080/api/common/tokens', { method: 'POST' });
-        const data = await res.json();
-        this.tokenList = data || [];
+        this.tokenList = (await res.json()) || [];
       } catch (err) {
         console.error('🔴 토큰 목록 로드 실패:', err);
       }
@@ -172,8 +189,7 @@ export default {
       }
     },
     formatDate(dateStr) {
-      const d = new Date(dateStr);
-      return d.toLocaleString();
+      return new Date(dateStr).toLocaleString();
     },
     copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
@@ -190,6 +206,7 @@ export default {
   color: white;
   width: 100%;
   height: 100vh;
+  box-sizing: border-box;
 }
 .controls {
   display: flex;
@@ -226,14 +243,14 @@ export default {
   flex-direction: column;
   gap: 6px;
   z-index: 100;
-  max-height: 300px;
+  max-height: 200px;
   overflow-y: auto;
 }
 .dropdown-option {
   background-color: #1f2630;
   color: #93c5fd;
   border: none;
-  padding: 10px 16px;
+  padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -252,33 +269,47 @@ export default {
 }
 .tx-table {
   margin-top: 16px;
-  width: 100%;
-  height: auto;
-  overflow: auto;
+  overflow: hidden;
 }
 .styled-table {
-  width: auto;
+  width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
   background-color: #1a1a1a;
 }
-
-th, td {
-  padding: 10px 12px;
+th,
+td {
+  padding: 8px 10px;
   border: 1px solid #444;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* 절대 너비 지정 - 비율 무시 */
-th:nth-child(1), td:nth-child(1) { min-width: 340px; max-width: 340px; width: 340px; }
-th:nth-child(2), td:nth-child(2) { min-width: 340px; max-width: 340px; width: 340px; }
-th:nth-child(3), td:nth-child(3) { min-width: 340px; max-width: 340px; width: 340px; }
-th:nth-child(4), td:nth-child(4) { min-width: 200px;  max-width: 200px;  width: 200px;  }
-th:nth-child(5), td:nth-child(5) { min-width: 180px; max-width: 180px; width: 180px; }
-th:nth-child(6), td:nth-child(6) { min-width: 220px; max-width: 220px; width: 220px; }
+th:nth-child(1),
+td:nth-child(1) {
+  width: 20%;
+}
+th:nth-child(2),
+td:nth-child(2) {
+  width: 15%;
+}
+th:nth-child(3),
+td:nth-child(3) {
+  width: 15%;
+}
+th:nth-child(4),
+td:nth-child(4) {
+  width: 10%;
+}
+th:nth-child(5),
+td:nth-child(5) {
+  width: 15%;
+}
+th:nth-child(6),
+td:nth-child(6) {
+  width: 25%;
+}
 th {
   background-color: #222;
   color: #ddd;
@@ -305,11 +336,10 @@ tr:hover {
   color: #fff;
 }
 .pagination {
-  margin-top: 16px;
+  margin-top: 12px;
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
 }
 .pagination button {
   padding: 6px 10px;

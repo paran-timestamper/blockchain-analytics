@@ -12,8 +12,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import HeatmapView from '@/components/v3_popup/HeatmapView.vue';
-import HeatmapTable from '@/components/v3_popup/HeatmapTable.vue';
+import HeatmapView from '@/components/transactionNodePopup/HeatmapView.vue';
+import HeatmapTable from '@/components/transactionNodePopup/HeatmapTable.vue';
 
 /* eslint-disable no-undef */
 defineProps({

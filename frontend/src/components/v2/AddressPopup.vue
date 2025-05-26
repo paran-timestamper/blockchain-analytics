@@ -1,10 +1,10 @@
 <script setup>
-import TransactionTable from '@/components/v3_popup/TransactionTable.vue';
-import MonthDayGraph from '@/components/v3_popup/MonthDayGraph.vue';
-import HeatmapView from '@/components/v3_popup/HeatmapView.vue';
-import GraphView from '@/components/v3_popup/GraphView.vue';
-import HeatmapTable from '@/components/v3_popup/HeatmapTable.vue';
-import Home from '@/components/v3_popup/Home.vue';
+import TransactionTable from '@/components/transactionNodePopup/TransactionTable.vue';
+import MonthDayGraph from '@/components/transactionNodePopup/MonthDayGraph.vue';
+import HeatmapView from '@/components/transactionNodePopup/HeatmapView.vue';
+import GraphView from '@/components/transactionNodePopup/GraphView.vue';
+import HeatmapTable from '@/components/transactionNodePopup/HeatmapTable.vue';
+import Home from '@/components/transactionNodePopup/Home.vue';
 import { defineProps, ref } from 'vue';
 
 const props = defineProps({

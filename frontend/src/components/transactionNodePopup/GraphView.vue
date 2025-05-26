@@ -33,8 +33,8 @@
 
 
 <script>
-import LineGraph from "@/components/v3_popup/BrokenLineGraph.vue";
-import Treemap from "@/components/v3_popup/Treemap.vue";
+import LineGraph from "@/components/transactionNodePopup/BrokenLineGraph.vue";
+import Treemap from "@/components/transactionNodePopup/Treemap.vue";
 
 export default {
   name: "GraphView",
