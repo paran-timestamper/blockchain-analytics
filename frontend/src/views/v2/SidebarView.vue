@@ -53,7 +53,7 @@
       </div>
     </div>
 
-    <!-- 4. 보조 기능: Chart 버튼만 -->
+    <!-- 4. 보조 기능: Chart 버튼 -->
     <div class="box bottom-fixed">
       <div class="box-content align-top">
         <h4 class="section-title">보조기능</h4>
@@ -63,27 +63,37 @@
       </div>
     </div>
 
-    <!-- Chart.vue 팝업 -->
-    <ChartPopup
+    <!-- 5. Chart.vue 팝업 모달 -->
+    <div
         v-if="showChart"
-        @close="showChart = false"
-    />
+        class="modal-overlay"
+        @click.self="showChart = false"
+    >
+      <div class="modal-content">
+        <!-- 닫기 버튼 -->
+        <button class="close-btn" @click="showChart = false">✕</button>
+        <!-- 실제 Chart component -->
+        <Chart :address="selectedAddress" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, provide, inject, onMounted } from 'vue'
-import TokenType  from '@/components/v2/TokenType.vue'
+import { ref, inject, onMounted } from 'vue'
+import TokenType from '@/components/v2/TokenType.vue'
 import NodeFinder from '@/components/v2/nodefinder.vue'
-import ChartPopup from '@/components/v2/Chart.vue'
+// Chart.vue 를 모달 팝업으로 쓰기 위해 import
+import Chart from '@/components/v2/Chart.vue'
 
-// 1) selectedNodeType은 App.vue에서 제공된 것을 inject
+// 1) App.vue 등에서 제공하는 selectedNodeType
 const selectedNodeType = inject('selectedNodeType')
-const showDepth1       = inject('showDepth1')
-const showDepth2       = inject('showDepth2')
 
-// 3) Chart 팝업 상태
+// 3) Chart 모달 표시 상태
 const showChart = ref(false)
+
+// (선택) Chart.vue 에 props로 넘겨줄 주소
+const selectedAddress = ref(null)
 
 // 4) Token Price 데이터
 const tokenIcons = [
@@ -119,43 +129,20 @@ onMounted(async () => {
   box-sizing: border-box;
   gap: 12px;
 }
-.top-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+.top-section { display: flex; flex-direction: column; gap: 12px; }
 .box {
   border: 1px solid #ccc;
   border-radius: 16px;
   padding: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   background-color: white;
   width: 100%;
   box-sizing: border-box;
 }
-.box-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  height: 100%;
-}
+.box-content { display: flex; flex-direction: column; justify-content: flex-start; }
 .align-top { justify-content: flex-start; }
-.section-title {
-  font-size: 13px;
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-.checkbox {
-  font-size: 12px;
-  margin: 4px 0;
-  display: block;
-  word-break: keep-all;
-}
-.token-price-box {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.section-title { font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+.checkbox { font-size: 12px; margin: 4px 0; display: block; word-break: keep-all; }
+.token-price-box { display: flex; flex-direction: column; gap: 8px; }
 .token-card {
   display: flex;
   align-items: center;
@@ -164,22 +151,59 @@ onMounted(async () => {
   padding: 8px 10px;
   gap: 10px;
 }
-.token-icon { width: 24px; height: 24px; object-fit: contain; }
-.token-info { display: flex; flex-direction: column; font-size: 12px; }
-.token-name { font-weight: bold; margin-bottom: 2px; }
-.token-value { font-family: monospace; color: #333; }
-.bottom-fixed {
-  margin-top : 12px;
-}
+.token-icon { width:24px; height:24px; object-fit:contain; }
+.token-info { display:flex; flex-direction:column; font-size:12px; }
+.token-name { font-weight:bold; margin-bottom:2px; }
+.token-value { font-family:monospace; color:#333; }
+.bottom-fixed { margin-top:12px; }
 .chart-btn {
-  width: 100%;
-  margin-top: 4px;
-  padding: 6px 0;
-  font-size: 12px;
-  background-color: #f0f0f0;
+  width:100%;
+  padding:6px 0;
+  font-size:12px;
+  background:#1f2630;
+  color:#c7d2fe;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+.chart-btn:hover { background:#2196f3; color:white; }
+
+/* 모달 오버레이 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  opacity : 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* 모달 박스 */
+.modal-content {
+  background: #1e1e1e;
+  padding: 24px;
+  border-radius: 8px;
+  color: white;
+  position: relative;
+  /* ▶ 전체 화면 대비 90% 너비/높이로 확장 */
+  width: 90vw;
+  max-width: none;
+  height: 70vh;
+  max-height: none;
+  overflow: auto;
+}
+
+/* 닫기 버튼 */
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
   border: none;
-  border-radius: 10px;
+  font-size: 24px;
+  color: white;
   cursor: pointer;
 }
-.chart-btn:hover { background-color: #e0e0e0; }
 </style>
