@@ -12,8 +12,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import HeatmapView from '@/components/v4_popup/HeatmapView.vue'
-import HeatmapTable from '@/components/v4_popup/HeatmapTable.vue'
+import HeatmapView from '@/components/tokenNodePopup/HeatmapView.vue'
+import HeatmapTable from '@/components/tokenNodePopup/HeatmapTable.vue'
 import { defineProps } from 'vue';
 
 defineProps({
