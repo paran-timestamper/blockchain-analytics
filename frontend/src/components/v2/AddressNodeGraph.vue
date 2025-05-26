@@ -346,6 +346,7 @@ async function loadData() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fromAddress: fromAddress.value })
     })
+
     const data = await res.json()
     if (data.fromAddress) fromAddress.value = data.fromAddress
     sections.value = data.sections || []
