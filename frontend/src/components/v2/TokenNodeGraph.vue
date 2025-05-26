@@ -104,6 +104,7 @@
 import { ref, reactive, computed, watch, nextTick, onMounted, inject, reactive as toReactive } from 'vue'
 import gsap from 'gsap'
 import TokenPopup from '@/components/v2/TokenPopup.vue'
+import {useNodeStore} from "@/store/nodeStore";
 
 // props & visible list
 const props = defineProps({ currentSection: String })
@@ -243,6 +244,9 @@ watch(visibleTokens, () => {
 // right-click selection toggle
 function toggleSelect(node) {
   const name = node.name
+  const nodeStore = useNodeStore()
+  nodeStore.node = name
+
   if (selectedTokens.has(name)) {
     selectedTokens.delete(name)
   } else {

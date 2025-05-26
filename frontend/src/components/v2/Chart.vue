@@ -58,19 +58,19 @@
         <tr v-for="tx in transactions" :key="tx.txHash">
           <td>
             <div class="address-cell">
-              {{ tx.txHash.slice(0, 32) + '...' }}
+              {{ tx.txHash.slice(0, 35) + '...' }}
               <button class="copy-button" @click="copyToClipboard(tx.txHash)">📋</button>
             </div>
           </td>
           <td>
             <div class="address-cell">
-              {{ tx.fromAddress.slice(0, 32) + '...' }}
+              {{ tx.fromAddress.slice(0, 25) + '...' }}
               <button class="copy-button" @click="copyToClipboard(tx.fromAddress)">📋</button>
             </div>
           </td>
           <td>
             <div class="address-cell">
-              {{ tx.toAddress.slice(0, 32) + '...' }}
+              {{ tx.toAddress.slice(0, 25) + '...' }}
               <button class="copy-button" @click="copyToClipboard(tx.toAddress)">📋</button>
             </div>
           </td>
@@ -193,7 +193,6 @@ export default {
     },
     copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
-        alert('복사되었습니다: ' + text);
       });
     }
   }
@@ -288,27 +287,32 @@ td {
 }
 th:nth-child(1),
 td:nth-child(1) {
-  width: 20%;
+  width: 30%; /* Tx Hash 더 넓게 */
 }
+
 th:nth-child(2),
 td:nth-child(2) {
-  width: 15%;
+  width: 20%; /* From Address 넓게 */
 }
+
 th:nth-child(3),
 td:nth-child(3) {
-  width: 15%;
+  width: 20%; /* To Address 넓게 */
 }
+
 th:nth-child(4),
 td:nth-child(4) {
-  width: 10%;
+  width: 10%; /* Value */
 }
+
 th:nth-child(5),
 td:nth-child(5) {
-  width: 15%;
+  width: 10%; /* Total Price 줄이기 */
 }
+
 th:nth-child(6),
 td:nth-child(6) {
-  width: 25%;
+  width: 15%; /* Date 줄이기 */
 }
 th {
   background-color: #222;
@@ -324,6 +328,7 @@ tr:hover {
 .address-cell {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* 복사 버튼을 오른쪽 끝으로 */
   gap: 6px;
 }
 .copy-button {

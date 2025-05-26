@@ -49,23 +49,17 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
-import { defineProps } from 'vue'
+import {ref, watch, onMounted} from 'vue'
+import {useNodeStore} from "@/store/nodeStore";
 
-const props = defineProps({
-  token: {
-    type: String,
-    required: true
-  }
-})
-
+const nodeStore = useNodeStore()
 const transactions = ref([])
 const currentPage = ref(1)
 const rowsPerPage = ref(10)
 
 async function fetchTransactions() {
   console.log("📡 API 호출 준비 중:", {
-    token: props.token,
+    token: nodeStore.node,
     page: currentPage.value,
     size: rowsPerPage.value
   })
@@ -75,7 +69,7 @@ async function fetchTransactions() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        token: props.token,
+        token: nodeStore.node,
         page: currentPage.value,
         size: rowsPerPage.value
       })
@@ -99,7 +93,7 @@ function copyToClipboard(value) {
   navigator.clipboard.writeText(value)
 }
 
-watch(() => props.token, () => {
+watch(() => nodeStore.node, () => {
   currentPage.value = 1
   fetchTransactions()
 }, { immediate: true })
