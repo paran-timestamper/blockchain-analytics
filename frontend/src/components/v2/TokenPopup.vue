@@ -1,9 +1,9 @@
 <script setup>
-import Transaction from '@/components/v4_popup/Transaction.vue'
-import LineGraph from '@/components/v4_popup/LineGraph.vue'
-import HeatmapView from '@/components/v4_popup/HeatmapView.vue'
-import HeatmapTable from '@/components/v4_popup/HeatmapTable.vue'
-import Chain from '@/components/v4_popup/Chain.vue'
+import Transaction from '@/components/tokenNodePopup/Transaction.vue'
+import LineGraph from '@/components/tokenNodePopup/LineGraph.vue'
+import HeatmapView from '@/components/tokenNodePopup/HeatmapView.vue'
+import HeatmapTable from '@/components/tokenNodePopup/HeatmapTable.vue'
+import Chain from '@/components/tokenNodePopup/Chain.vue'
 import { ref, computed } from 'vue'
 import { defineProps } from 'vue'
 

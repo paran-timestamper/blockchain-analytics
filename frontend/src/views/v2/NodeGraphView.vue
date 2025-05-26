@@ -1,43 +1,35 @@
+<!-- src/views/v2/NodeGraphView.vue -->
 <template>
-  <div class="graph-container">
-    <div class="graph-placeholder">그래프 영역</div>
-
-    <!-- ✅ 테스트용 팝업 항상 표시 -->
-
-    <!-- ===== 사용하려면 아래 중에서 원하는 팝업 주석 해제 ===== -->
-
-    <!-- 🔁 TokenPopup 테스트용 -->
-
-    <TokenPopup
-        :a-token="'ATOM'"
-        :b-token="'INJ'"
-        @close="() => {}"
+  <div class="graph-pane">
+    <component
+        :is="selectedComponent"
+        :currentSection="currentSection"
+        @toggleChart="emitToggle"
     />
-
-    <!-- 🔁 AddressPopup 테스트용 -->
-    <!--
-        <AddressPopup
-          :address="'axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k'"
-          @close="() => {}"
-        />
-        -->
-
   </div>
 </template>
 
 <script setup>
-import TokenPopup from "@/components/v2/TokenPopup.vue"
-//import AddressPopup from "@/components/v2/AddressPopup.vue"
+import { inject, computed } from 'vue'
+import TokenNodeGraph   from '@/components/v2/TokenNodeGraph.vue'
+import AddressNodeGraph from '@/components/v2/AddressNodeGraph.vue'
+
+const selectedNodeType = inject('selectedNodeType')
+const currentSection   = inject('currentSection')
+
+// 부모로 toggleChart 이벤트 올리기
+const emit = defineEmits(['toggleChart'])
+function emitToggle(address) {
+  emit('toggleChart', address)
+}
+
+const selectedComponent = computed(() =>
+    selectedNodeType.value === 'token'
+        ? TokenNodeGraph
+        : AddressNodeGraph
+)
 </script>
 
 <style scoped>
-.graph-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-.graph-placeholder {
-  height: 100%;
-  background: #f0f0f0;
-}
+.graph-pane { width:100%; height:100%; }
 </style>

@@ -1,22 +1,27 @@
+<!-- src/components/v2/nodefinder.vue -->
 <template>
   <div class="token-type-box box">
     <h4 class="section-title">Node Type</h4>
     <label class="checkbox">
-      <input type="checkbox" v-model="smallValue" />
+      <input type="checkbox" v-model="showDepth1" />
       smallvalue
     </label>
     <label class="checkbox">
-      <input type="checkbox" v-model="largeValue" />
+      <input type="checkbox" v-model="showDepth2" />
       largevalue
     </label>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
-const smallValue = ref(false)
-const largeValue = ref(false)
+import { ref,inject,provide } from 'vue'
+const smallValue = ref(true)
+const largeValue = ref(true)
+// 상위(SidebarView.vue)에서 provide한 값을 inject
+provide('showDepth1', smallValue)
+provide('showDepth2', largeValue)
+const showDepth1 = inject('showDepth1')
+const showDepth2 = inject('showDepth2')
 </script>
 
 <style scoped>
