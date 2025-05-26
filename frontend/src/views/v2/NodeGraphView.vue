@@ -8,25 +8,26 @@
 
     <!-- 🔁 TokenPopup 테스트용 -->
 
-<!--
     <TokenPopup
         :a-token="'ATOM'"
         :b-token="'INJ'"
         @close="() => {}"
     />
--->
+
     <!-- 🔁 AddressPopup 테스트용 -->
-    <AddressPopup
-      :address="'axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k'"
-      @close="() => {}"
-    />
+    <!--
+        <AddressPopup
+          :address="'axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k'"
+          @close="() => {}"
+        />
+        -->
 
   </div>
 </template>
 
 <script setup>
-//import TokenPopup from "@/components/v2/TokenPopup.vue"
-import AddressPopup from "@/components/v2/AddressPopup.vue"
+import TokenPopup from "@/components/v2/TokenPopup.vue"
+//import AddressPopup from "@/components/v2/AddressPopup.vue"
 </script>
 
 <style scoped>
