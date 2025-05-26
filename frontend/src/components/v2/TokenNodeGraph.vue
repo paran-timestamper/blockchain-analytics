@@ -89,6 +89,7 @@
       </g>
     </svg>
 
+
     <!-- Compare popup -->
     <TokenPopup
         v-if="showComparePopup"
