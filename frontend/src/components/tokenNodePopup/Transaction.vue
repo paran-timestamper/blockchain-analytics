@@ -64,7 +64,12 @@ async function fetchTransactions() {
     size: rowsPerPage.value
   })
 
+
+
   try {
+
+    console.log("token", props.token);
+
     const res = await fetch("http://localhost:8080/api/tokenNode/transaction", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

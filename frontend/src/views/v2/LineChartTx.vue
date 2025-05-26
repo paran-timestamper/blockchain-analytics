@@ -255,6 +255,7 @@ async function loadData() {
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ fromAddress: fromAddress.value })
   })
+
   const raw = await res.json()
   console.log('raw.sections:', raw.sections)
   const COLORS = {

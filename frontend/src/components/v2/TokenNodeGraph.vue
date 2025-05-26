@@ -107,6 +107,7 @@ import TokenPopup from '@/components/v2/TokenPopup.vue'
 import {useNodeStore} from "@/store/nodeStore";
 
 // props & visible list
+const emit = defineEmits(['show-token-popup'])
 const props = defineProps({ currentSection: String })
 const visibleTokens = inject('visibleTokens', ref([]))
 
@@ -253,8 +254,14 @@ function toggleSelect(node) {
     selectedTokens.add(name)
   }
   if (selectedTokens.size === 2) {
-    comparePair.value      = Array.from(selectedTokens)
+    comparePair.value = Array.from(selectedTokens)
     showComparePopup.value = true
+
+    console.log('[TokenNodeGraph] Selected tokens:', comparePair.value)
+    emit('show-token-popup', {
+      tokenA: comparePair.value[0],
+      tokenB: comparePair.value[1]
+    })
   }
 }
 
