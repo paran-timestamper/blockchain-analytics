@@ -111,7 +111,6 @@ function handleCellClick({ date, mode }) {
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: auto auto auto;
   gap: 12px;
-  padding-bottom: auto;
 }
 
 .left.top      { grid-column: 1 / 2; grid-row: 1 / 2; }
