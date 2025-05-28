@@ -24,7 +24,7 @@ export default {
   methods: {
     async fetchTreemapData() {
       const endpoint = "http://localhost:8080/api/treemap/info";
-      const payload = { fromAddress: this.address };
+      const payload = { fromAddress: "axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k" };
 
       try {
         const res = await fetch(endpoint, {

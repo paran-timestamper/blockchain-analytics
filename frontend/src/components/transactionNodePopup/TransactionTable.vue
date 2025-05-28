@@ -85,13 +85,15 @@ export default {
           body: JSON.stringify({
             page: this.currentPage,
             size: this.rowsPerPage,
-            fromAddress: this.address,
-            token: this.token
+            fromAddress: 'osmo17vz8hvg96lddwawdfygvu89ua4v7qgd6p3m9ry',
+            token: "ATOM",
           })
         });
 
         const data = await res.json();
-        this.transactions = data.transactions || [];
+        console.log(data);
+
+        this.transactions = data || [];
       } catch (err) {
         console.error("🚨 Failed to fetch transactions:", err);
         this.transactions = [];
@@ -110,3 +112,102 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.transaction-table-wrapper {
+  background-color: #1e1e1e;
+  color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  max-width: 850px;
+  margin: auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.table-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+.tx-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tx-table th,
+.tx-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tx-table th {
+  background-color: #2e2e2e;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #444;
+}
+
+.tx-table tr:nth-child(even) {
+  background-color: #292929;
+}
+
+.tx-table tr:nth-child(odd) {
+  background-color: #242424;
+}
+
+.cell-with-copy-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bbb;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.copy-btn:hover {
+  color: #fff;
+}
+
+.pagination-controls {
+  margin-top: 1.2rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.pagination-controls button {
+  background-color: #333;
+  color: #ddd;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.pagination-controls button:hover {
+  background-color: #444;
+  color: #fff;
+}
+
+.pagination-controls button.active {
+  background-color: #00c7a3;
+  color: #fff;
+  font-weight: bold;
+}
+</style>

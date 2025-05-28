@@ -66,14 +66,19 @@ export default {
     async fetchHeatmapData() {
       if (!this.selectedDate) return;
       const dateOnly = this.selectedDate;
+      console.log("dateOnly:", dateOnly);
+
       const monthOnly = dateOnly.slice(0, 7);
 
       // Daily
       const resD = await fetch('/api/heatmap/daily', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fromAddress: this.address, date: dateOnly })
+        body: JSON.stringify({ fromAddress: 'axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k', date: dateOnly })
       });
       const rD = await resD.json();
+
+      console.log(rD);
+
       const ranges = ["00-04","04-08","08-12","12-16","16-20","20-24"];
       const blocks = rD.timeBlocks?.length ? rD.timeBlocks : ranges.map(r=>({range:r,txCount:0}));
       this.heatmapDataDaily = blocks.map(b=>({ range:b.range, txCount:+b.txCount }));
@@ -82,7 +87,7 @@ export default {
       // Monthly
       const resM = await fetch('/api/heatmap/monthly', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fromAddress: this.address, date: monthOnly })
+        body: JSON.stringify({ fromAddress: 'axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k', date: monthOnly })
       });
       let rM = await resM.json();
       if (!Array.isArray(rM)) rM = [rM];

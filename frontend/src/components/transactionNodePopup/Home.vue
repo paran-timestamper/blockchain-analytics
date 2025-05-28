@@ -63,7 +63,7 @@ export default {
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        this.allArticles = (data.articles || []).slice(0, 100); // 최대 100개 제한
+        this.allArticles = (data.articles || []).slice(0, 4);
         this.updatePaginatedArticles();
       } catch (error) {
         console.error('뉴스 가져오기 실패:', error);
