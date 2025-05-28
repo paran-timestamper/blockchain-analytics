@@ -49,17 +49,19 @@
 </template>
 
 <script setup>
-import {ref, watch, onMounted} from 'vue'
-import {useNodeStore} from "@/store/nodeStore";
+import {ref, watch, onMounted, defineProps} from 'vue'
 
-const nodeStore = useNodeStore()
+const props = defineProps({
+  token: { type: String, required: true },
+  label: { type: String, default: '' }
+})
 const transactions = ref([])
 const currentPage = ref(1)
 const rowsPerPage = ref(10)
 
 async function fetchTransactions() {
   console.log("📡 API 호출 준비 중:", {
-    token: nodeStore.node,
+    token: props.token,
     page: currentPage.value,
     size: rowsPerPage.value
   })
@@ -68,19 +70,20 @@ async function fetchTransactions() {
 
   try {
 
-    console.log("token", props.token);
 
     const res = await fetch("http://localhost:8080/api/tokenNode/transaction", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        token: nodeStore.node,
-        page: currentPage.value,
-        size: rowsPerPage.value
+
+        "token": props.token,
+        "page": currentPage.value,
+        "size": rowsPerPage.value
       })
     })
-
+    console.log("token :",props.token)
     const data = await res.json()
+    console.log("data :",data)
     transactions.value = data.transactions || []
   } catch (err) {
     console.error("🚨 Failed to fetch token transactions:", err)
@@ -98,7 +101,7 @@ function copyToClipboard(value) {
   navigator.clipboard.writeText(value)
 }
 
-watch(() => nodeStore.node, () => {
+watch(() => props.token, () => {
   currentPage.value = 1
   fetchTransactions()
 }, { immediate: true })
