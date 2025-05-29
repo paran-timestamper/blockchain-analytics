@@ -91,12 +91,7 @@
 
 
     <!-- Compare popup -->
-    <TokenPopup
-        v-if="showComparePopup"
-        :tokenA="comparePair[0]"
-        :tokenB="comparePair[1]"
-        @close="resetSelection"
-    />
+
   </div>
 </template>
 
@@ -262,6 +257,7 @@ function toggleSelect(node) {
       tokenA: comparePair.value[0],
       tokenB: comparePair.value[1]
     })
+    selectedTokens.clear()
   }
 }
 
