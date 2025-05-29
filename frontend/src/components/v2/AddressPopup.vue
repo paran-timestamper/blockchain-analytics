@@ -18,7 +18,6 @@ const selectedDate = ref('');
 const selectedMode = ref('');
 
 function handleCellClick({ date, mode }) {
-  console.log('[📥 addresspopup handleCellClick]', date, mode);
   selectedDate.value = date;
   selectedMode.value = mode;
 }

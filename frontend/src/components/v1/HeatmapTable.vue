@@ -48,8 +48,6 @@ export default {
   methods: {
     async fetchTop3() {
       try {
-        console.log("📩 [fetchTop3] props - address:", this.address, "| date:", this.date, "| mode:", this.mode);
-
         const endpoint = this.mode === 'monthly'
             ? 'http://localhost:8080/api/heatmap/monthly/detail'
             : 'http://localhost:8080/api/heatmap/daily/detail';
@@ -61,20 +59,13 @@ export default {
               : '2022-10-01T02:00:00'               // 예: "2022-10-31"
         };
 
-
-        console.log("🚀 [fetchTop3] POST", endpoint, "with payload:", payload);
-
         const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
-        console.log("📥 [fetchTop3] response status:", res.status);
-
         const result = await res.json();
-        console.log("📦 [fetchTop3] result:", result);
-
         this.top3Data = result.dataDailyTransactions?.length
             ? result.dataDailyTransactions
             : this.getDefaultRows();

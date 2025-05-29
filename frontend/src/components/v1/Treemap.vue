@@ -31,9 +31,6 @@ export default {
       const payload = { fromAddress: "axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k" };
 
       try {
-        console.log("📡 요청 URL:", endpoint);
-        console.log("📨 요청 Payload:", payload);
-
         const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -45,8 +42,6 @@ export default {
         }
 
         let data = await res.json();
-        console.log("📦 응답 데이터:", data);
-
         if (!Array.isArray(data) || data.length === 0) {
           console.warn("⚠️ Treemap 데이터 없음. 기본값 사용.");
           data = [

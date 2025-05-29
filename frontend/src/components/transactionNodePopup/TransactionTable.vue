@@ -76,8 +76,6 @@ export default {
 
   methods: {
     async fetchTransactions() {
-      console.log("📡 Fetching transactions", this.address, this.token, "page", this.currentPage);
-
       try {
         const res = await fetch("http://localhost:8080/api/node/nodeTransaction", {
           method: "POST",
@@ -91,8 +89,6 @@ export default {
         });
 
         const data = await res.json();
-        console.log(data);
-
         this.transactions = data || [];
       } catch (err) {
         console.error("🚨 Failed to fetch transactions:", err);

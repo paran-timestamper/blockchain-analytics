@@ -24,7 +24,6 @@ provide('visibleAddresses', visibleAddresses)
 
 // ② 토글 핸들러 (NodeGraphView로부터 받아서 set을 업데이트)
 function onToggleChart(address) {
-  console.log('toggling', address)
   if (visibleAddresses.value.has(address)) {
     visibleAddresses.value.delete(address)
   } else {

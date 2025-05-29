@@ -257,7 +257,6 @@ async function loadData() {
   })
 
   const raw = await res.json()
-  console.log('raw.sections:', raw.sections)
   const COLORS = {
     cosmos: '#a855f7',
     evm:    '#7c3aed',

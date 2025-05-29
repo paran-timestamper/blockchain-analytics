@@ -117,7 +117,6 @@ function drawHeatmap() {
       .on('click', (event, d) => {
         if (!d.day || !d.timeRange) return
         const emittedPayload = { date: d.timeRange, mode: 'monthly' }
-        console.log('[📤 HeatmapView emit]', emittedPayload)
         emit('cell-click', emittedPayload)
       })
       .on('mouseover', function (event, d) {

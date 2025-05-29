@@ -50,7 +50,6 @@ export default {
   },
   mounted() {
     const fixedKeyword = this.keyword?.trim() || "bitcoin";
-    console.log("🔍 키워드:", fixedKeyword);
     this.fetchArticles(fixedKeyword);
   },
   methods: {

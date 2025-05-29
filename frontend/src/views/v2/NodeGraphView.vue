@@ -47,7 +47,6 @@ const bToken = ref('')
 
 // ✅ 토큰 팝업 열기 (TokenNodeGraph.vue에서 emit함)
 function handleTokenPopup({ tokenA, tokenB }) {
-  console.log('[NodeGraphView] 받은 토큰 A:', tokenA, 'B:', tokenB)
   aToken.value = tokenA
   bToken.value = tokenB
 

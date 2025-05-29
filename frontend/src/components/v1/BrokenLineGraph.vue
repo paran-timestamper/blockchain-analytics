@@ -54,15 +54,11 @@ export default {
           date: "2022-10-25"           // ✅ 'T00:00:00' 제거 this.date
         };
 
-        console.log("payload = ", payload);
-
         const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
-
-        console.log("res = ", res);
 
         let data = await res.json();
 

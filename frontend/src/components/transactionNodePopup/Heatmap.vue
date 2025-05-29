@@ -28,7 +28,6 @@ const selectedMode = ref('');
 const forceUpdate = ref(0);
 
 function handleClick({ date, mode }) {
-  console.log('[Heatmap.vue] clicked', date, mode);
   forceUpdate.value++;
   selectedDate.value = date;
   selectedMode.value = mode;

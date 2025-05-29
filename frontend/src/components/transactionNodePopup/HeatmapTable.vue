@@ -51,8 +51,6 @@ export default {
   methods: {
     async fetchTop3() {
       try {
-        console.log("📩 [fetchTop3] props - address:", this.address, "| date:", this.date, "| mode:", this.mode);
-
         const endpoint = this.mode === 'monthly'
             ? 'http://localhost:8080/api/heatmap/monthly/detail'
             : 'http://localhost:8080/api/heatmap/daily/detail';
@@ -62,19 +60,13 @@ export default {
           date: this.date
         };
 
-        console.log("🚀 [fetchTop3] POST", endpoint, "with payload:", payload);
-
         const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
-        console.log("📥 [fetchTop3] response status:", res.status);
-
         const result = await res.json();
-        console.log("📦 [fetchTop3] result:", result);
-
         if (this.mode === "daily" && result.dataDailyTransactions?.length > 0) {
           this.top3Data = [...result.dataDailyTransactions]; // ✅ 배열 복사
         } else if (this.mode === "monthly" && result.dataTransactions?.length > 0) {

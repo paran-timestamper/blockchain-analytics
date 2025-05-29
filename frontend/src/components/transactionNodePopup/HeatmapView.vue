@@ -15,23 +15,6 @@
         </div>
       </div>
     </div>
-
-    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-content large">
-        <h3>{{ modalTitle }}</h3>
-        <div class="modal-heatmaps">
-          <div class="section-wrapper">
-            <div class="section-title">Daily Heatmap</div>
-            <div ref="modalDaily" class="heatmap-box"></div>
-          </div>
-          <div class="section-wrapper">
-            <div class="section-title">Monthly Heatmap</div>
-            <div ref="modalMonthly" class="heatmap-box"></div>
-          </div>
-        </div>
-        <button class="close-btn" @click="closeModal">✕</button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -51,23 +34,10 @@ export default {
       modalDate: null
     };
   },
-  computed: {
-    modalTitle() {
-      return `${this.modalDate} Heatmap`;
-    }
-  },
   methods: {
-    closeModal() {
-      this.showModal = false;
-      this.modalDate = null;
-      d3.select(this.$refs.modalDaily).select('svg').remove();
-      d3.select(this.$refs.modalMonthly).select('svg').remove();
-    },
     async fetchHeatmapData() {
       if (!this.selectedDate) return;
       const dateOnly = this.selectedDate;
-      console.log("dateOnly:", dateOnly);
-
       const monthOnly = dateOnly.slice(0, 7);
 
       // Daily
@@ -76,9 +46,6 @@ export default {
         body: JSON.stringify({ fromAddress: 'axelar19xj4ncc6h6y5ahpfqtspdx75y3dkrxj3zpah9k', date: dateOnly })
       });
       const rD = await resD.json();
-
-      console.log(rD);
-
       const ranges = ["00-04","04-08","08-12","12-16","16-20","20-24"];
       const blocks = rD.timeBlocks?.length ? rD.timeBlocks : ranges.map(r=>({range:r,txCount:0}));
       this.heatmapDataDaily = blocks.map(b=>({ range:b.range, txCount:+b.txCount }));
@@ -134,6 +101,15 @@ export default {
           .attr('text-anchor','middle')
           .attr('fill','white')
           .text(d=>d);
+      svg.selectAll('text.txcount').data(this.heatmapDataDaily.map((d, i) => ({ ...d, index: i })))
+          .enter().append('text')
+          .attr('class', 'txcount')
+          .attr('x', d => margin.left + d.index * 80 + 40)
+          .attr('y', margin.top + 25)
+          .attr('text-anchor', 'middle')
+          .attr('fill', 'white')
+          .attr('font-size', '14px')
+          .text(d => d.txCount);
     },
     drawMonthlyHeatmap(container) {
       const margin = { top:80, right:40, bottom:40, left:80 };
@@ -181,6 +157,15 @@ export default {
           .attr('fill','white')
           .attr('font-size','12px')
           .text(d=>d.day.replace('일',''));
+      svg.selectAll('text.txcount').data(cells)
+          .enter().append('text')
+          .attr('class', 'txcount')
+          .attr('x', (_, i) => margin.left + (i % 7) * 80 + 76) // 오른쪽 하단에 배치
+          .attr('y', (_, i) => margin.top + Math.floor(i / 7) * 40 + 36)
+          .attr('text-anchor', 'end')
+          .attr('fill', 'white')
+          .attr('font-size', '11px')
+          .text(d => d.dateStr ? d.txCount : '');
     }
   },
   mounted() {
@@ -195,13 +180,7 @@ input[type="date"] { background:#1e1e1e; color:#fff; border:1px solid #444; bord
 .controls { margin-bottom:16px; display:flex; gap:10px; align-items:center; }
 .heatmap-container { display:flex; flex-direction:column; }
 svg { background:#1e1e1e; border-radius:8px; }
-.cell:hover { stroke:yellow; stroke-width:2px; cursor:pointer; }
 .section-title { text-align:center; font-weight:bold; font-size:18px; margin-bottom:8px; }
 .heatmap-box { display:block; overflow-x:auto; border-radius:8px; padding:12px; }
 .section-wrapper { border:1px solid #444; border-radius:8px; padding:16px; margin-bottom:16px; background:#1e1e1e; }
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:1000; }
-.modal-content { background:#1e1e1e; padding:24px; border-radius:8px; color:#fff; position:relative; max-width:90%; max-height:90%; overflow:auto; }
-.modal-content.large { width:80vw; }
-.modal-heatmaps { display:flex; gap:16px; flex-wrap:wrap; }
-.close-btn { position:absolute; top:12px; right:12px; background:transparent; border:none; font-size:24px; color:#fff; cursor:pointer; }
 </style>

@@ -170,8 +170,6 @@ function computeTargetNodes(tokens) {
     // alpha ∈ [1/7 .. 7/7]
     const dark  = +d.colorDarkening || 7
     const alpha = Math.max(1, Math.min(dark,7)) / 7
-
-    console.log(`computeTargetNodes →`, tk, 'colorDarkening:', d.colorDarkening, 'dark:', dark, 'alpha:', alpha)
     return {
       name: tk,
       x:    rad * Math.cos(ang),
@@ -215,7 +213,6 @@ onMounted(async () => {
         )
     )
     const toks = fullTokenData.value[props.currentSection]
-    console.log("Data : ", toks)
     if (toks) animateTo(toks)
   } catch(e) {
     console.error(e)
@@ -251,8 +248,6 @@ function toggleSelect(node) {
   if (selectedTokens.size === 2) {
     comparePair.value = Array.from(selectedTokens)
     showComparePopup.value = true
-
-    console.log('[TokenNodeGraph] Selected tokens:', comparePair.value)
     emit('show-token-popup', {
       tokenA: comparePair.value[0],
       tokenB: comparePair.value[1]

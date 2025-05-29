@@ -55,8 +55,6 @@ async function fetchDetails() {
     tokens: [props.aToken, props.bToken]
   }
 
-  console.log('[📡 fetchDetails payload]', payload)
-
   const res = await fetch('http://localhost:8080/api/heatmap/compare/daily', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -64,13 +62,10 @@ async function fetchDetails() {
   })
 
   const result = await res.json()
-  console.log('[📨 fetchDetails result]', result)
 
   // ✅ 실제로 데이터에 반영
   aData.value = result.details.find(d => d.token === props.aToken)
   bData.value = result.details.find(d => d.token === props.bToken)
-
-  console.log('[✅ 세팅 완료]', aData.value, bData.value)
 }
 
 
@@ -78,7 +73,6 @@ async function fetchDetails() {
 watch(
     () => [props.date, props.mode],
     ([newDate, newMode]) => {
-      console.log('[📩 HeatmapTable props changed]', newDate, newMode)
       fetchDetails()
     },
     { immediate: true }

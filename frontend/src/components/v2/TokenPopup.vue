@@ -16,7 +16,6 @@ const selectedDate = ref('')
 const selectedMode = ref('')
 
 function handleHeatmapClick(payload) {
-  console.log('[📥 TokenPopup handleHeatmapClick]', payload)
   selectedDate.value = payload.date
   selectedMode.value = payload.mode
 }

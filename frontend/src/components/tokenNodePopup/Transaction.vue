@@ -81,9 +81,7 @@ async function fetchTransactions() {
         "size": rowsPerPage.value
       })
     })
-    console.log("token :",props.token)
     const data = await res.json()
-    console.log("data :",data)
     transactions.value = data.transactions || []
   } catch (err) {
     console.error("🚨 Failed to fetch token transactions:", err)
