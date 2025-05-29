@@ -20,6 +20,7 @@
 
 <script>
 import * as d3 from "d3";
+
 export default {
   name: "HeatmapView",
   props: { address: { type: String, required: true } },
@@ -31,7 +32,9 @@ export default {
       maxValDaily: 1,
       maxValMonthly: 1,
       showModal: false,
-      modalDate: null
+      modalDate: null,
+      clickedDate: '',
+      clickedMode: '',
     };
   },
   methods: {
@@ -66,14 +69,24 @@ export default {
         this.drawMonthlyHeatmap(this.$refs.monthlyHeatmapContainer);
       });
     },
-    handleCellClick(dateStr) {
-      this.modalDate = dateStr;
-      this.showModal = true;
-      this.$nextTick(() => {
-        this.drawDailyHeatmap(this.$refs.modalDaily);
-        this.drawMonthlyHeatmap(this.$refs.modalMonthly);
+    async handleCellClick(dateStr) {
+      console.log("zzcxz")
+      this.$emit('cell-click', {
+        date: dateStr,
+        mode: 'daily'
       });
+      console.log('📤 emit fired', dateStr); // 추가
     },
+    async handleMonthlyCellClick(dateStr) {
+      console.log("zzcxz2")
+      this.$emit('cell-click', {
+        date: dateStr,
+        mode: 'monthly'
+      });
+      console.log('📤 emit fired', dateStr); // 추가
+    },
+
+
     drawDailyHeatmap(container) {
       const margin = { top:40, right:40, bottom:30, left:60 };
       const w = 80*6 + margin.left + margin.right;
@@ -148,7 +161,7 @@ export default {
           .attr('width',80).attr('height',40)
           .attr('fill',d=>scale(d.txCount))
           .attr('stroke','#333')
-          .on('click',(e,d)=>{ if(d.dateStr) this.handleCellClick(d.dateStr); });
+          .on('click',(e,d)=>{ if(d.dateStr) this.handleMonthlyCellClick(d.dateStr); });
       svg.selectAll('text.num').data(cells)
           .enter().append('text')
           .attr('class','num')

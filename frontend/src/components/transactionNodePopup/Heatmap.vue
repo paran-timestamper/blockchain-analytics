@@ -1,37 +1,55 @@
 <template>
   <div class="heatmap-wrapper">
     <HeatmapView :address="address" @cell-click="handleClick" />
-    <HeatmapTable
-        :address="address"
-        :date="selectedDate"
-        :mode="selectedMode"
-        :key="selectedDate + '-' + selectedMode"
-    />
+    <HeatmapTable ref="heatmapTable" />
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script>
 import HeatmapView from '@/components/transactionNodePopup/HeatmapView.vue';
 import HeatmapTable from '@/components/transactionNodePopup/HeatmapTable.vue';
 
-/* eslint-disable no-undef */
-defineProps({
-  address: {
-    type: String,
-    required: true
+export default {
+  name: 'Heatmap',
+  props: {
+    address: {
+      type: String,
+      required: true
+    }
+  },
+  components: {
+    HeatmapView,
+    HeatmapTable
+  },
+  data() {
+    return {
+      // ref 역할을 이렇게 data에서 함
+      heatmapTable: null
+    };
+  },
+  mounted() {
+    // ref 연결
+    this.heatmapTable = this.$refs.heatmapTable;
+  },
+  methods: {
+    async handleClick({ date, mode }) {
+      console.log("🔥 handleClick fired from Heatmap.vue", date, mode);
+
+      const endpoint = mode === 'monthly'
+          ? 'http://localhost:8080/api/heatmap/monthly/detail'
+          : 'http://localhost:8080/api/heatmap/daily/detail';
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fromAddress: this.address, date })
+      });
+
+      const result = await res.json();
+      this.heatmapTable?.setData(result);
+    }
   }
-});
-
-const selectedDate = ref('');
-const selectedMode = ref('');
-const forceUpdate = ref(0);
-
-function handleClick({ date, mode }) {
-  forceUpdate.value++;
-  selectedDate.value = date;
-  selectedMode.value = mode;
-}
+};
 </script>
 
 <style scoped>

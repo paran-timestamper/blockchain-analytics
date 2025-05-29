@@ -29,56 +29,17 @@
 <script>
 export default {
   name: "HeatmapTable",
-  props: {
-    address: { type: String, required: true },
-    date: { type: String, required: true },
-    mode: { type: String, required: true } // "daily" or "monthly"
-  },
   data() {
     return {
       top3Data: []
     };
   },
-  mounted() {
-    if (!this.date || !this.mode) return; // ✅ 클릭 안 했으면 skip
-    this.fetchTop3();
-  },
-  watch: {
-    address() { this.fetchTop3(); },
-    date() { this.fetchTop3(); },
-    mode() { this.fetchTop3(); }
-  },
   methods: {
-    async fetchTop3() {
-      try {
-        const endpoint = this.mode === 'monthly'
-            ? 'http://localhost:8080/api/heatmap/monthly/detail'
-            : 'http://localhost:8080/api/heatmap/daily/detail';
-
-        const payload = {
-          fromAddress: this.address,
-          date: this.date
-        };
-
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await res.json();
-        if (this.mode === "daily" && result.dataDailyTransactions?.length > 0) {
-          this.top3Data = [...result.dataDailyTransactions]; // ✅ 배열 복사
-        } else if (this.mode === "monthly" && result.dataTransactions?.length > 0) {
-          this.top3Data = [...result.dataTransactions]; // ✅ 배열 복사
-        } else {
-          this.top3Data = this.getDefaultRows();
-        }
-
-      } catch (err) {
-        console.error("🔥 Top 3 fetch error:", err);
-        this.top3Data = this.getDefaultRows();
-      }
+    setData(data) {
+      console.log(":bbb")
+      this.top3Data = data?.dataTransactions?.length > 0
+          ? data.dataTransactions
+          : this.getDefaultRows();
     },
     getDefaultRows() {
       return [
