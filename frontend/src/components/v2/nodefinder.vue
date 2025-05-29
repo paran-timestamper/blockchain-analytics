@@ -3,10 +3,6 @@
   <div class="token-type-box box">
     <h4 class="section-title">Node Type</h4>
     <label class="checkbox">
-      <input type="checkbox" v-model="showDepth1" />
-      smallvalue
-    </label>
-    <label class="checkbox">
       <input type="checkbox" v-model="showDepth2" />
       largevalue
     </label>
