@@ -70,20 +70,18 @@ export default {
       });
     },
     async handleCellClick(dateStr) {
-      console.log("zzcxz")
       this.$emit('cell-click', {
-        date: dateStr,
-        mode: 'daily'
+        date: this.selectedDate,
+        mode: 'daily' // 👈 명시적으로 'daily' 전달
       });
-      console.log('📤 emit fired', dateStr); // 추가
+      console.log('📤 emit fired [daily]', dateStr);
     },
     async handleMonthlyCellClick(dateStr) {
-      console.log("zzcxz2")
       this.$emit('cell-click', {
-        date: dateStr,
-        mode: 'monthly'
+        date: this.selectedDate,
+        mode: 'monthly' // 👈 명시적으로 'monthly' 전달
       });
-      console.log('📤 emit fired', dateStr); // 추가
+      console.log('📤 emit fired [monthly]', dateStr);
     },
 
 

@@ -13,7 +13,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="row in top3Data" :key="row.rank">
+        <tr v-for="row in tableData" :key="row.rank">
           <td>{{ row.rank }}</td>
           <td>{{ row.token }}</td>
           <td>{{ row.transactionCount }}</td>
@@ -29,24 +29,10 @@
 <script>
 export default {
   name: "HeatmapTable",
-  data() {
-    return {
-      top3Data: []
-    };
-  },
-  methods: {
-    setData(data) {
-      console.log(":bbb")
-      this.top3Data = data?.dataTransactions?.length > 0
-          ? data.dataTransactions
-          : this.getDefaultRows();
-    },
-    getDefaultRows() {
-      return [
-        { rank: 1, token: '-', transactionCount: 0, totalAmount: 0, currentMarketPrice: 0 },
-        { rank: 2, token: '-', transactionCount: 0, totalAmount: 0, currentMarketPrice: 0 },
-        { rank: 3, token: '-', transactionCount: 0, totalAmount: 0, currentMarketPrice: 0 }
-      ];
+  props: {
+    tableData: {
+      type: Array,
+      required: true
     }
   }
 };
@@ -57,17 +43,16 @@ export default {
   width: 100%;
   height: 100%;
   background-color: #1e1e1e;
-  /* ✅ 테두리 제거 */
-  /* border: 1px solid #ffffff; */
   border-radius: 12px;
   padding: 20px;
   box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 .heatmap-table {
   width: 100%;
   height: 100%;
-  color: white;
+  color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -77,18 +62,21 @@ export default {
   font-size: 18px;
   margin-bottom: 16px;
   font-weight: bold;
+  color: #f0f0f0;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px; /* ✅ 글씨 크기 증가 */
-  color: white;
+  font-size: 14px;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 th, td {
   border: 1px solid #444;
-  padding: 10px 12px; /* ✅ 패딩 증가 */
+  padding: 12px;
   text-align: center;
 }
 
@@ -99,8 +87,16 @@ th {
   font-weight: 600;
 }
 
-tbody tr {
-  height: 48px; /* ✅ 줄 높이 늘리기 */
+tbody tr:nth-child(even) {
+  background-color: #262626;
 }
 
+tbody tr:nth-child(odd) {
+  background-color: #1e1e1e;
+}
+
+tbody tr:hover {
+  background-color: #3a3a3a;
+  transition: background-color 0.2s ease-in-out;
+}
 </style>

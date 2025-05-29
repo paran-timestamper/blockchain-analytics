@@ -1,11 +1,11 @@
 <script setup>
+import { ref } from 'vue';
 import TransactionTable from '@/components/transactionNodePopup/TransactionTable.vue';
 import MonthDayGraph from '@/components/transactionNodePopup/MonthDayGraph.vue';
 import HeatmapView from '@/components/transactionNodePopup/HeatmapView.vue';
 import GraphView from '@/components/transactionNodePopup/GraphView.vue';
 import HeatmapTable from '@/components/transactionNodePopup/HeatmapTable.vue';
 import Home from '@/components/transactionNodePopup/Home.vue';
-import { defineProps, ref } from 'vue';
 
 const props = defineProps({
   address: {
@@ -16,11 +16,64 @@ const props = defineProps({
 
 const selectedDate = ref('');
 const selectedMode = ref('');
+const top3Data = ref([]); // ✅ HeatmapTable에 넘길 데이터
 
 function handleCellClick({ date, mode }) {
+  console.log('[📥 addresspopup handleCellClick]', date, mode);
   selectedDate.value = date;
   selectedMode.value = mode;
+
+  if (mode === 'monthly') {
+    top3Data.value = [
+      {
+        rank: 1,
+        token: "USDC.axl",
+        transactionCount: 406,
+        totalAmount: 4121795.942903,
+        currentMarketPrice: 0.9999633305
+      },
+      {
+        rank: 2,
+        token: "WETH.axl",
+        transactionCount: 41,
+        totalAmount: 23.4893420134,
+        currentMarketPrice: 2469.9995732076
+      },
+      {
+        rank: 3,
+        token: "DOT.axl",
+        transactionCount: 14,
+        totalAmount: 6924.9949233661,
+        currentMarketPrice: 5.1172303046
+      }
+    ];
+  } else {
+    top3Data.value = [
+      {
+        rank: 1,
+        token: "USDC.axl",
+        transactionCount: 114,
+        totalAmount: 584408.09546,
+        currentMarketPrice: 0.9999633305
+      },
+      {
+        rank: 2,
+        token: "WETH.axl",
+        transactionCount: 39,
+        totalAmount: 3.7908549584,
+        currentMarketPrice: 2469.9995732076
+      },
+      {
+        rank: 3,
+        token: "WBTC.axl",
+        transactionCount: 24,
+        totalAmount: 0.55377021,
+        currentMarketPrice: 103430.7697558647
+      }
+    ];
+  }
 }
+
 </script>
 
 <template>
@@ -60,6 +113,7 @@ function handleCellClick({ date, mode }) {
               :address="address"
               :date="selectedDate"
               :mode="selectedMode"
+              :tableData="top3Data"
           />
         </div>
 
@@ -153,4 +207,9 @@ button {
   font-size: 18px;
   cursor: pointer;
 }
+
+.full-height {
+  grid-row: 1 / 3; /* ✅ 위에서 아래로 2줄 차지 */
+}
+
 </style>
