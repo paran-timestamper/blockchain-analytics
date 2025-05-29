@@ -21,7 +21,7 @@ public class CryptoNewsAPI {
         String url = UriComponentsBuilder.fromUriString(baseUrl)
                 .queryParam("q", keyword)
                 .queryParam("lang", "en")
-                .queryParam("max", 100)
+                .queryParam("max", 4)
                 .queryParam("sortby", "publishedAt")
                 .queryParam("token", apiKey)
                 .toUriString();
