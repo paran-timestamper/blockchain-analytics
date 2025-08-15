@@ -39,14 +39,14 @@
 이 테이블은 블록체인에서 발생한 트랜잭션 정보를 저장하며, 각 컬럼의 의미는 다음과 같습니다.
 
 ## 1️⃣ 트랜잭션 기본 정보
-| 컬럼명 | 데이터 타입 | 설명 |
-|--------|------------|------|
-| `type` | `VARCHAR(20)` | 트랜잭션 유형 (예: `Send`, `IBCSend`) |
-| `txhash` | `VARCHAR(100)` | 트랜잭션 해시 값 (고유한 식별자) |
-| `timestamp` | `BIGINT` | 트랜잭션 발생 시간 (Unix Timestamp, 밀리초 단위) |
-| `amount` | `NUMERIC(30,10)` | 전송된 토큰 개수 |
-| `denom` | `VARCHAR(20)` | 내부에서 사용하는 자산 단위 (예: `uatom`, `uscrt`) |
-| `dpDenom` | `VARCHAR(20)` | 사람이 이해하기 쉬운 자산 이름 (예: `ATOM`, `SCRT`) |
+| 컬럼명 | 데이터 타입 | 설명                                    |
+|--------|------------|---------------------------------------|
+| `type` | `VARCHAR(20)` | 트랜잭션 유형 (예: `Send`, `IBCSend`)        |
+| `txhash` | `VARCHAR(100)` | 트랜잭션 해시 값 (고유한 식별자)                   |
+| `timestamp` | `BIGINT` | 트랜잭션 발생 시간 (Unix Timestamp, 밀리초 단위)   |
+| `amount` | `NUMERIC(30,10)` | 전송된 토큰 개수                             |
+| `denom` | `VARCHAR(20)` | 내부에서 사용하는 토큰 단위 (예: `uatom`, `uscrt`) |
+| `dpDenom` | `VARCHAR(20)` | 사람이 이해하기 쉬운 토큰 이름 (예: `ATOM`, `SCRT`) |
 
 ## 2️⃣ 송신자 및 수신자 정보
 | 컬럼명 | 데이터 타입 | 설명 |
@@ -71,7 +71,7 @@ CREATE TABLE transaction (
      type VARCHAR(20) NOT NULL,
      txhash VARCHAR(100) UNIQUE NOT NULL,
      timestamp BIGINT NOT NULL,
-     amount NUMERIC(30,10) NOT NULL,
+     amount NUMERIC(40,10) NOT NULL,
      denom VARCHAR(100) NOT NULL,
      dpDenom VARCHAR(30) NOT NULL,
      fromAddress VARCHAR(100) NOT NULL,
@@ -86,6 +86,20 @@ CREATE TABLE transaction (
 CREATE INDEX idx_txhash ON transaction(txhash);
 CREATE INDEX idx_from_address ON transaction(fromAddress);
 CREATE INDEX idx_to_address ON transaction(toAddress);
+
+
+-- 타임스탬프 변환을 위한 컬럼 추가
+ALTER TABLE transaction
+    ADD COLUMN converted_date TIMESTAMP;
+
+UPDATE transaction
+SET converted_date = TO_TIMESTAMP(timestamp / 1000);
+
+-- category column 추가
+ALTER TABLE token ADD COLUMN category VARCHAR(20);
+
+ALTER TABLE token ADD COLUMN generation_date VARCHAR(20);
 ```
 
-
+## API 명세 보는법
+- backend 서버 실행 후 다음 주소로 접근 (http://localhost:8080/swagger-ui.html)

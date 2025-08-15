@@ -1,13 +1,38 @@
-const { defineConfig } = require('@vue/cli-service')
+const path = require('path')
+
 module.exports = {
-  outputDir: "../src/main/resources/static",
+  transpileDependencies: ['chart.js'],
   devServer: {
     port: 8082,
     proxy: {
       '/api': {
+
         target: 'http://localhost:8080',
-        changeOrigin: true //cross origin 허용
-      }
-    }
-  }
-};
+        changeOrigin: true,
+      },
+    },
+  },
+  configureWebpack: {
+    module: {
+      rules: [
+        {
+          test: /\.m?js$/,                  // ✅ .mjs 및 .js 둘 다 처리
+          include: /node_modules/,
+          type: 'javascript/auto',
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env']
+            }
+          }
+        }
+      ]
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+      },
+      extensions: ['.js', '.vue', '.json', '.mjs'],
+    },
+  },
+}
