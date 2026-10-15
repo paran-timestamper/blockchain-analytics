@@ -1,5 +1,18 @@
 # blockchain-analytics
 
+Cosmos SDK 기반 체인의 2년치 트랜잭션 약 2억 건을 적재해, 어떤 토큰에 돈이 몰리고 어느 체인을 거쳐 움직이는지를 비전공자도 읽을 수 있게 만든 온체인 데이터 가시화 프로젝트입니다. 아주대학교 파란학기제 2025-1 성과발표에서 수상했습니다.
+
+## 프로젝트 개요
+- **데이터**: Cosmos SDK 기반 체인의 2년치 트랜잭션 약 2억 건을 PostgreSQL(AWS RDS)에 적재했습니다.
+- **가시화**: 노드 맵, 히트맵, 트리맵 등 6가지 표현을 같은 데이터에 붙여 어떤 표현이 무엇을 잘 보여주는지 비교했습니다. 2년치를 3개월 단위 동심원과 하단 타임라인으로 나눠 시계열 변화를 볼 수 있게 했습니다.
+- **추적 범위**: 체인 내부 단위(`uatom`)와 표시 이름(`ATOM`), 송신·수신 체인을 따로 저장해 IBC로 체인을 건너는 흐름까지 그릴 수 있습니다.
+- **팀**: 3명. fl0wizy는 UI 설계, 수집부터 화면까지의 데이터 파이프라인 설계, Vue 프론트엔드를 맡았습니다.
+- **기간**: 2025.03 ~ 2025.06
+
+### Overview (English)
+An on-chain data visualization project built on about 200 million transactions covering two years of Cosmos SDK chains. It puts six views (node maps, heatmaps, treemaps and more) on the same data so non-specialists can see which tokens draw money and which chains it moves through, and it records base units apart from display names and source and destination chains separately to trace IBC transfers. Team of 3; fl0wizy owned the UI design, the pipeline design from collection to screen, and the Vue frontend. Award at the Ajou Paran Semester 2025-1 showcase.
+
+## 개발 가이드
 
 ### frontend 실행 방법
 1. frontend 폴더로 이동
